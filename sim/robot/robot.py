@@ -46,7 +46,9 @@ class Robot:
         self.fell = False           # drove into a pit: mission over
         self.collisions = 0
         self.distance = 0.0
-        self.sensors = []           # filled by the sensor suite (stage 2)
+        from ..sensors.suite import SensorSuite   # local import: the suite reads the robot
+        self.sensors = SensorSuite(cfg, rng)
+        self.headlights = cfg.ambient_light < 0.3
 
     # ------------------------------------------------------------ helpers
     def wheel_positions(self) -> tuple[tuple[float, float], tuple[float, float]]:
@@ -89,3 +91,5 @@ class Robot:
         if self.headlights:
             load += self.cfg.headlight_w
         self.battery.step(dt, load)
+        w.time += dt
+        self.sensors.update(self, w, dt)
