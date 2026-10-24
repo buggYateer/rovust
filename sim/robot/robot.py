@@ -77,10 +77,17 @@ class Robot:
 
         self.collided = False
         if w.circle_hits_obstacle(new.x, new.y, self.radius):
-            # blocked: keep heading change, lose the translation, bumper fires
+            # blocked: keep the heading change, bumper fires; the body slides
+            # along the wall if one axis of the motion is still free, so a
+            # current or a wall contact can never pin the robot in place
             self.collided = True
             self.collisions += 1
-            new.x, new.y = self.pose.x, self.pose.y
+            if not w.circle_hits_obstacle(new.x, self.pose.y, self.radius):
+                new.y = self.pose.y
+            elif not w.circle_hits_obstacle(self.pose.x, new.y, self.radius):
+                new.x = self.pose.x
+            else:
+                new.x, new.y = self.pose.x, self.pose.y
             self.drive.left.omega *= 0.2
             self.drive.right.omega *= 0.2
         if w.circle_over_pit(new.x, new.y, self.radius * 0.6):
