@@ -37,15 +37,17 @@ def synth_patch(label: str, rng: np.random.Generator, light: float = 1.0) -> np.
         img = 0.3 + 0.04 * rng.standard_normal((PATCH, PATCH))
         img += 0.05 * np.sin(2 * np.pi * rng.uniform(1, 2) * yy)
     elif label == "bedrock":
-        # flat with thin cracks
-        img = np.full((PATCH, PATCH), 0.6)
-        for _ in range(rng.integers(1, 3)):
+        # flat, slightly brighter, with thin dark cracks
+        img = np.full((PATCH, PATCH), 0.66)
+        for _ in range(rng.integers(2, 4)):
             a, b = rng.uniform(0, 1), rng.uniform(-1, 1)
-            img[np.abs(yy - (a + b * xx)) < 0.04] = 0.35
-        img += 0.03 * rng.standard_normal((PATCH, PATCH))
+            img[np.abs(yy - (a + b * xx)) < 0.04] = 0.3
+        img += 0.015 * rng.standard_normal((PATCH, PATCH))
     elif label == "water":
-        img = 0.4 + 0.08 * np.sin(2 * np.pi * rng.uniform(3, 6) * xx + rng.uniform(0, 6)) \
-            + 0.05 * rng.standard_normal((PATCH, PATCH))
+        # fine caustic ripples in both directions, smooth, no blobs
+        img = 0.42 + 0.07 * np.sin(2 * np.pi * rng.uniform(4, 7) * xx + rng.uniform(0, 6)) \
+            + 0.05 * np.sin(2 * np.pi * rng.uniform(3, 5) * yy + rng.uniform(0, 6)) \
+            + 0.02 * rng.standard_normal((PATCH, PATCH))
     else:  # pit: dark, featureless, vignette
         img = 0.08 + 0.05 * (1 - ((xx - 0.5) ** 2 + (yy - 0.5) ** 2) * 2) + 0.02 * rng.standard_normal((PATCH, PATCH))
     img = img * (0.25 + 0.75 * light)
