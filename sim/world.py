@@ -119,8 +119,8 @@ class World:
         with occasional chambers, pits and gas pockets. Produces branching
         corridors and many dead ends, which is what DFS-with-backtracking is for."""
         self.grid[:] = Terrain.WALL
-        pitch = 6                      # lattice spacing in cells
-        cw = 3                         # corridor width
+        pitch = 7                      # lattice spacing in cells
+        cw = 4                         # corridor width (0.8 m for a 0.44 m robot)
         nx, ny = (self.w - 3) // pitch, (self.h - 3) // pitch
         visited = np.zeros((ny, nx), bool)
         stack = [(0, 0)]
