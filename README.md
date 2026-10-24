@@ -31,6 +31,22 @@ In the simulator: `SPACE` pause · `1–4` speed ×1/×4/×8/×16 · `S` sonar r
 > Control* on, the compiled parts of matplotlib / scikit-learn may be blocked;
 > turn it off or use Python 3.12.
 
+## Screenshots
+
+| Start menu | Live simulator (cave) |
+|---|---|
+| ![menu](docs/screenshots/menu.png) | ![cave](docs/screenshots/sim_cave.png) |
+| **Mars** (utility explorer, AI fault detector on) | **Underwater** (DVL, current, 12-sonar ring) |
+| ![mars](docs/screenshots/sim_mars.png) | ![underwater](docs/screenshots/sim_underwater.png) |
+
+Left panel: the true world the robot never sees (sonar cones, IR beams, true
+path). Right panel: the robot's own map (occupancy + terrain + hazards, fused
+estimate in green, encoders-only estimate in red, planned path, frontiers).
+Below: every sensor reading live, the PWM/encoder/PID loop of the left wheel,
+and the mission statistics.
+
+![pid](docs/figures/pid_step_response.png)
+
 ## What is simulated
 
 | Layer | What the code does | Course topic |
