@@ -136,12 +136,13 @@ class Bumper(Sensor):
     def _measure(self, robot, world, dt):
         if not robot.collided:
             return 0.0, 0.0, 0
-        # which side touched? probe the front corners
+        # the bumper is a strip across the front: it only closes when the
+        # contact is on its own front corner or head-on. A body pushed
+        # sideways into a wall (by a current) does not press the front bumper.
         r = robot.radius
-        x, y = robot.body_point(r * 0.9, self.side * r * 0.6)
-        hit = world.circle_hits_obstacle(x, y, r * 0.35)
-        # if neither corner probe hits, the contact was head-on: both fire
-        other = robot.body_point(r * 0.9, -self.side * r * 0.6)
-        if not hit and not world.circle_hits_obstacle(other[0], other[1], r * 0.35):
-            hit = True
+        x, y = robot.body_point(r * 0.95, self.side * r * 0.55)
+        hit = world.circle_hits_obstacle(x, y, r * 0.3)
+        if not hit:
+            fx, fy = robot.body_point(r * 1.0, 0.0)
+            hit = world.circle_hits_obstacle(fx, fy, r * 0.25)     # head-on: both sides close
         return float(hit), float(hit), int(hit)
