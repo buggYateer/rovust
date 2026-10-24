@@ -170,8 +170,9 @@ class World:
             if nb:
                 yy_, xx_ = nb[self.rng.integers(len(nb))]
                 self.grid[yy_, xx_] = Terrain.PIT
+        far = [(y, x) for y, x in free_cells if math.hypot(x - 4, y - 4) > 18]
         for _ in range(3):
-            y, x = free_cells[self.rng.integers(len(free_cells))]
+            y, x = far[self.rng.integers(len(far))]
             yy, xx = np.mgrid[0:self.h, 0:self.w]
             self.gas += np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / (2 * 4.0 ** 2)).astype(np.float32)
         self.gas = np.clip(self.gas, 0, 1)
