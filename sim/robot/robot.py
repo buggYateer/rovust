@@ -46,6 +46,7 @@ class Robot:
         self.fell = False           # drove into a pit: mission over
         self.collisions = 0
         self.distance = 0.0
+        self.ground_v = (0.0, 0.0)   # true body velocity in the body frame (forward, lateral)
         from ..sensors.suite import SensorSuite   # local import: the suite reads the robot
         self.sensors = SensorSuite(cfg, rng)
         self.headlights = cfg.ambient_light < 0.3
@@ -84,7 +85,10 @@ class Robot:
             self.drive.right.omega *= 0.2
         if w.circle_over_pit(new.x, new.y, self.radius * 0.6):
             self.fell = True
-        self.distance += math.hypot(new.x - self.pose.x, new.y - self.pose.y)
+        dx, dy = new.x - self.pose.x, new.y - self.pose.y
+        self.distance += math.hypot(dx, dy)
+        c, s = math.cos(new.theta), math.sin(new.theta)
+        self.ground_v = ((dx * c + dy * s) / dt, (-dx * s + dy * c) / dt)
         self.pose = new
 
         load = self.drive.left.power + self.drive.right.power

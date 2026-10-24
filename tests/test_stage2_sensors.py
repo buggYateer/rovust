@@ -39,10 +39,10 @@ def test_ir_lookup_table_linearises_nonlinear_response():
 def test_every_environment_mounts_the_right_suite():
     cfg, w, r = make("cave")
     names = r.sensors.names()
-    assert "gas" in names and "light" in names and "compass" in names and "cliffL" in names
+    assert "gas" in names and "light" in names and "compass" in names and "cliffFL" in names
     cfg, w, r = make("mars")
     names = r.sensors.names()
-    assert "compass" not in names and "cliffL" in names and "gyro" in names
+    assert "compass" not in names and "cliffFL" in names and "cliffRL" in names and "gyro" in names and "sun" in names
     cfg, w, r = make("underwater")
     names = r.sensors.names()
     assert "dvl" in names and "pressure" in names and not any(n.startswith("ir") for n in names)
@@ -54,9 +54,10 @@ def test_sonar_sees_wall_and_specular_loses_it():
     r.step(0.05)
     s0 = r.sensors.sonars[0]
     assert 0 < s0.true_value <= s0.max_range
-    # head-on wall: reading close to truth
+    # head-on wall: reading close to truth (after the median filter settles)
     r.pose.theta = math.pi
-    r.step(0.05)
+    for _ in range(3):
+        r.step(0.05)
     assert abs(s0.value - s0.true_value) < 0.3 or s0.value == s0.max_range
 
 

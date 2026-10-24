@@ -19,7 +19,7 @@ from .core import Pose, wrap_angle
 
 
 class HeadingFilter:
-    def __init__(self, compass_gain: float = 0.05, bias_gain: float = 0.02):
+    def __init__(self, compass_gain: float = 0.05, bias_gain: float = 0.1):
         self.theta = 0.0
         self.bias = 0.0
         self.compass_gain = compass_gain
@@ -64,34 +64,38 @@ class PoseEstimator:
         suite = r.sensors
         drive = r.drive
         wr = r.cfg.drive.wheel_radius
-        # ---- displacement source: encoders (or DVL underwater)
+        # ---- dead reckoning from the encoders (lecture): this is "odom"
+        al, ar = drive.enc_l.wheel_angle(), drive.enc_r.wheel_angle()
+        dl, dr = (al - self._last_l) * wr, (ar - self._last_r) * wr
+        self._last_l, self._last_r = al, ar
+        ds_enc = (dl + dr) / 2
+        dth_odom = (dr - dl) / r.cfg.drive.wheel_base
+        mid = self.odom.theta + dth_odom / 2
+        self.odom.x += ds_enc * math.cos(mid)
+        self.odom.y += ds_enc * math.sin(mid)
+        self.odom.theta = wrap_angle(self.odom.theta + dth_odom)
+        # ---- the fused estimate prefers a ground-speed sensor (DVL / optical
+        #      flow) when one is mounted and healthy: it does not see slip
+        ds, dlat = ds_enc, 0.0
         if suite.dvl is not None and suite.dvl.healthy:
             ds = suite.dvl.value * dt
-            dth_odom = suite.dvl.omega * dt
-        else:
-            al, ar = drive.enc_l.wheel_angle(), drive.enc_r.wheel_angle()
-            dl, dr = (al - self._last_l) * wr, (ar - self._last_r) * wr
-            self._last_l, self._last_r = al, ar
-            ds = (dl + dr) / 2
-            dth_odom = (dr - dl) / r.cfg.drive.wheel_base
+            dlat = suite.dvl.lateral * dt
+            if suite.gyro is None or not suite.gyro.healthy:
+                dth_odom = suite.dvl.omega * dt
         self.v_est, self.omega_est = ds / dt, dth_odom / dt
-        # ---- odometry only
-        mid = self.odom.theta + dth_odom / 2
-        self.odom.x += ds * math.cos(mid)
-        self.odom.y += ds * math.sin(mid)
-        self.odom.theta = wrap_angle(self.odom.theta + dth_odom)
         # ---- fused heading
         gyro = suite.gyro.value if (suite.gyro is not None and suite.gyro.healthy) else None
-        compass = suite.compass.value if (suite.compass is not None and suite.compass.healthy) else None
-        stationary = abs(drive.des_wl) < 1e-6 and abs(drive.des_wr) < 1e-6 and abs(ds) < 1e-4
+        ref = suite.heading_ref
+        compass = ref.value if ref is not None else None
+        stationary = abs(drive.des_wl) < 1e-6 and abs(drive.des_wr) < 1e-6 and abs(ds) < 0.004
         if gyro is None and compass is None:
             theta = wrap_angle(self.fused.theta + dth_odom)
             self.heading.theta = theta
         else:
             theta = self.heading.update(gyro, compass, stationary, dt)
         mid = self.fused.theta + wrap_angle(theta - self.fused.theta) / 2
-        self.fused.x += ds * math.cos(mid)
-        self.fused.y += ds * math.sin(mid)
+        self.fused.x += ds * math.cos(mid) - dlat * math.sin(mid)
+        self.fused.y += ds * math.sin(mid) + dlat * math.cos(mid)
         self.fused.theta = theta
         self.error_history.append(self.pose.distance_to(r.pose))
 

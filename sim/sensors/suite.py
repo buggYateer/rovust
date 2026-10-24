@@ -48,23 +48,33 @@ class SensorSuite:
             s.neighbours = [self.sonars[(i - 1) % len(self.sonars)], self.sonars[(i + 1) % len(self.sonars)]]
         self.sensors += self.sonars
 
-        ir_angles = {0: [], 1: [0.0], 2: [0.5, -0.5], 3: [0.0, 0.52, -0.52]}[min(sc.ir_count, 3)]
-        for a in ir_angles:
-            # recessed so nothing can get closer than the minimum range
-            s = IRDistance(f"ir{int(math.degrees(a)):+d}", rng, r - sc.ir_min_range, 0.5 * r * math.sin(a), a,
-                           sc.ir_range, sc.ir_min_range, sc.ir_noise, self.adc)
-            self.irs.append(s)
+        # IR PSDs all face forward, spread across the body width, so anything
+        # the body is about to hit lies in at least one beam (the sonar cones
+        # at 0 and +/-45 deg leave a blind strip there). Recessed so nothing
+        # can get closer than the minimum range.
+        ir_offsets = {0: [], 1: [("irC", 0.0)], 2: [("irL", 0.7 * r), ("irR", -0.7 * r)],
+                      3: [("irC", 0.0), ("irL", 0.75 * r), ("irR", -0.75 * r)]}[min(sc.ir_count, 3)]
+        for name, dy in ir_offsets:
+            self.irs.append(IRDistance(name, rng, r - sc.ir_min_range, dy, 0.0,
+                                       sc.ir_range, sc.ir_min_range, sc.ir_noise, self.adc))
         self.sensors += self.irs
 
         if sc.cliff_sensors:
-            self.cliffs = [CliffSensor("cliffL", rng, r + sc.cliff_lookahead, 0.6 * r),
-                           CliffSensor("cliffR", rng, r + sc.cliff_lookahead, -0.6 * r)]
+            # front pair looks ahead of the wheels; the rear pair exists because
+            # the escape behaviours *reverse*, and a pit behind the robot is
+            # just as fatal as one in front
+            self.cliffs = [CliffSensor("cliffFL", rng, r + sc.cliff_lookahead, 0.6 * r),
+                           CliffSensor("cliffFR", rng, r + sc.cliff_lookahead, -0.6 * r),
+                           CliffSensor("cliffRL", rng, -(r + sc.cliff_lookahead), 0.6 * r),
+                           CliffSensor("cliffRR", rng, -(r + sc.cliff_lookahead), -0.6 * r)]
             self.sensors += self.cliffs
         if sc.bumpers:
             self.bumpers = [Bumper("bumpL", rng, +1), Bumper("bumpR", rng, -1)]
             self.sensors += self.bumpers
 
         self.compass = Compass("compass", rng, sc.compass_noise_deg, sc.compass_disturbance) if sc.compass else None
+        # Mars has no usable magnetic field: rovers take absolute heading from the sun instead
+        self.sun = Compass("sun", rng, sc.sun_noise_deg, 0.0) if sc.sun_sensor else None
         self.gyro = Gyro("gyro", rng, sc.gyro_noise, sc.gyro_bias) if sc.imu else None
         self.accel = Accelerometer("accel", rng) if sc.imu else None
         self.camera = Camera("camera", rng, r + sc.camera_range) if sc.camera else None
@@ -72,8 +82,8 @@ class SensorSuite:
         self.light = LightSensor("light", rng, self.adc) if sc.light_sensor else None
         self.gas = GasSensor("gas", rng, self.adc) if sc.gas_sensor else None
         self.pressure = PressureSensor("pressure", rng, self.adc) if sc.pressure_sensor else None
-        self.dvl = DVL("dvl", rng) if sc.dvl else None
-        for s in (self.compass, self.gyro, self.accel, self.camera, self.battery,
+        self.dvl = DVL("dvl", rng) if sc.dvl else (DVL("optflow", rng, noise=0.015) if sc.optical_flow else None)
+        for s in (self.compass, self.sun, self.gyro, self.accel, self.camera, self.battery,
                   self.light, self.gas, self.pressure, self.dvl):
             if s is not None:
                 self.sensors.append(s)
@@ -88,6 +98,14 @@ class SensorSuite:
 
     def names(self):
         return [s.name for s in self.sensors]
+
+    @property
+    def heading_ref(self):
+        """Whichever absolute heading sensor is mounted and healthy."""
+        for s in (self.compass, self.sun):
+            if s is not None and s.healthy:
+                return s
+        return None
 
     # convenience views used by the behaviours ---------------------------------
     def sonar_front(self) -> float:
@@ -109,6 +127,12 @@ class SensorSuite:
 
     def cliff(self) -> bool:
         return any(c.value > 0.5 for c in self.cliffs if c.healthy)
+
+    def cliff_front(self) -> bool:
+        return any(c.value > 0.5 for c in self.cliffs if c.healthy and c.dx > 0)
+
+    def cliff_rear(self) -> bool:
+        return any(c.value > 0.5 for c in self.cliffs if c.healthy and c.dx < 0)
 
     def bumped(self) -> tuple[bool, bool]:
         if not self.bumpers:
