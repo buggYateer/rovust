@@ -50,11 +50,12 @@ Autonomous exploration of unknown environments is a core challenge in robotics: 
 | Sensor | Type (course classification) | Placement | Justification |
 |---|---|---|---|
 | Sonar ring (8 × 45°, or 5 front + 2 rear) | External, active, analog (time-of-flight) | Around the body at bumper height | Main range sensor for mapping and avoidance; simulated with narrow cone, specular reflection at shallow angles, and cross-talk between neighbours |
-| IR PSD × 3 (0°, ±30°) | External, active, analog → lookup table | Front, recessed so no object can come closer than the minimum range | Short-range precision in front of the wheels; non-linear output calibrated per sensor, as in the lecture |
-| IR cliff detectors × 2 | External, active, binary | Front corners, pointing down ahead of the wheels | Horizontal sensors cannot see craters or pits; the robot must stop before the wheel reaches the edge |
+| IR PSD × 3 (all facing forward) | External, active, analog → lookup table | Front, spread across the body width, recessed so no object can come closer than the minimum range | Anything the body is about to hit lies in a beam (the sonar cones leave a blind strip there); non-linear output calibrated per sensor, as in the lecture |
+| IR cliff detectors × 6 | External, active, binary | Front corners, sides, rear corners, pointing down | Horizontal sensors cannot see craters or pits; the front pair stops the robot before the wheel reaches the edge, the rear pair protects the escape manoeuvres (which reverse), the side pair protects turns |
 | Bumpers × 2 (left / right) | External, passive, binary (tactile) | Front left and front right | Last line of defence; left/right pair tells the robot which way to turn away |
 | Shaft encoders × 2 | Internal, passive, digital (2-phase incremental) | On each motor shaft before the gearbox | Speed feedback for PID; dead reckoning; direction from phase order |
-| Compass | Internal, passive, digital | Top centre, away from motors | Absolute heading; cancels the unbounded drift of dead reckoning |
+| Compass (cave, underwater) / Sun sensor (Mars) | Internal, passive, digital | Top centre, away from motors | Absolute heading; cancels the unbounded drift of dead reckoning. Mars has no usable magnetic field, so a sun sensor takes the compass's role |
+| Optical flow (cave, Mars) / DVL (underwater) | External, active, digital | Underside, looking at the ground | Measures true ground speed, immune to wheel slip; underwater it is the only odometry (thrusters have no ground contact) |
 | Gyro + accelerometer (MPU6050) | Internal, passive, digital (I2C) | Centre of mass | Angular rate integrated to heading; tilt detection to refuse steep slopes |
 | Camera | External, passive, digital | Front, tilted ~15° down | Sees the ground ahead; input to the AI terrain classifier |
 | Battery monitor | Internal, passive, analog | On-board | Triggers the return-home behaviour |
