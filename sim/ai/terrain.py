@@ -30,11 +30,20 @@ def features(img: np.ndarray) -> np.ndarray:
     gx = np.diff(img, axis=1)
     gy = np.diff(img, axis=0)
     hist, _ = np.histogram(img, bins=8, range=(0, 1))
-    f = [img.mean(), img.std(), np.abs(gx).mean(), np.abs(gy).mean(), gx.std(), gy.std(),
+    z = img - img.mean()
+    var = (z * z).mean() + 1e-6
+    ac_x = (z[:, 1:] * z[:, :-1]).mean() / var          # lag-1 autocorrelation: noise vs smooth
+    ac_y = (z[1:, :] * z[:-1, :]).mean() / var
+    mu, sd = img.mean(), img.std() + 1e-6
+    f = [mu, sd, np.abs(gx).mean(), np.abs(gy).mean(), gx.std(), gy.std(),
          np.percentile(img, 10), np.percentile(img, 90),
          (np.abs(gx) > 0.15).mean(),                       # fraction of sharp edges
          np.abs(np.fft.rfft(img.mean(axis=0))[1:5]).sum(),  # horizontal periodicity (ripples)
-         np.abs(np.fft.rfft(img.mean(axis=1))[1:5]).sum()]
+         np.abs(np.fft.rfft(img.mean(axis=1))[1:5]).sum(),
+         ac_x, ac_y,
+         (img < mu - 2 * sd).mean(),                       # dark thin cracks / blobs
+         img.mean(axis=0).std(), img.mean(axis=1).std(),   # column / row structure
+         ((z / sd) ** 3).mean(), ((z / sd) ** 4).mean()]   # skewness, kurtosis
     return np.concatenate([f, hist / img.size])
 
 
@@ -49,12 +58,12 @@ class TerrainClassifier:
         self.last_proba = 0.0
 
     # ----------------------------------------------------------------- train
-    def train(self, n_per_class: int = 400, seed: int = 0, save: bool = True):
+    def train(self, n_per_class: int = 500, seed: int = 0, save: bool = True):
         rng = np.random.default_rng(seed)
         X, y = [], []
         for ci, c in enumerate(CLASSES):
             for _ in range(n_per_class):
-                light = rng.uniform(0.05, 1.0)
+                light = rng.uniform(0.2, 1.0)     # below this the headlights are on anyway
                 X.append(features(synth_patch(c, rng, light)))
                 y.append(ci)
         X, y = np.array(X), np.array(y)
