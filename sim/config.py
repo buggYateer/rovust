@@ -75,7 +75,7 @@ class EnvConfig:
     description: str
     width: int = 80                 # cells
     height: int = 60                # cells
-    cell_size: float = 0.25         # [m]
+    cell_size: float = 0.2          # [m]
     seed: int = 0
     ambient_light: float = 1.0      # 0 = darkness
     water_current: tuple = (0.0, 0.0)   # [m/s] constant drift applied to the body
@@ -94,7 +94,7 @@ def cave() -> EnvConfig:
     return EnvConfig(
         name="cave",
         description="Narrow branching corridors, dead ends, darkness, gas pockets.",
-        width=84, height=60, cell_size=0.25,
+        width=90, height=64, cell_size=0.2,
         ambient_light=0.05,
         battery_wh=18.0,
         sensors=SensorConfig(
@@ -111,7 +111,7 @@ def mars() -> EnvConfig:
     return EnvConfig(
         name="mars",
         description="Open terrain with rocks, craters and sandy ground with high wheel slip.",
-        width=96, height=70, cell_size=0.25,
+        width=100, height=72, cell_size=0.2,
         ambient_light=0.9,
         battery_wh=25.0,
         drive=DriveConfig(slip_noise=0.06),
@@ -128,7 +128,7 @@ def underwater() -> EnvConfig:
     return EnvConfig(
         name="underwater",
         description="Flooded site: reef walls, mud, a water current, sonar instead of light sensing.",
-        width=80, height=60, cell_size=0.25,
+        width=90, height=64, cell_size=0.2,
         ambient_light=0.3,
         water_current=(0.04, -0.02), current_noise=0.02,
         battery_wh=22.0,
