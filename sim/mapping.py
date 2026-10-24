@@ -13,10 +13,10 @@ import numpy as np
 from .core import Pose
 
 L_FREE = -0.4
-L_OCC = 0.7
+L_OCC = 0.6
 L_MAX = 5.0
-P_FREE = 0.35
-P_OCC = 0.65
+P_FREE = 0.35     # logit -0.62: two clear passes make a cell free
+P_OCC = 0.72      # logit +0.94: one echo is never enough to make a cell occupied
 
 
 class OccupancyGrid:
@@ -76,7 +76,9 @@ class OccupancyGrid:
         cx, cy = self._cells_along(x0, y0, angle, max(0.0, dist - self.cell * 0.5))
         self.logodds[cy, cx] = np.maximum(-L_MAX, self.logodds[cy, cx] + L_FREE * weight)
         if hit:
-            ex, ey = self.to_cell(x0 + math.cos(angle) * dist, y0 + math.sin(angle) * dist)
+            # the echo comes from the obstacle's surface; the occupied cell is just beyond it
+            d_in = dist + 0.45 * self.cell
+            ex, ey = self.to_cell(x0 + math.cos(angle) * d_in, y0 + math.sin(angle) * d_in)
             if self.in_bounds(ex, ey):
                 self.logodds[ey, ex] = min(L_MAX, self.logodds[ey, ex] + L_OCC * weight)
         self.updates += 1
@@ -151,7 +153,7 @@ class Mapper:
         for cl in suite.cliffs:
             if cl.healthy and cl.value > 0.5:
                 x, y = at(cl.dx, cl.dy)
-                self.grid.mark_hazard(x, y, 1)
+                self.grid.mark_hazard(x, y, 0)     # the planner's inflation adds the margin
         if suite.gas is not None and suite.gas.healthy and suite.gas.value > 0.5:
             self.grid.mark_hazard(est.x, est.y, 2)
         self.grid.mark_visited(est, r.radius)
