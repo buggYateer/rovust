@@ -63,8 +63,12 @@ class SensorSuite:
             # front pair looks ahead of the wheels; the rear pair exists because
             # the escape behaviours *reverse*, and a pit behind the robot is
             # just as fatal as one in front
+            # plus a side pair: the body can brush a pit while turning or
+            # steering around an obstacle, which no front sensor can see
             self.cliffs = [CliffSensor("cliffFL", rng, r + sc.cliff_lookahead, 0.6 * r),
                            CliffSensor("cliffFR", rng, r + sc.cliff_lookahead, -0.6 * r),
+                           CliffSensor("cliffL", rng, 0.0, r + sc.cliff_lookahead * 0.5),
+                           CliffSensor("cliffR", rng, 0.0, -(r + sc.cliff_lookahead * 0.5)),
                            CliffSensor("cliffRL", rng, -(r + sc.cliff_lookahead), 0.6 * r),
                            CliffSensor("cliffRR", rng, -(r + sc.cliff_lookahead), -0.6 * r)]
             self.sensors += self.cliffs
@@ -122,7 +126,7 @@ class SensorSuite:
         return min(vals) if vals else math.inf
 
     def ir_front(self) -> float:
-        vals = [s.value for s in self.irs if s.healthy]
+        vals = [s.value for s in self.irs if s.healthy and s.value < s.max_range * 0.7]
         return min(vals) if vals else math.inf
 
     def cliff(self) -> bool:
@@ -133,6 +137,13 @@ class SensorSuite:
 
     def cliff_rear(self) -> bool:
         return any(c.value > 0.5 for c in self.cliffs if c.healthy and c.dx < 0)
+
+    def cliff_side(self) -> int:
+        """+1 if the left side sensor sees a drop, -1 for the right, 0 otherwise."""
+        for c in self.cliffs:
+            if c.healthy and c.dx == 0 and c.value > 0.5:
+                return 1 if c.dy > 0 else -1
+        return 0
 
     def bumped(self) -> tuple[bool, bool]:
         if not self.bumpers:
