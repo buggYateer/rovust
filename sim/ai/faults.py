@@ -37,12 +37,14 @@ class SensorWatch:
         rated = getattr(self.s, "noise", 0.02)
         max_range = getattr(self.s, "max_range", None)
         d = np.abs(np.diff(h))
-        # stuck: no change at all over the whole window while moving
-        if moving and d.max() < 1e-9:
+        at_max = max_range is not None and (h >= max_range * 0.98).all()
+        # stuck: no change at all over the whole window while moving. A
+        # constant *maximum* reading is not a fault: it is open space.
+        if moving and d.max() < 1e-9 and not at_max:
             self.verdict, self.score = "stuck", 1.0
         # dead: pinned at max range while neighbours see near obstacles
-        elif max_range is not None and (h >= max_range * 0.98).all() and neighbours \
-                and all(np.mean(n.hist or [max_range]) < max_range * 0.5 for n in neighbours):
+        elif at_max and neighbours \
+                and all(np.mean(n.hist or [max_range]) < max_range * 0.35 for n in neighbours):
             self.verdict, self.score = "dead", 1.0
         # noisy: jitter far above the rated noise
         else:
