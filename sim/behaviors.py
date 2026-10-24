@@ -100,12 +100,15 @@ class CliffStop(Behavior):
     def __init__(self):
         super().__init__()
         self.away = -1.0      # drive direction that leads away from the edge
+        self.turn = 1.3       # turn direction after backing off (away from a side drop)
 
     def active(self, ctx):
         s = ctx.suite
         if s.cliff() and self.timer <= 0:
             self.timer = 1.6
             self.away = 1.0 if (s.cliff_rear() and not s.cliff_front()) else -1.0
+            side = s.cliff_side()
+            self.turn = -1.3 * side if side else 1.3
             ctx.m.stats["cliff_events"] += 1
             ctx.m.explorer.path = None
             # the mapper already marked the hazard; also blacklist the target
@@ -120,7 +123,7 @@ class CliffStop(Behavior):
         return False
 
     def act(self, ctx):
-        return (0.15 * self.away, 0.0) if self.timer > 0.8 else (0.0, 1.3)
+        return (0.15 * self.away, 0.0) if self.timer > 0.8 else (0.0, self.turn)
 
 
 class SlopeRefuse(Behavior):

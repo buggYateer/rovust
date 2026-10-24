@@ -30,7 +30,7 @@ class Sonar(Sensor):
         self.neighbours: list["Sonar"] = []
         self.tof_us = 0.0
         self.value = max_range
-        self.history = [max_range] * 3     # median-of-3 filter rejects single spikes (cross-talk)
+        self.history = [max_range] * 3     # last readings (the fault detector looks at them)
         self.unfiltered = max_range
 
     def _measure(self, robot, world, dt):
@@ -56,7 +56,10 @@ class Sonar(Sensor):
         self.tof_us = 2 * best / self.c * 1e6
         self.unfiltered = best
         self.history = self.history[1:] + [best]
-        return true_best, sorted(self.history)[1], int(self.tof_us)
+        # no temporal filter: a filtered value lags while the robot turns and
+        # paints walls in the wrong direction; single cross-talk spikes are
+        # rejected by the map instead (one echo never makes a cell occupied)
+        return true_best, best, int(self.tof_us)
 
     def _dead_value(self):
         return self.max_range, int(2 * self.max_range / self.c * 1e6)

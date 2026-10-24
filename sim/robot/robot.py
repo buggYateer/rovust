@@ -90,7 +90,8 @@ class Robot:
                 new.x, new.y = self.pose.x, self.pose.y
             self.drive.left.omega *= 0.2
             self.drive.right.omega *= 0.2
-        if w.circle_over_pit(new.x, new.y, self.radius * 0.6):
+        # a wheel goes over the edge when the body overlaps a pit substantially
+        if w.circle_over_pit(new.x, new.y, self.radius * 0.45):
             self.fell = True
         dx, dy = new.x - self.pose.x, new.y - self.pose.y
         self.distance += math.hypot(dx, dy)

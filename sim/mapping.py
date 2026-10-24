@@ -109,7 +109,8 @@ class OccupancyGrid:
         for dy in range(-radius_cells, radius_cells + 1):
             for dx in range(-radius_cells, radius_cells + 1):
                 if self.in_bounds(cx + dx, cy + dy):
-                    self.terrain_label[cy + dy, cx + dx] = label
+                    if label >= 0:
+                        self.terrain_label[cy + dy, cx + dx] = label
                     self.terrain_cost[cy + dy, cx + dx] = cost
 
 
@@ -148,12 +149,16 @@ class Mapper:
             if not ir.healthy:
                 continue
             x, y = at(ir.dx, ir.dy)
-            hit = ir.value < ir.max_range * 0.95
-            self.grid.update_beam(x, y, est.theta + ir.angle, ir.value, hit, weight=0.8)
+            # the IR characteristic is flat at long range, so a far reading is
+            # just noise: only the near 70 % of the range is trusted
+            reliable = ir.max_range * 0.7
+            hit = ir.value < reliable
+            self.grid.update_beam(x, y, est.theta + ir.angle, min(ir.value, reliable), hit, weight=0.8)
         for cl in suite.cliffs:
             if cl.healthy and cl.value > 0.5:
                 x, y = at(cl.dx, cl.dy)
                 self.grid.mark_hazard(x, y, 0)     # the planner's inflation adds the margin
-        if suite.gas is not None and suite.gas.healthy and suite.gas.value > 0.5:
-            self.grid.mark_hazard(est.x, est.y, 2)
+        if suite.gas is not None and suite.gas.healthy and suite.gas.value > 0.4:
+            # gas is a danger zone, not a wall: the planner pays dearly to cross it
+            self.grid.set_terrain(est.x, est.y, -1, 1.0 + 6.0 * suite.gas.value, radius_cells=2)
         self.grid.mark_visited(est, r.radius)
