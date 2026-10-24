@@ -30,6 +30,8 @@ class Sonar(Sensor):
         self.neighbours: list["Sonar"] = []
         self.tof_us = 0.0
         self.value = max_range
+        self.history = [max_range] * 3     # median-of-3 filter rejects single spikes (cross-talk)
+        self.unfiltered = max_range
 
     def _measure(self, robot, world, dt):
         x, y, a = self.world_position(robot)
@@ -49,10 +51,12 @@ class Sonar(Sensor):
         if self.neighbours and self.rng.random() < self.crosstalk:
             best = self.neighbours[self.rng.integers(len(self.neighbours))].value * self.rng.uniform(0.6, 1.4)
         if best < self.max_range:
-            best += self.rng.normal(0, self.noise * self.max_range)
+            best += self.rng.normal(0, self.noise * best + 0.005)   # timing error grows with range
         best = min(max(best, 0.02), self.max_range)
         self.tof_us = 2 * best / self.c * 1e6
-        return true_best, best, int(self.tof_us)
+        self.unfiltered = best
+        self.history = self.history[1:] + [best]
+        return true_best, sorted(self.history)[1], int(self.tof_us)
 
     def _dead_value(self):
         return self.max_range, int(2 * self.max_range / self.c * 1e6)

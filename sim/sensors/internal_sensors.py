@@ -22,8 +22,8 @@ class Compass(Sensor):
         true = robot.pose.theta
         dist = self.disturbance * math.sin(robot.pose.x * 0.7) * math.cos(robot.pose.y * 0.5)
         meas = wrap_angle(true + dist + self.rng.normal(0, self.noise))
-        raw = int(round(math.degrees(meas) % 360))
-        return true, math.radians(raw), raw
+        raw = int(round(math.degrees(meas) % 360))          # 1 deg digital resolution
+        return true, wrap_angle(math.radians(raw)), raw
 
 
 class Gyro(Sensor):
@@ -51,18 +51,24 @@ class Accelerometer(Sensor):
     cls = SensorClass("local", "internal", "passive", "digital")
     units = "rad"
 
-    def __init__(self, name, rng, noise=0.01):
+    def __init__(self, name, rng, noise=0.01, tau=0.5):
         super().__init__(name, rng)
         self.noise = noise
+        self.tau = tau
         self._last_v = 0.0
+        self._filtered = 0.0
 
     def _measure(self, robot, world, dt):
         cx, cy = world.to_cell(robot.pose.x, robot.pose.y)
         tilt = float(world.slope[cy, cx]) if world.in_bounds(cx, cy) else 0.0
         accel = (robot.drive.v - self._last_v) / dt
         self._last_v = robot.drive.v
-        meas = tilt + accel / 9.81 + self.rng.normal(0, self.noise)
-        return tilt, meas, int(meas * 1000)
+        raw = tilt + accel / 9.81 + self.rng.normal(0, self.noise)
+        # the gravity direction cannot be separated from body acceleration in
+        # one sample, so the tilt estimate is low-pass filtered (lecture:
+        # inclinometers lag; gyros respond fast; combine them)
+        self._filtered += (raw - self._filtered) * min(1.0, dt / self.tau)
+        return tilt, self._filtered, int(raw * 1000)
 
 
 class BatteryMonitor(Sensor):
@@ -127,9 +133,14 @@ class PressureSensor(Sensor):
 
 
 class DVL(Sensor):
-    """Doppler velocity log: ground-relative body velocity (v, omega).
-    Underwater there are no wheels to count, so this replaces the encoders as
-    the odometry source."""
+    """Ground-relative body velocity (forward, lateral, yaw rate).
+
+    Underwater this is a Doppler velocity log (active sonar on the sea bed):
+    there are no wheels to count, so it replaces the encoders as the
+    odometry source. On the planet surface the same role is played by a
+    downward optical-flow sensor (a camera chip like an optical mouse): it
+    measures how the ground really moves under the robot, so it does not
+    see wheel slip in sand. Both are modelled by this class."""
     cls = SensorClass("local", "external", "active", "digital")
     units = "m/s"
 
@@ -137,12 +148,13 @@ class DVL(Sensor):
         super().__init__(name, rng)
         self.noise = noise
         self.omega = 0.0
+        self.lateral = 0.0      # sideways ground velocity (the current pushes the body)
 
     def _measure(self, robot, world, dt):
-        cur = robot.cfg.water_current
-        # ground-relative velocity includes the current pushing the body
-        c, s = math.cos(robot.pose.theta), math.sin(robot.pose.theta)
-        v_ground = robot.drive.v + cur[0] * c + cur[1] * s
+        # the true motion of the ground under the body (includes the current,
+        # excludes wheel slip and wheels spinning against a wall)
+        v_fwd, v_lat = robot.ground_v
         self.omega = robot.drive.omega + self.rng.normal(0, self.noise)
-        meas = v_ground + self.rng.normal(0, self.noise)
-        return v_ground, meas, int(meas * 1000)
+        self.lateral = v_lat + self.rng.normal(0, self.noise)
+        meas = v_fwd + self.rng.normal(0, self.noise)
+        return v_fwd, meas, int(meas * 1000)

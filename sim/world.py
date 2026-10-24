@@ -119,8 +119,8 @@ class World:
         with occasional chambers, pits and gas pockets. Produces branching
         corridors and many dead ends, which is what DFS-with-backtracking is for."""
         self.grid[:] = Terrain.WALL
-        pitch = 7                      # lattice spacing in cells
-        cw = 4                         # corridor width (0.8 m for a 0.44 m robot)
+        pitch = 9                      # lattice spacing in cells
+        cw = 6                         # corridor width (1.2 m for a 0.40 m robot)
         nx, ny = (self.w - 3) // pitch, (self.h - 3) // pitch
         visited = np.zeros((ny, nx), bool)
         stack = [(0, 0)]
@@ -158,18 +158,26 @@ class World:
         for _ in range(5):
             y, x = free_cells[self.rng.integers(len(free_cells))]
             self._blob(x, y, 2, Terrain.MUD, prob=0.8)
-        for _ in range(4):
-            y, x = free_cells[self.rng.integers(len(free_cells))]
-            if math.hypot(x - 3, y - 3) > 12:
-                self._blob(x, y, 1.2, Terrain.PIT)
+        # pits sit against a corridor wall so the corridor narrows but stays passable
+        wall = self.grid == Terrain.WALL
+        edge = [(y, x) for y, x in free_cells
+                if wall[y - 1:y + 2, x - 1:x + 2].any() and math.hypot(x - 4, y - 4) > 12]
+        for _ in range(5):
+            y, x = edge[self.rng.integers(len(edge))]
+            self.grid[y, x] = Terrain.PIT
+            nb = [(y + dy, x + dx) for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0))
+                  if self.grid[y + dy, x + dx] == Terrain.FREE]
+            if nb:
+                yy_, xx_ = nb[self.rng.integers(len(nb))]
+                self.grid[yy_, xx_] = Terrain.PIT
         for _ in range(3):
             y, x = free_cells[self.rng.integers(len(free_cells))]
             yy, xx = np.mgrid[0:self.h, 0:self.w]
             self.gas += np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / (2 * 4.0 ** 2)).astype(np.float32)
         self.gas = np.clip(self.gas, 0, 1)
         self._border()
-        self.start = self.to_world(3, 3)
-        self.grid[2:5, 2:5] = Terrain.FREE
+        self.start = self.to_world(4, 4)
+        self.grid[2:7, 2:7] = Terrain.FREE
 
     def _gen_mars(self):
         """Open planetary surface: rock fields, craters with rims, sand and bedrock."""
@@ -231,21 +239,20 @@ class World:
         self.grid[2:7, 2:7] = Terrain.WATER
 
     def _ensure_connected(self):
-        """Everything the robot cannot reach from the start becomes wall, so
-        'coverage' statistics are measured against reachable area only."""
+        """Everything the robot's body cannot reach from the start becomes wall,
+        so 'coverage' statistics are measured against reachable area only.
+        The robot has a radius, so free space is first eroded by that radius
+        (a one-cell gap is not a passage)."""
+        from scipy import ndimage
+        r_cells = max(1, int(round(self.cfg.drive.robot_radius / self.cell)))
+        passable = ~np.isin(self.grid, list(OBSTACLES)) & (self.grid != Terrain.PIT)
+        core = ndimage.binary_erosion(passable, iterations=r_cells, border_value=0)
         sx, sy = self.to_cell(*self.start)
-        reach = np.zeros_like(self.grid, dtype=bool)
-        q = deque([(sx, sy)])
-        reach[sy, sx] = True
-        while q:
-            x, y = q.popleft()
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                nx_, ny_ = x + dx, y + dy
-                if self.in_bounds(nx_, ny_) and not reach[ny_, nx_] and not self.is_obstacle(nx_, ny_) \
-                        and self.grid[ny_, nx_] != Terrain.PIT:
-                    reach[ny_, nx_] = True
-                    q.append((nx_, ny_))
-        unreachable = (~reach) & (~np.isin(self.grid, list(OBSTACLES))) & (self.grid != Terrain.PIT)
+        core[sy, sx] = True
+        labels, _ = ndimage.label(core)
+        reach_core = labels == labels[sy, sx]
+        reach = ndimage.binary_dilation(reach_core, iterations=r_cells) & passable
+        unreachable = (~reach) & passable
         self.grid[unreachable] = Terrain.WALL
         self.reachable = reach
         self.reachable_count = int(reach.sum())
