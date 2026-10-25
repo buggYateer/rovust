@@ -56,6 +56,7 @@
   .status { padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--muted); }
   .status.exploring, .status.returning { color: var(--teal); }
   .status.fell, .status.battery_dead { color: var(--red); }
+  .status.stopped, .status.returned { color: var(--muted); }
   .iconbtn { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; width: 34px; height: 34px; font-size: 16px; cursor: pointer; }
 
   /* ------------------------------------------------------------ layout */
@@ -393,7 +394,7 @@
       $('notice').textContent = note;
       const bn = $('banner');
       if (s.done) {
-        const good = s.status === 'returned';
+        const good = s.status === 'returned' || s.status === 'stopped';
         bn.className = 'show over' + (good ? ' good' : '');
         bn.innerHTML = `<span><b>Mission over.</b> ${s.end_reason}</span><button class="btn" id="restart">New mission</button>`;
         $('restart').onclick = () => post({ type: 'restart' });
