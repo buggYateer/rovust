@@ -150,7 +150,7 @@ python -m sim.experiments.run_batch --ablation            # one sensor off at a 
 
 - [Proposal (Task 1)](docs/Task1_v2.md) · [Design notes & sensor placement](docs/DESIGN.md) · [Results](docs/RESULTS.md)
 - [Drive reports bridge](docs/DRIVE_REPORTS.md) · [Setup with Claude](docs/SETUP_WITH_CLAUDE.md)
-- **Presentation (30 slides):** [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [PowerPoint with Egyptian-Arabic speaker notes](docs/presentation/PyRov_presentation_ar_notes.pptx) · [PDF](docs/presentation/PyRov_presentation.pdf) · [web viewer](docs/presentation/PyRov_presentation.html) (N = notes, L = EN/مصري) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) — rebuilt with `python tools/build_presentation.py`
+- **Presentation (30 slides):** [Claude Slides (online, with transitions)](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) · [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [PowerPoint with Egyptian-Arabic speaker notes](docs/presentation/PyRov_presentation_ar_notes.pptx) · [PDF](docs/presentation/PyRov_presentation.pdf) · [web viewer](docs/presentation/PyRov_presentation.html) (N = notes, L = EN/مصري) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) — rebuilt with `python tools/build_presentation.py`
 - [Promo trailer](docs/media/trailer.html) — 75 s animated page with an English voice-over spoken by the browser (open the file, press Play)
 - **[دليل الفريق بالعربي (HTML تفاعلي)](docs/team_guide_ar.html)** — شرح كل جزء في المشروع وربطه بالمنهج وسيناريو العرض
 - [رحلة بناء المشروع](docs/JOURNEY_ar.md) — الأفكار والمشاكل والإصلاحات بالترتيب
