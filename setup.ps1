@@ -12,7 +12,9 @@
 
 param([string]$Dest = "")
 
-$ErrorActionPreference = "Stop"
+# Native tools (git, pip) write progress to stderr; PowerShell 5.1 would treat that as an
+# error and abort under "Stop", so exit codes are checked by hand instead.
+$ErrorActionPreference = "Continue"
 $Repo = "https://github.com/buggYateer/robotics-project"
 $Zip = "$Repo/archive/refs/heads/main.zip"
 
@@ -63,13 +65,14 @@ $git = Get-Command git -ErrorAction SilentlyContinue
 if (Test-Path (Join-Path $Dest "main.py")) {
     if ($git -and (Test-Path (Join-Path $Dest ".git"))) {
         Say "Project already there - pulling the latest version"
-        Push-Location $Dest; git pull --ff-only; Pop-Location
+        Push-Location $Dest; & cmd /c "git pull --ff-only 2>&1"; Pop-Location
     } else {
         Say "Project already there - keeping it (delete the folder to re-download)"
     }
 } elseif ($git) {
     Say "Cloning the repository with git"
-    git clone $Repo $Dest
+    & cmd /c "git clone --quiet `"$Repo`" `"$Dest`" 2>&1"
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $Dest "main.py"))) { Fail "git clone failed. Check your internet connection and run the setup again." }
 } else {
     Say "git is not installed - downloading the project as a zip instead"
     $tmp = Join-Path $env:TEMP "pyrov_download"
@@ -92,13 +95,14 @@ if (-not (Test-Path $venvPy)) {
     if (-not (Test-Path $venvPy)) { Fail "Could not create the virtual environment." }
 }
 Say "Installing the dependencies (this takes a few minutes the first time)"
-& $venvPy -m pip install --upgrade pip --quiet
-& $venvPy -m pip install -r (Join-Path $Dest "requirements.txt")
+& cmd /c "`"$venvPy`" -m pip install --upgrade pip --quiet 2>&1"
+$req = Join-Path $Dest "requirements.txt"
+& cmd /c "`"$venvPy`" -m pip install -r `"$req`" 2>&1"
 if ($LASTEXITCODE -ne 0) { Fail "pip could not install the dependencies. Check your internet connection and run the setup again." }
 
 # ------------------------------------------------------------------ check
 Say "Checking that everything imports"
-$check = & $venvPy -c "import numpy, scipy, sklearn, matplotlib, pygame, PySide6; print('ok')" 2>&1
+$check = & cmd /c "`"$venvPy`" -c `"import numpy, scipy, sklearn, matplotlib, pygame, PySide6; print('ok')`" 2>&1"
 if ($check -notmatch "ok") {
     Write-Host $check
     if ("$check" -match "Application Control") {
