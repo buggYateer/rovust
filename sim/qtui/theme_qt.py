@@ -55,6 +55,8 @@ QTabBar::tab:selected {{ background: {surface}; color: {text}; font-weight: 600;
 QTableWidget {{ background: {surface}; alternate-background-color: {surface2}; gridline-color: {line}; border: none; border-radius: 8px; selection-background-color: {surface2}; }}
 QHeaderView::section {{ background: {surface}; color: {muted}; padding: 6px; border: none; border-bottom: 1px solid {line}; font-weight: 600; }}
 QTableWidget QComboBox {{ padding: 1px 6px; min-height: 18px; border-radius: 5px; }}
+QPushButton#faultbtn {{ padding: 0 6px; border-radius: 5px; font-size: 9pt; min-width: 34px; }}
+QPushButton#faultbtn:checked {{ background: {accent}; color: {on_accent}; border-color: {accent}; }}
 QProgressBar {{ border: none; border-radius: 6px; background: {surface2}; text-align: center; color: {text}; min-height: 12px; }}
 QProgressBar::chunk {{ border-radius: 6px; background: {accent}; }}
 QPlainTextEdit, QTextBrowser {{ background: {surface}; border: 1px solid {line}; border-radius: 8px; padding: 6px; }}
