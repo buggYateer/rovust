@@ -1,7 +1,7 @@
 """The main window: menus, toolbar, setup dock, two maps, bottom tabs, status bar."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence
 from PySide6.QtWidgets import (QApplication, QDockWidget, QLabel, QMainWindow, QScrollArea, QSplitter, QTabWidget,
                                QToolBar, QVBoxLayout, QWidget)
@@ -12,6 +12,8 @@ from ..ui import theme as T
 from .mapview import MapWidget
 from .panels import (LEGEND_HTML, AboutDialog, ControlsDialog, GuideDialog, MotorTab, SensorsTab, SetupPanel,
                      StatsTab)
+from .theme_qt import apply_theme, ensure_icon
+from ..teleop.server import ConsoleServer
 
 SPEEDS = [1, 4, 8, 16]
 
@@ -19,13 +21,17 @@ SPEEDS = [1, 4, 8, 16]
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Exploration Rover Simulator")
+        self.setWindowTitle(f"{T.ROVER_NAME} - Multi-Environment Exploration Rover")
+        self.setWindowIcon(ensure_icon())
         self.resize(1500, 950)
         self.setMinimumSize(1100, 700)
         self.mission: Mission | None = None
         self.paused = False
         self.speed = 1
         self._tick = 0
+        self.settings = QSettings("RoboticsTeamProject", "RoverSimulator")
+        self.server: ConsoleServer | None = None
+        self._keys = set()
 
         # ---- central: the two maps + legend
         central = QWidget()
@@ -48,6 +54,9 @@ class MainWindow(QMainWindow):
         self.setup.start_requested.connect(self.start_mission)
         for cb in self.setup.layer_boxes.values():
             cb.toggled.connect(self._layers_changed)
+        self.setup.mode.currentIndexChanged.connect(self._mode_changed)
+        self.setup.loss.currentIndexChanged.connect(self._loss_changed)
+        self.setup.server_btn.toggled.connect(self._toggle_server)
         self.setCorner(Qt.Corner.BottomLeftCorner, Qt.DockWidgetArea.LeftDockWidgetArea)
         dock = QDockWidget("Mission setup", self)
         dock.setObjectName("setupDock")
@@ -127,6 +136,12 @@ class MainWindow(QMainWindow):
         m_view.addSeparator()
         m_view.addAction(self.setup_dock.toggleViewAction())
         m_view.addAction(self.telemetry_dock.toggleViewAction())
+        m_view.addSeparator()
+        self.act_dark = QAction("&Dark mode", self, checkable=True, shortcut=QKeySequence("Ctrl+D"))
+        self.act_dark.setChecked(self.settings.value("dark", False, type=bool))
+        self.act_dark.toggled.connect(self._set_dark)
+        m_view.addAction(self.act_dark)
+        self._set_dark(self.act_dark.isChecked())
 
         m_help = mb.addMenu("&Help")
         m_help.addAction(QAction("&User guide", self, shortcut=QKeySequence("F1"), triggered=lambda: GuideDialog(self).exec()))
@@ -148,6 +163,8 @@ class MainWindow(QMainWindow):
             tb.addAction(self.speed_actions[s])
         tb.addSeparator()
         tb.addAction(self.act_lights)
+        tb.addSeparator()
+        tb.addAction(self.act_dark)
         self.addToolBar(tb)
 
     def _build_statusbar(self):
@@ -156,7 +173,9 @@ class MainWindow(QMainWindow):
         self.st_time = QLabel("")
         self.st_cov = QLabel("")
         self.st_beh = QLabel("")
+        self.st_link = QLabel("")
         sb.addWidget(self.st_status, 1)
+        sb.addPermanentWidget(self.st_link)
         sb.addPermanentWidget(self.st_beh)
         sb.addPermanentWidget(self.st_cov)
         sb.addPermanentWidget(self.st_time)
@@ -171,13 +190,15 @@ class MainWindow(QMainWindow):
         self.paused = False
         self.act_pause.setChecked(False)
         self.act_lights.setChecked(self.mission.robot.headlights)
+        self.mission.mode = self.setup.mode.currentData()
+        self.mission.on_link_loss = self.setup.loss.currentData()
         layers = self.setup.layers()
         self.map_world.set_mission(self.mission, "world", layers)
         self.map_belief.set_mission(self.mission, "belief", layers)
         self.sensors_tab.set_mission(self.mission)
         self.motor_tab.set_mission(self.mission)
         self.stats_tab.set_mission(self.mission)
-        self.setWindowTitle(f"Exploration Rover Simulator - {T.ENV_TITLES[cfg['env']]} / {self.mission.explorer.name} / {cfg['localisation']}")
+        self.setWindowTitle(f"{T.ROVER_NAME} - {T.ENV_TITLES[cfg['env']]} / {self.mission.explorer.name} / {cfg['localisation']}")
 
     def restart_mission(self):
         if self.mission is not None:
@@ -200,6 +221,64 @@ class MainWindow(QMainWindow):
             self.mission.returning = True
             self.mission.stats["return_reason"] = "operator"
 
+    # ----------------------------------------------------------- teleop
+    def _mode_changed(self, _):
+        if self.mission is not None:
+            # the operator's own console is wired to the rover, not radio
+            self.mission.mode = self.setup.mode.currentData()
+            self.mission.link_fallback = False
+            self.mission.operator_cmd = (0.0, 0.0)
+        self.setFocus()
+
+    def _loss_changed(self, _):
+        if self.mission is not None:
+            self.mission.on_link_loss = self.setup.loss.currentData()
+        self.setFocus()
+
+    def _toggle_server(self, on):
+        if on:
+            try:
+                self.server = ConsoleServer(lambda: self.mission, port=8080)
+                self.server.start()
+                self.setup.server_url.setText(f"On the phone or tablet (same Wi-Fi) open:\n{self.server.url}")
+                self.setup.server_btn.setText("Close console")
+            except OSError as e:
+                self.setup.server_url.setText(f"Could not start the console: {e}")
+                self.setup.server_btn.setChecked(False)
+        else:
+            if self.server is not None:
+                self.server.stop()
+                self.server = None
+            self.setup.server_url.setText("")
+            self.setup.server_btn.setText("Open console for phone / tablet")
+        self.setFocus()
+
+    def _set_dark(self, dark):
+        apply_theme(QApplication.instance(), dark)
+        self.settings.setValue("dark", dark)
+        self.update()
+
+    def keyPressEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        self._keys.add(event.key())
+        self._key_drive()
+
+    def keyReleaseEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        self._keys.discard(event.key())
+        self._key_drive()
+
+    def _key_drive(self):
+        m = self.mission
+        if m is None or m.mode == "autonomous":
+            return
+        k = self._keys
+        fwd = (1 if (Qt.Key.Key_Up in k or Qt.Key.Key_W in k) else 0) - (1 if (Qt.Key.Key_Down in k or Qt.Key.Key_S in k) else 0)
+        turn = (1 if (Qt.Key.Key_Left in k or Qt.Key.Key_A in k) else 0) - (1 if (Qt.Key.Key_Right in k or Qt.Key.Key_D in k) else 0)
+        m.operator_drive(fwd, turn)
+
     def _layers_changed(self):
         layers = self.setup.layers()
         for key, a in self.layer_actions.items():
@@ -216,6 +295,8 @@ class MainWindow(QMainWindow):
         if m is None:
             return
         if not self.paused and not m.done:
+            if self._keys and m.mode != "autonomous" and self._tick % 8 == 0:
+                self._key_drive()                   # keep the watchdog fed while a key is held
             for _ in range(self.speed):
                 m.step()
                 self.motor_tab.push_sample()
@@ -237,19 +318,39 @@ class MainWindow(QMainWindow):
                 status += "  -  PAUSED"
             self.st_status.setText(status)
             self.st_beh.setText(f"behaviour: {m.arbiter.active_name}   ")
+            lk = m.link
+            if m.mode == "autonomous" and self.server is None:
+                self.st_link.setText("")
+            else:
+                extra = "  (rover on its own)" if m.link_fallback else ""
+                self.st_link.setText(f"link: {lk.state} {lk.strength:.0%}{extra}   ")
             self.st_cov.setText(f"coverage {m.coverage():.1%}   ")
             self.st_time.setText(f"t = {m.time:.1f} s   x{self.speed}")
 
     def closeEvent(self, event):
         self.timer.stop()
+        if self.server is not None:
+            self.server.stop()
         event.accept()
 
 
 def run():
     import sys
+    if sys.platform == "win32":
+        # Without its own AppUserModelID the taskbar groups the window under
+        # python.exe and shows Python's icon instead of ours.
+        try:
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"RoboticsTeamProject.{T.ROVER_NAME}.Simulator.1")
+        except Exception:
+            pass
     app = QApplication(sys.argv)
-    app.setApplicationName("Exploration Rover Simulator")
+    app.setApplicationName(f"{T.ROVER_NAME} Rover Simulator")
+    app.setApplicationDisplayName(T.ROVER_NAME)
     app.setOrganizationName("Robotics Team Project")
+    icon = ensure_icon()
+    app.setWindowIcon(icon)
     w = MainWindow()
+    w.setWindowIcon(icon)
     w.show()
     return app.exec()
