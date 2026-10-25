@@ -128,7 +128,27 @@ Highest active layer wins:
   noise). A faulty sensor is dropped from mapping and avoidance.
 * **Utility explorer**: see §7.
 
-## 9. Things we learned the hard way (all reproducible with the fault buttons)
+## 9. Remote operation and the radio link
+
+A `TELEOP` layer sits between `AVOID` and `HOME` in the subsumption stack.
+When the operator chooses *assisted* or *manual* it takes the place of
+`EXPLORE`; in *assisted* mode every layer above it still overrides the
+operator (shared control), in *manual* mode `ESCAPE`, `CLIFF`, `SLOPE` and
+`AVOID` are switched off and only `STOP` remains. A watchdog zeroes the
+command one second after the last one received.
+
+Commands (from the keyboard, or from the phone/tablet console served by
+`sim/teleop/server.py`) go through `RadioLink` (`sim/comms.py`): a base
+station at the start point, signal strength
+`(1 − 0.65 (d / range)²) · (1 − wall_loss · walls)` smoothed like an RSSI,
+packets dropped with 50 % probability when *weak* and always when *lost*,
+delivered after the environment's latency (Mars 2 s, underwater 0.4 s). Lost
+for three seconds → `link_fallback`: autonomy takes over according to the
+operator's *Link lost* choice (wait / explore / return home) until a command
+arrives again. The console page never touches the robot directly: it only
+sends packets into this link.
+
+## 10. Things we learned the hard way (all reproducible with the fault buttons)
 
 * Without rear and side cliff sensors the rover reverses or brushes into craters.
 * A median filter on the sonar lags during turns and paints walls in the wrong
