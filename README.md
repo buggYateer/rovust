@@ -150,6 +150,7 @@ python -m sim.experiments.run_batch --ablation            # one sensor off at a 
 
 - [Proposal (Task 1)](docs/Task1_v2.md) · [Design notes & sensor placement](docs/DESIGN.md) · [Results](docs/RESULTS.md)
 - [Drive reports bridge](docs/DRIVE_REPORTS.md) · [Setup with Claude](docs/SETUP_WITH_CLAUDE.md)
+- **[دليل الفريق بالعربي (HTML تفاعلي)](docs/team_guide_ar.html)** — شرح كل جزء في المشروع وربطه بالمنهج وسيناريو العرض
 
 ## Team
 
