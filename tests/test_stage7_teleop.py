@@ -99,6 +99,11 @@ def test_console_server_round_trip():
             m.step()
         assert m.mode == "assisted" and m.robot.headlights
         assert m.operator_cmd[0] > 0
+        # stick to the right must turn right (clockwise = negative angular velocity)
+        assert cmd({"type": "drive", "x": 1.0, "y": 0.0})
+        for _ in range(20):
+            m.step()
+        assert m.operator_cmd[1] < 0
         png = urllib.request.urlopen(base + "/api/map.png", timeout=5).read()
         assert png[:8] == b"\x89PNG\r\n\x1a\n"
         assert urllib.request.urlopen(base + "/api/camera.png", timeout=5).read()[:4] == b"\x89PNG"

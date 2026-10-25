@@ -125,7 +125,9 @@ class ConsoleServer:
             return False
         t = cmd.get("type")
         if t == "drive":
-            ok = m.operator_drive(float(cmd.get("y", 0.0)), float(cmd.get("x", 0.0)))
+            # stick right (+x) must turn the rover right: a clockwise turn is a
+            # negative angular velocity in the robot's frame
+            ok = m.operator_drive(float(cmd.get("y", 0.0)), -float(cmd.get("x", 0.0)))
         elif t == "speed":
             m.operator_speed = max(0.05, min(0.6, float(cmd.get("value", 0.35))))
             ok = True
@@ -185,9 +187,8 @@ class ConsoleServer:
             rgb[hy, hx] = (255, 255, 255)
         bx, by = m.home_cell
         rgb[by, bx] = (255, 255, 255)
-        rgb = np.ascontiguousarray(rgb[::-1])            # y up
-        rgb = np.repeat(np.repeat(rgb, 3, 0), 3, 1)     # 3x nearest-neighbour upscale
-        return png_bytes(rgb)
+        # 1x pixels: tiny PNG, the page scales it with image-rendering: pixelated
+        return png_bytes(np.ascontiguousarray(rgb[::-1]))   # y up
 
     def camera_png(self) -> bytes:
         m = self.get_mission()
@@ -195,6 +196,4 @@ class ConsoleServer:
         if cam is None:
             return png_bytes(np.zeros((16, 16, 3), np.uint8))
         g = (np.clip(cam.image, 0, 1) * 255).astype(np.uint8)
-        rgb = np.stack([g, g, g], -1)
-        rgb = np.repeat(np.repeat(rgb, 6, 0), 6, 1)
-        return png_bytes(np.ascontiguousarray(rgb))
+        return png_bytes(np.ascontiguousarray(np.stack([g, g, g], -1)))
