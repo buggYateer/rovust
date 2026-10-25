@@ -335,12 +335,12 @@
   }
   setInterval(() => { if (stick.active) send(true); }, 400);   // keep the rover's watchdog fed
 
-  const keys = {};
-  addEventListener('keydown', (e) => { keys[e.key] = true; keyDrive(); });
-  addEventListener('keyup', (e) => { keys[e.key] = false; keyDrive(); });
+  const keys = {};   // physical key codes: independent of the keyboard language
+  addEventListener('keydown', (e) => { keys[e.code] = true; keyDrive(); });
+  addEventListener('keyup', (e) => { keys[e.code] = false; keyDrive(); });
   function keyDrive() {
-    const y = (keys['ArrowUp'] || keys['w'] ? 1 : 0) - (keys['ArrowDown'] || keys['s'] ? 1 : 0);
-    const x = (keys['ArrowRight'] || keys['d'] ? 1 : 0) - (keys['ArrowLeft'] || keys['a'] ? 1 : 0);
+    const y = (keys['ArrowUp'] || keys['KeyW'] ? 1 : 0) - (keys['ArrowDown'] || keys['KeyS'] ? 1 : 0);
+    const x = (keys['ArrowRight'] || keys['KeyD'] ? 0.75 : 0) - (keys['ArrowLeft'] || keys['KeyA'] ? 0.75 : 0);
     stick.x = x; stick.y = y; stick.active = !!(x || y); send(true); requestDraw();
   }
 
