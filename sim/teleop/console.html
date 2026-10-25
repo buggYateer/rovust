@@ -103,6 +103,10 @@
   #banner { display: none; padding: 10px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 600; font-size: 14px; }
   #banner.weak { background: var(--amber); color: #141a1f; }
   #banner.show { display: block; grid-column: 1 / -1; }
+  #banner.over { background: var(--surface); color: var(--text); border: 2px solid var(--red); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  #banner.over.good { border-color: var(--teal); }
+  #banner.over b { color: var(--red); } #banner.over.good b { color: var(--teal); }
+  #banner .btn { padding: 8px 14px; margin-left: auto; }
   #toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--red); color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9; max-width: 90vw; text-align: center; }
   #toast.show { opacity: 1; }
 
@@ -258,7 +262,9 @@
   let toastTimer = 0;
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
   const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true })
-    .then(r => r.json()).then(r => { if (!r.ok && body.type !== 'drive') toast('No radio link - the rover did not receive that'); return r.ok; })
+    .then(r => r.json()).then(r => {
+      if (!r.ok && body.type !== 'drive') toast(r.reason === 'mission_over' ? 'Mission over - start a new mission first' : 'No radio link - the rover did not receive that');
+      return r.ok; })
     .catch(() => { toast('Cannot reach the simulator'); return false; });
 
   // ------------------------------------------------------------- joystick
@@ -386,7 +392,12 @@
       else if (s.cliff.some(Boolean)) note = 'Cliff detected under the rover.';
       $('notice').textContent = note;
       const bn = $('banner');
-      if (lk.state === 'lost' && s.mode !== 'autonomous') {
+      if (s.done) {
+        const good = s.status === 'returned';
+        bn.className = 'show over' + (good ? ' good' : '');
+        bn.innerHTML = `<span><b>Mission over.</b> ${s.end_reason}</span><button class="btn" id="restart">New mission</button>`;
+        $('restart').onclick = () => post({ type: 'restart' });
+      } else if (lk.state === 'lost' && s.mode !== 'autonomous') {
         const act = { hold: 'is waiting for the link', explore: 'is exploring on its own', home: 'is coming back towards the base' }[s.on_link_loss];
         bn.textContent = s.fallback ? `Out of radio range - the rover ${act}. It will listen again once the link is back.` : `Out of radio range - the rover cannot hear you. In ${Math.max(0, 3 - lk.lost_for).toFixed(0)} s it will act on its own.`;
         bn.className = 'show';

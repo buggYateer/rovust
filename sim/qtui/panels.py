@@ -517,13 +517,19 @@ wait. Console <i>settings</i> (who drives, link-lost action, top speed) apply at
 go over the radio. The <b>Radio link</b> tab shows all of this live: RSSI, walls on the line of sight,
 latency, packets delivered and dropped, and a log of every packet with the sender's address.</p>
 
-<h3>5. Controls</h3>
+<h3>5. When a mission ends</h3>
+<p>A mission is over when the rover is back at the base, when the battery is empty, or when it falls into a
+pit (only possible in <i>manual</i> mode, where the cliff layer is switched off). A banner on the maps and on
+the console says why; nothing listens to commands any more. Start a new mission with <b>Restart mission</b>
+(R), <b>New mission</b> in the toolbar, or the <b>New mission</b> button on the phone.</p>
+
+<h3>6. Controls</h3>
 <p><b>Space</b> pause / resume &nbsp;&middot;&nbsp; <b>1 2 3 4</b> speed &times;1 &times;4 &times;8 &times;16
 &nbsp;&middot;&nbsp; <b>R</b> restart &nbsp;&middot;&nbsp; <b>H</b> headlights. Map layers can be switched
 in the left panel or the View menu. The panels are dockable: drag them to rearrange, or hide them from the
 View menu.</p>
 
-<h3>6. What to look for in a demonstration</h3>
+<h3>7. What to look for in a demonstration</h3>
 <ul>
 <li>Switch to <i>Assisted</i>, open the console on a tablet, and drive into a wall: the rover refuses.
 Switch to <i>Manual</i> and do it again.</li>

@@ -61,6 +61,7 @@ class ConsoleServer:
         self.thread = None
         self.clients = 0
         self.last_cmd_ok = True
+        self.restart_requested = False      # set from the console, consumed by the window's timer
 
     # ------------------------------------------------------------ lifecycle
     def start(self):
@@ -104,7 +105,9 @@ class ConsoleServer:
                     cmd = json.loads(self.rfile.read(n) or b"{}")
                     cmd["from"] = self.client_address[0]
                     ok = server.command(cmd)
-                    self._send(200, json.dumps({"ok": ok}).encode(), "application/json")
+                    m = server.get_mission()
+                    reason = "" if ok else ("mission_over" if (m is not None and m.done and cmd.get("type") != "restart") else "no_link")
+                    self._send(200, json.dumps({"ok": ok, "reason": reason}).encode(), "application/json")
                 except Exception as e:
                     self._send(400, str(e).encode(), "text/plain")
 
@@ -129,6 +132,11 @@ class ConsoleServer:
         if m is None:
             return False
         t = cmd.get("type")
+        if t == "restart":
+            self.restart_requested = True
+            return True
+        if m.done:
+            return False                        # nothing listens once the mission is over
         if t == "drive":
             # stick right (+x) must turn the rover right: a clockwise turn is a
             # negative angular velocity in the robot's frame
@@ -159,6 +167,7 @@ class ConsoleServer:
         cliffs = [c.value > 0.5 for c in s.cliffs]
         return {
             "mission": True, "env": m.cfg.name, "status": m.status, "time": round(m.time, 1),
+            "done": m.done, "end_reason": m.end_reason(),
             "mode": m.mode, "effective_mode": m.effective_mode, "fallback": m.link_fallback,
             "on_link_loss": m.on_link_loss, "behaviour": m.arbiter.active_name,
             "link": {"state": m.link.state, "strength": round(m.link.strength, 2),

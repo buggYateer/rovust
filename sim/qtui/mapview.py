@@ -93,6 +93,23 @@ class MapWidget(QWidget):
             self._paint_world(p)
         else:
             self._paint_belief(p)
+        if m.done:
+            self._paint_end_banner(p, m)
+
+    def _paint_end_banner(self, p, m):
+        s, ox, oy, pw, ph = self._geo
+        col = QColor(239, 68, 68) if m.status in ("fell", "battery_dead") else QColor(45, 212, 191)
+        box = QRectF(ox + 10, oy + ph / 2 - 34, pw - 20, 68)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(20, 26, 31, 215))
+        p.drawRoundedRect(box, 8, 8)
+        p.setPen(col)
+        p.setFont(QFont(self.font().family(), 12, QFont.Weight.Bold))
+        p.drawText(box.adjusted(10, 6, -10, -32), Qt.AlignmentFlag.AlignCenter, "MISSION OVER")
+        p.setPen(QColor(230, 237, 243))
+        p.setFont(QFont(self.font().family(), 9))
+        p.drawText(box.adjusted(10, 30, -10, -6), Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap,
+                   m.end_reason() + "   Start a new mission (Restart, or R).")
 
     def _path(self, p, poses, color, width):
         if len(poses) < 2:
