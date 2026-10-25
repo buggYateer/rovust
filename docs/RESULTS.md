@@ -94,9 +94,56 @@ the true position (upper bound).
   of 0.006 rad/s alone would rotate the map by 20° per minute; the compass
   (cave, underwater) and the sun sensor (Mars) bound it.
 
-## 3. Sensor ablation
+## 3. Sensor ablation (120 runs, 4 seeds, DFS strategy, 300 s)
 
-*Filled in from `results/ablation.csv` — see below.*
+Each run kills one sensor group at the start (`dead`: it reports nothing) and
+the mission continues with the rest. A fault on a sensor the environment does
+not mount (e.g. the sun sensor in the cave) is the control: it must change
+nothing, and it does not.
+
+| Dead sensor | Cave coverage | Cave loc. err. [m] | Mars coverage | Mars loc. err. [m] | Underwater coverage | Underwater loc. err. [m] |
+|---|---|---|---|---|---|---|
+| none (baseline) | 0.83 | 0.15 | 0.68 | 0.09 | 0.85 | 0.04 |
+| **sonar ring** | **0.25** | 0.14 | **0.11** | 0.07 | **0.05** (15 bumps) | 0.05 |
+| IR PSDs | 0.80 | 0.16 | 0.78 | 0.09 | – (not mounted) | – |
+| cliff switches | 0.68, **1 fall** | 0.16 | 0.79 | 0.09 | – | – |
+| bumpers | 0.83 | 0.19 | 0.79 | 0.09 | 0.85 | 0.03 |
+| gyro | 0.23 | 0.64 | 0.61 | 2.15 | 0.85 | 1.12 |
+| compass | 0.25 | **7.75** | – | – | 0.49 | **8.45** |
+| sun sensor | – | – | 0.50 | **9.90** | – | – |
+| optical flow | **0.08** | **5.02** | **0.08** | **15.8** | – | – |
+| DVL | – | – | – | – | **0.17** | **12.2** |
+
+![ablation](figures/ablation_summary.png)
+![ablation coverage](figures/ablation_coverage.png)
+
+**Findings**
+
+* **The sonar ring is the mapping sensor.** Without it the robot still
+  survives (the IRs and bumpers keep it off the walls) but it cannot see far
+  enough to map: coverage collapses to 5–25 %, and underwater — where there
+  are no IRs — it bumps into the reef 15 times per run.
+* **The ground-speed sensor is the localisation sensor.** Without optical
+  flow (cave, Mars) or the DVL (underwater) the fused estimate falls back on
+  the encoders and drifts 5–16 m; the map becomes useless and coverage drops
+  to 8–17 %. Wheel slip in sand and mud is that large.
+* **An absolute heading reference is indispensable.** Killing the compass
+  (cave, underwater) or the sun sensor (Mars) leaves the gyro alone; its bias
+  turns the whole map by tens of degrees and the position error reaches 8–10 m.
+  Killing the gyro instead is milder (0.6–2 m) because the compass still
+  bounds the heading, but the heading becomes noisy and coverage suffers in
+  the cave's narrow corridors.
+* **The cliff switches are the only thing between the robot and a crater.**
+  With them dead, one of four cave runs ended in a pit. In the Mars runs the
+  SLOPE behaviour (accelerometer) happened to keep the rover off the crater
+  rims, which is why a second, independent protection exists.
+* **IR PSDs and bumpers are redundant with the sonar** in these runs: losing
+  them costs almost nothing, because the sonar ring already sees the walls
+  and the avoidance layer keeps the body clear. They earn their place on the
+  robot as the last line of defence, not as the primary sensors.
+* Faults on sensors that are not mounted (sun sensor in the cave, compass on
+  Mars, DVL on land, optical flow underwater) reproduce the baseline exactly,
+  which confirms that the harness injects faults where it should.
 
 ## 4. Motor control (PID demo)
 
