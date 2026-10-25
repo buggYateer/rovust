@@ -13,7 +13,7 @@ Set up and run the PyRov project on this computer:
 2. Make sure Python 3.12 or newer is available (install it if it is not).
 3. Inside the project folder create a virtual environment in .venv, upgrade pip
    and install requirements.txt.
-4. Verify with:  python -c "import numpy, scipy, sklearn, matplotlib, pygame, PySide6"
+4. Verify with:  python -c "import numpy, scipy, sklearn, matplotlib, PySide6"
    If Windows reports "An Application Control policy has blocked this file",
    tell me to turn off Smart App Control (Windows Security > App & browser
    control) and stop; do not try to work around it.

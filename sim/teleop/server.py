@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import numpy as np
 
-from ..ui.render import belief_rgb
+from ..render import belief_rgb
 
 PAGE = os.path.join(os.path.dirname(__file__), "console.html")
 ICON = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "icon.png")
