@@ -1,0 +1,36 @@
+<section id="architecture" data-transition="fade" style="background:#11161b;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">DESIGN · ARCHITECTURE</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">The world the robot never sees, and the belief it builds</h2>
+<div style="display:flex;gap:28px;align-items:stretch">
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:30px;color:#f5a524">Ground truth</h3>
+<p style="font-size:24px;line-height:1.45;color:#bfd0d8">World: terrain grid, pits, gas, slope, current · Robot: true pose, motors, battery, collisions</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#92a1af">world.py · robot/</p>
+</div>
+<x-shape kind="arrow-right" style="width:72px;height:36px;background:#2dd4bf;align-self:center"></x-shape>
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:30px;color:#2dd4bf">Sensors</h3>
+<p style="font-size:24px;line-height:1.45;color:#bfd0d8">The only window onto the world: physics, noise, ADC, faults, placement per environment</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#92a1af">sensors/</p>
+</div>
+<x-shape kind="arrow-right" style="width:72px;height:36px;background:#2dd4bf;align-self:center"></x-shape>
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:30px;color:#2dd4bf">Belief</h3>
+<p style="font-size:24px;line-height:1.45;color:#bfd0d8">Pose estimate (odometry + fusion) · log-odds occupancy grid · terrain and hazard layers</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#92a1af">estimation.py · mapping.py</p>
+</div>
+<x-shape kind="arrow-right" style="width:72px;height:36px;background:#2dd4bf;align-self:center"></x-shape>
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:30px;color:#2dd4bf">Decision</h3>
+<p style="font-size:24px;line-height:1.45;color:#bfd0d8">Subsumption layers · explorer picks a target · A* on the cost map · operator over the radio</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#92a1af">behaviors.py · planning.py · comms.py</p>
+</div>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:22px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:28px;color:#f5a524">Configuration, not code</h3><p style="font-size:24px;line-height:1.45;color:#bfd0d8">config.py holds everything that differs between cave, Mars and underwater: map generator, terrain costs, slip, sensor suite, noise, radio link.</p></div>
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:22px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:28px;color:#f5a524">One mission object</h3><p style="font-size:24px;line-height:1.45;color:#bfd0d8">mission.py wires world, robot, estimator, grid, explorer and behaviours; the desktop app, the phone console and the headless experiments all drive the same object.</p></div>
+<div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:22px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:28px;color:#f5a524">~4 500 lines of Python</h3><p style="font-size:24px;line-height:1.45;color:#bfd0d8">NumPy, SciPy, scikit-learn, PySide6; 49 tests; no robotics framework underneath.</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Design · Architecture</p>
+<aside>The architecture has one rule: the robot never touches the world directly. The world and the robot's true state are ground truth; only the sensors read them; everything the robot knows lives in its belief — a pose estimate and a map; and decisions are made on the belief alone. The interface shows both side by side, which is how you see the difference between what is true and what the robot thinks. Everything that differs between environments is configuration.</aside>
+</section>

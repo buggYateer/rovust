@@ -586,8 +586,9 @@ the console says why; nothing listens to commands any more. Start a new mission 
 (R), <b>New mission</b> in the toolbar, or the <b>New mission</b> button on the phone.</p>
 
 <h3>6. Mission reports</h3>
-<p><b>Send report</b> (toolbar, File menu, Ctrl+S) saves a report of the current mission under
-<i>reports/Mission #n - date time - environment (computer)</i>: an HTML page with all statistics and both
+<p><b>Send report</b> (toolbar, File menu, Ctrl+S) asks for a name for the report (or sends it with the automatic
+name) and saves it under <i>reports/Mission #n - name</i>, the automatic name being
+<i>date time - environment (computer)</i>: an HTML page with all statistics and both
 maps, the map images and the raw numbers. With <i>auto-send</i> on (File &rarr; Report settings) a report is
 made by itself when a mission ends. When the team's Drive bridge is configured (docs/DRIVE_REPORTS.md), the
 folder is also uploaded to the shared Google Drive folder; if the computer is offline the report waits and is

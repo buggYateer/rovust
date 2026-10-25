@@ -2,7 +2,8 @@
 
 Every mission can produce a report (`report.html` with the statistics and
 both maps, `true_world.png`, `robot_map.png`, `metrics.json`). Reports are
-saved locally under `reports/Mission #<n> - <date time> - <environment> (<machine>)/`.
+saved locally under `reports/Mission #<n> - <title>/`, where the title is the
+name typed when sending or, by default, `<date time> - <environment> (<machine>)`.
 **The mission number is given by the Drive folder itself:** the bridge looks
 at the folders already there and uses the next number, so numbers are unique
 for the whole team (a report that has not been uploaded yet is called
@@ -92,8 +93,9 @@ Or in the program: **File → Report settings…**, paste the URL, Save.
 
 ## 3. Use it
 
-- **Send report** (toolbar, or File menu) builds the report for the current
-  mission and uploads it.
+- **Send report** (toolbar, or File menu) asks for a name for the report
+  (or sends it with the automatic name), builds it for the current mission
+  and uploads it.
 - With *auto-send* on (default) a report is sent automatically when a mission
   ends (returned, battery empty, fell).
 - The status bar shows *report uploaded* / *offline – n report(s) waiting*;

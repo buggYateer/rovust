@@ -301,7 +301,7 @@
 
 <h2 id="reports">14. التقارير وفولدر Drive (<code>sim/report.py</code>)</h2>
 <div class="card">
-<p>لما المهمة تخلص (أو تدوس Send report) بيتعمل فولدر <code class="ltr">reports/Mission #n - 2026-10-26 14-05 - cave (اسم الجهاز)/</code> فيه <code>report.html</code> (كل الإحصائيات + صورتي الخريطتين + الفريق)، صور PNG، و<code>metrics.json</code>، وسطر في <code>missions.csv</code>.</p>
+<p>لما المهمة تخلص (أو تدوس Send report، وساعتها بيسألك تسمّي التقرير ولا يبعته بالاسم التلقائي) بيتعمل فولدر <code class="ltr">reports/Mission #n - 2026-10-26 14-05 - cave (اسم الجهاز)/</code> (أو <code class="ltr">Mission #n - الاسم اللي كتبته</code>) فيه <code>report.html</code> (كل الإحصائيات + صورتي الخريطتين + الفريق)، صور PNG، و<code>metrics.json</code>، وسطر في <code>missions.csv</code>.</p>
 <p>وبيترفع لفولدر Drive الموحد بتاع الفريق عن طريق <b>Google Apps Script</b> صغير في حساب صاحب الفولدر (بوّابة): البرنامج يبعت الملفات → السكريبت يشوف آخر رقم Mission في الفولدر ويدي الجديد n+1 → يرجّع الاسم → النسخة المحلية تتسمّى زيه. <b>لو مفيش نت:</b> التقرير يستنى في <code>reports/pending.json</code> ويترفع لوحده كل 30 ث أو عند التشغيل الجاي. التفاصيل في <a href="DRIVE_REPORTS.md">DRIVE_REPORTS.md</a>.</p>
 <figure><img src="screenshots/report.png" alt="" style="max-width:720px;margin:0 auto"><figcaption>شكل التقرير.</figcaption></figure>
 </div>

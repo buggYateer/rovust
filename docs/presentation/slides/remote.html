@@ -1,0 +1,16 @@
+<section id="remote" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">IMPLEMENTATION · REMOTE CONTROL &amp; THE RADIO LINK</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Drive it from a phone — through a radio that can fail</h2>
+<div style="display:flex;gap:28px;align-items:start">
+<img src="../screenshots/console_tablet_dark.jpg" alt="Tablet console: joystick inside the sonar ring, map, camera, link and battery, mode buttons" style="width:760px;height:528px;object-fit:cover;border-radius:14px;border:1px solid #2f3b46">
+<img src="../screenshots/console_phone_light.jpg" alt="Phone console in compact light mode" style="width:244px;height:528px;object-fit:cover;object-position:top;border-radius:14px;border:1px solid #2f3b46">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Console</b> — a web page served by the simulator over Wi-Fi. The joystick sits inside a ring of live sonar readings: amber and red where something is close, so you drive by feel.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Assisted / manual</b> — in assisted mode the safety layers still override you; in manual nothing does. Car-like stick response; keyboard too.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#f5a524">Radio link model</b> — signal = f(distance, walls on the line of sight); weak: half the packets lost; lost for 3 s: the rover returns home, explores alone or waits. Mars adds a 2 s delay, the underwater modem 0.4 s.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Radio link tab</b> — RSSI, walls in the way, latency, packets delivered and dropped, and a log of every packet with the sender’s address.</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Implementation · comms.py, teleop/ — the “communication” activity of mobile robots</p>
+<aside>Remote control is where the communication activity from Robot Behaviour meets the argument for autonomy. Every command from the phone travels through a simulated radio link that weakens with distance and with each wall between the rover and its base. When you drive deep into the cave the link drops, the console tells you so, and after three seconds the rover takes over and drives itself back into range. The lesson writes itself: a rover that cannot decide alone is lost the moment the radio is.</aside>
+</section>

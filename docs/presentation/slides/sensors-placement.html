@@ -1,0 +1,27 @@
+<section id="sensors-placement" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">ANALYSIS · SENSOR PLACEMENT</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Where each sensor sits — and the failure it prevents</h2>
+<div style="display:flex;gap:48px;align-items:center">
+<svg aria-label="Top view of the rover: sonar ring around the body, three IR beams forward, cliff switches at the front, sides and rear, camera at the front, gyro and compass at the centre" viewBox="0 0 640 520" style="width:640px;height:520px">
+<circle cx="320" cy="270" r="215" fill="none" stroke="#2f3b46" stroke-width="2" stroke-dasharray="8 8"/>
+<rect x="230" y="150" width="180" height="240" rx="28" fill="#f5a524"/>
+<rect x="196" y="190" width="30" height="64" rx="8" fill="#e6edf3"/><rect x="196" y="296" width="30" height="64" rx="8" fill="#e6edf3"/>
+<rect x="414" y="190" width="30" height="64" rx="8" fill="#e6edf3"/><rect x="414" y="296" width="30" height="64" rx="8" fill="#e6edf3"/>
+<circle cx="320" cy="270" r="14" fill="#11161b"/><circle cx="320" cy="270" r="26" fill="none" stroke="#11161b" stroke-width="3"/>
+<circle cx="320" cy="176" r="12" fill="#11161b"/>
+<g fill="#2dd4bf"><circle cx="320" cy="55" r="12"/><circle cx="472" cy="118" r="12"/><circle cx="535" cy="270" r="12"/><circle cx="472" cy="422" r="12"/><circle cx="320" cy="485" r="12"/><circle cx="168" cy="422" r="12"/><circle cx="105" cy="270" r="12"/><circle cx="168" cy="118" r="12"/></g>
+<g stroke="#2dd4bf" stroke-width="2" opacity="0.5"><path d="M320 55 L285 20 M320 55 L355 20"/><path d="M535 270 L570 235 M535 270 L570 305"/><path d="M105 270 L70 235 M105 270 L70 305"/><path d="M320 485 L285 520 M320 485 L355 520"/></g>
+<g stroke="#ef4444" stroke-width="4" stroke-linecap="round"><line x1="268" y1="150" x2="268" y2="60"/><line x1="320" y1="150" x2="320" y2="60"/><line x1="372" y1="150" x2="372" y2="60"/></g>
+<g fill="#22c55e"><circle cx="244" cy="130" r="9"/><circle cx="396" cy="130" r="9"/><circle cx="210" cy="270" r="9"/><circle cx="430" cy="270" r="9"/><circle cx="244" cy="410" r="9"/><circle cx="396" cy="410" r="9"/></g>
+<path d="M300 20 L320 2 L340 20 Z" fill="#92a1af"/>
+</svg>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#2dd4bf;font-weight:600;white-space:nowrap">Sonar ring</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">at bumper height, 45° apart, so no part of the body shadows a cone.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#ef4444;font-weight:600;white-space:nowrap">IR beams</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">three, all forward, spread across the body: anything the body will hit is in a beam. Recessed 6 cm — below that the IR curve folds back.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#22c55e;font-weight:600;white-space:nowrap">Cliff switches</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">front pair ahead of the wheels; rear pair because every escape manoeuvre reverses; side pair because the body brushes pits while turning. Each missing pair cost us a rover in testing.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#f5a524;font-weight:600;white-space:nowrap">Centre</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">gyro and accelerometer at the centre of mass; compass on top away from the motors; camera at the front tilted 15° down; optical flow underneath.</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Analysis · Sensor placement</p>
+<aside>This is the rover from above. Teal dots are the eight sonars, red lines the three infrared beams, green dots the six cliff switches. Two placement decisions came from failures: the rear cliff pair, because our escape behaviours reverse and a rover fell into a crater backwards, and the side pair, because the body brushed a pit while turning. The infrared sensors were first mounted at plus and minus thirty degrees — that left a blind strip exactly where the body is, so they now all face forward across the width.</aside>
+</section>
