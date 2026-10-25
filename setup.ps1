@@ -106,7 +106,7 @@ if ($LASTEXITCODE -ne 0) { Fail "pip could not install the dependencies. Check y
 
 # ------------------------------------------------------------------ check
 Say "Checking that everything imports"
-$check = & cmd /c "`"$venvPy`" -c `"import numpy, scipy, sklearn, matplotlib, pygame, PySide6; print('ok')`" 2>&1"
+$check = & cmd /c "`"$venvPy`" -c `"import numpy, scipy, sklearn, matplotlib, PySide6; print('ok')`" 2>&1"
 $check = ($check | Out-String)
 if ($check -notmatch "(?m)^ok\s*$") {
     Write-Host $check

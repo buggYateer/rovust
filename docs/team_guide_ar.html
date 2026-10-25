@@ -325,9 +325,9 @@
 <h2 id="files">16. ملفات المشروع — إيه كل ملف</h2>
 <div class="card">
 <details open><summary>جذر المشروع</summary><div class="tree">
-<div class="f"><span>main.py</span><span>نقطة البداية: <code>python main.py</code> (Qt) أو <code>--pygame</code> للواجهة القديمة</span></div>
+<div class="f"><span>main.py</span><span>نقطة البداية: <code>python main.py</code> (Qt)</span></div>
 <div class="f"><span>run.bat / setup.bat / setup.ps1</span><span>تشغيل بضغطة · تثبيت بضغطة واحدة (ينزّل، يجهّز، shortcut، يشغّل)</span></div>
-<div class="f"><span>requirements.txt</span><span>numpy, scipy, scikit-learn, matplotlib, pygame-ce, PySide6, pytest</span></div>
+<div class="f"><span>requirements.txt</span><span>numpy, scipy, scikit-learn, matplotlib, PySide6, pytest</span></div>
 <div class="f"><span>report_config.json</span><span>لينك بوّابة Drive + auto_send</span></div>
 <div class="f"><span>assets/icon.png, icon.ico</span><span>الأيقونة (بتتولّد من <code>paint_icon</code>)</span></div>
 </div></details>
@@ -343,6 +343,8 @@
 <div class="f"><span>mission.py</span><span>بيجمّع كل حاجة في مهمة واحدة: step()، المقاييس، أوضاع التحكم، الراديو</span></div>
 <div class="f"><span>comms.py</span><span>RadioLink: قوة الإشارة، فقد الحزم، التأخير، السجل</span></div>
 <div class="f"><span>report.py</span><span>بناء التقرير + ReportUploader (طابور offline)</span></div>
+<div class="f"><span>meta.py</span><span>ثوابت المشروع: اسم الروفر، الفريق، الدكتورة، أسماء البيئات والاستراتيجيات</span></div>
+<div class="f"><span>render.py</span><span>تلوين العالم الحقيقي وخريطة الاعتقاد كمصفوفات RGB (numpy فقط)</span></div>
 <div class="d">sim/robot/</div>
 <div class="f"><span>motor.py</span><span>DCMotor, HBridge, calibration_table</span></div>
 <div class="f"><span>encoder.py</span><span>IncrementalEncoder</span></div>
@@ -369,7 +371,6 @@
 <div class="d">sim/teleop/</div>
 <div class="f"><span>server.py</span><span>HTTP server: الصفحة، /api/state، /api/cmd، الصور</span></div>
 <div class="f"><span>console.html</span><span>صفحة الموبايل/التابلت (HTML/CSS/JS واحد)</span></div>
-<div class="d">sim/ui/ (الواجهة القديمة Pygame — fallback)</div>
 <div class="f"><span>app.py, render.py, theme.py, widgets.py</span><span>render.py لسه مستخدم لتلوين الخرائط في Qt والتقارير</span></div>
 <div class="d">sim/experiments/</div>
 <div class="f"><span>run_batch.py</span><span>التجارب بدون واجهة (strategies / --localisation / --ablation)</span></div>

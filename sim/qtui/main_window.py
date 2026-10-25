@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QDialogButtonBo
 
 from ..ai.brain import AIBrain
 from ..mission import Mission
-from ..ui import theme as T
+from .. import meta as T
 from .mapview import MapWidget
 from .panels import (LEGEND_HTML, AboutDialog, ControlsDialog, GuideDialog, MotorTab, SensorsTab, SetupPanel,
                      StatsTab)
