@@ -16,21 +16,24 @@ QSS = """
 * {{ font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; font-size: 10pt; }}
 QMainWindow, QDialog {{ background: {bg}; }}
 QWidget {{ color: {text}; }}
-QMenuBar {{ background: {bg}; padding: 2px 6px; }}
+QMenuBar {{ background: {surface}; padding: 3px 8px; border-bottom: 1px solid {line}; }}
 QMenuBar::item {{ padding: 6px 10px; border-radius: 6px; }}
 QMenuBar::item:selected {{ background: {surface2}; }}
 QMenu {{ background: {surface}; border: 1px solid {line}; border-radius: 8px; padding: 6px; }}
 QMenu::item {{ padding: 6px 26px 6px 12px; border-radius: 6px; }}
 QMenu::item:selected {{ background: {accent}; color: {on_accent}; }}
 QMenu::separator {{ height: 1px; background: {line}; margin: 6px 4px; }}
-QToolBar {{ background: {bg}; border: none; padding: 4px 8px; spacing: 4px; }}
-QToolBar::separator {{ width: 1px; background: {line}; margin: 6px 6px; }}
-QToolButton {{ padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; }}
-QToolButton:hover {{ background: {surface2}; border-color: {line}; }}
+QToolBar {{ background: {toolbar}; border: none; border-bottom: 1px solid {line}; padding: 6px 10px; spacing: 6px; }}
+QToolBar::separator {{ width: 1px; background: {line}; margin: 4px 8px; }}
+QToolButton {{ padding: 6px 12px; border-radius: 6px; border: 1px solid {line}; background: {surface2}; }}
+QToolButton:hover {{ border-color: {accent}; }}
 QToolButton:checked {{ background: {accent}; color: {on_accent}; font-weight: 600; }}
 QStatusBar {{ background: {surface}; border-top: 1px solid {line}; }}
 QStatusBar QLabel {{ color: {muted}; padding: 0 6px; }}
-QDockWidget::title {{ background: {bg}; padding: 8px 10px; color: {muted}; font-weight: 600; text-align: left; }}
+QDockWidget {{ background: {bg}; }}
+QDockWidget::title {{ background: {surface}; padding: 8px 12px; color: {text}; font-weight: 600; text-align: left; border-top: 1px solid {line}; border-bottom: 1px solid {line}; }}
+QScrollArea {{ background: {bg}; border: none; }}
+QScrollArea > QWidget > QWidget {{ background: {bg}; }}
 QGroupBox {{ border: 1px solid {line}; border-radius: 10px; margin-top: 16px; padding: 10px 8px 8px; background: {surface}; }}
 QGroupBox::title {{ subcontrol-origin: margin; subcontrol-position: top left; left: 10px; padding: 0 6px; color: {muted}; font-weight: 600; }}
 QPushButton {{ background: {surface2}; border: 1px solid {line}; border-radius: 8px; padding: 7px 14px; }}
@@ -72,9 +75,9 @@ QToolTip {{ background: {surface}; color: {text}; border: 1px solid {line}; bord
 QLabel#hint {{ color: {muted}; }}
 """
 
-DARK = dict(bg="#141a1f", surface="#1e262d", surface2="#26303a", line="#2f3b46", text="#e6edf3", muted="#8b9aa7",
+DARK = dict(bg="#11161b", surface="#1b232a", surface2="#28323d", line="#36434f", toolbar="#161d23", text="#e6edf3", muted="#8b9aa7",
             accent="#2dd4bf", accent_hover="#5eead4", on_accent="#0b1114")
-LIGHT = dict(bg="#eef1f4", surface="#ffffff", surface2="#f3f6f8", line="#d5dde4", text="#141a1f", muted="#5c6b78",
+LIGHT = dict(bg="#e9edf1", surface="#ffffff", surface2="#f4f7f9", line="#c9d3dc", toolbar="#f7f9fb", text="#141a1f", muted="#5c6b78",
              accent="#0f9d8a", accent_hover="#13b39d", on_accent="#ffffff")
 
 
