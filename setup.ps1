@@ -33,6 +33,10 @@ if (-not $Dest) {
     $Dest = if ($answer) { $answer } else { $default }
 }
 $Dest = [System.IO.Path]::GetFullPath($Dest)
+if ($Dest.Length -gt 70) {
+    # Windows limits paths to 260 characters and the Qt package has very deep folders
+    Fail "That folder path is too long ($($Dest.Length) characters). Please choose a short one such as C:\Users\$env:USERNAME\PyRov and run the setup again."
+}
 Say "Project folder: $Dest"
 
 # ------------------------------------------------------------------ python
@@ -103,9 +107,10 @@ if ($LASTEXITCODE -ne 0) { Fail "pip could not install the dependencies. Check y
 # ------------------------------------------------------------------ check
 Say "Checking that everything imports"
 $check = & cmd /c "`"$venvPy`" -c `"import numpy, scipy, sklearn, matplotlib, pygame, PySide6; print('ok')`" 2>&1"
-if ($check -notmatch "ok") {
+$check = ($check | Out-String)
+if ($check -notmatch "(?m)^ok\s*$") {
     Write-Host $check
-    if ("$check" -match "Application Control") {
+    if ($check -match "Application Control") {
         Fail "Windows 'Smart App Control' is blocking the installed packages. Turn it off in Windows Security > App & browser control > Smart App Control, then run the setup again."
     }
     Fail "Something did not install correctly (see the message above)."
