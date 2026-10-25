@@ -122,6 +122,8 @@ class SetupPanel(QWidget):
         f.addWidget(self.loss)
         self.server_btn = QPushButton("Open console for phone / tablet")
         self.server_btn.setCheckable(True)
+        self.server_btn.setObjectName("secondary")
+        self.server_btn.setMinimumHeight(36)
         f.addWidget(self.server_btn)
         self.server_url = QLabel("")
         self.server_url.setWordWrap(True)

@@ -43,6 +43,9 @@ QPushButton:checked {{ background: {accent}; color: {on_accent}; border-color: {
 QPushButton:disabled {{ color: {muted}; }}
 QPushButton#primary {{ background: {accent}; color: {on_accent}; border-color: {accent}; font-weight: 600; }}
 QPushButton#primary:hover {{ background: {accent_hover}; }}
+QPushButton#secondary {{ background: {amber_bg}; color: {amber_text}; border-color: {amber}; font-weight: 600; }}
+QPushButton#secondary:hover {{ background: {amber}; color: #141a1f; }}
+QPushButton#secondary:checked {{ background: {amber}; color: #141a1f; border-color: {amber}; }}
 QComboBox, QSpinBox, QLineEdit {{ background: {surface2}; border: 1px solid {line}; border-radius: 8px; padding: 5px 10px; min-height: 22px; }}
 QComboBox:hover, QSpinBox:hover {{ border-color: {accent}; }}
 QComboBox::drop-down {{ border: none; width: 26px; subcontrol-origin: padding; subcontrol-position: center right; }}
@@ -76,9 +79,11 @@ QLabel#hint {{ color: {muted}; }}
 """
 
 DARK = dict(bg="#11161b", surface="#1b232a", surface2="#28323d", line="#36434f", toolbar="#161d23", text="#e6edf3", muted="#8b9aa7",
-            accent="#2dd4bf", accent_hover="#5eead4", on_accent="#0b1114")
+            accent="#2dd4bf", accent_hover="#5eead4", on_accent="#0b1114",
+            amber="#f5a524", amber_bg="#3a2e14", amber_text="#f5a524")
 LIGHT = dict(bg="#e9edf1", surface="#ffffff", surface2="#f4f7f9", line="#c9d3dc", toolbar="#f7f9fb", text="#141a1f", muted="#5c6b78",
-             accent="#0f9d8a", accent_hover="#13b39d", on_accent="#ffffff")
+             accent="#0f9d8a", accent_hover="#13b39d", on_accent="#ffffff",
+             amber="#d97706", amber_bg="#fff4e0", amber_text="#8a4b00")
 
 
 def apply_theme(app: QApplication, dark: bool):
