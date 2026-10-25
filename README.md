@@ -10,7 +10,8 @@ and decision code never changes.
 
 Robotics course — team project, supervised by **Dr. Elshaimaa Nabil Nada**.
 Full proposal: [docs/Task1_v2.md](docs/Task1_v2.md). Design notes and sensor
-placement: [docs/DESIGN.md](docs/DESIGN.md).
+placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
+[docs/RESULTS.md](docs/RESULTS.md).
 
 ## How to run (for the team)
 
