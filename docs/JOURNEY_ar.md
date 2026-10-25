@@ -19,7 +19,7 @@
 - النتيجة: proposal معدّل (Task1_v2) بيضيف طبقة الهاردوير والتصنيف الدقيق للسنسورز. القالب الأصلي كان طالب abstract بس، فاللي اترفع كان كافي، والنسخة الجديدة بقت مرجع التنفيذ.
 
 **3. تجهيز البيئة — أول عقبة**
-- Python 3.15 جديد جدًا؛ pygame الأصلي ما ليهوش wheel ليه → استخدمنا **pygame-ce**.
+- Python 3.15 جديد جدًا؛ pygame الأصلي ما ليهوش wheel ليه → استخدمنا **pygame-ce** للواجهة الأولى (اتشالت بعدين لما Qt حلّت مكانها).
 - Windows **Smart App Control** كان بيعمل block للـ DLLs بتاعة matplotlib وscikit-learn ("Application Control policy has blocked this file"). الحل: إيقافه. اتكتبت ملاحظة في الـ README لزمايلنا.
 - عملنا GitHub repo ورفعنا الهيكل.
 

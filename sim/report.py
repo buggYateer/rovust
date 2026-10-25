@@ -34,7 +34,7 @@ CONFIG_PATH = os.path.join(ROOT, "report_config.json")
 PENDING_PATH = os.path.join(REPORTS_DIR, "pending.json")
 INDEX_CSV = os.path.join(REPORTS_DIR, "missions.csv")
 
-from .ui import theme as T
+from . import meta as T
 
 
 # ------------------------------------------------------------------ config

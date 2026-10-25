@@ -30,7 +30,7 @@ def no_wheel(widget):
     return widget
 
 from ..sensors.base import FAULT_MODES
-from ..ui import theme as T
+from .. import meta as T
 
 ENV_ORDER = ["cave", "mars", "underwater"]
 

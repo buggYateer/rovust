@@ -8,7 +8,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
-from ..ui.render import belief_rgb, world_rgb
+from ..render import belief_rgb, world_rgb
 
 C_TRUE_PATH = QColor(255, 215, 0)
 C_FUSED = QColor(40, 170, 90)
