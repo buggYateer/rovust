@@ -491,7 +491,6 @@ def run():
             pass
     app = QApplication(sys.argv)
     app.setApplicationName(f"{T.ROVER_NAME} Rover Simulator")
-    app.setApplicationDisplayName(T.ROVER_NAME)
     app.setOrganizationName("Robotics Team Project")
     icon = ensure_icon()
     app.setWindowIcon(icon)
