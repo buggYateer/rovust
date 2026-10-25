@@ -8,3 +8,4 @@ results/
 !docs/**/*.png
 !assets/*
 sim/ai/terrain_rf.pkl
+reports/

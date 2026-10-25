@@ -29,7 +29,7 @@ and decision code never changes.
 Robotics course — team project, supervised by **Dr. Elshaimaa Nabil Nada**.
 Full proposal: [docs/Task1_v2.md](docs/Task1_v2.md). Design notes and sensor
 placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
-[docs/RESULTS.md](docs/RESULTS.md).
+[docs/RESULTS.md](docs/RESULTS.md). Drive reports: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md).
 
 ## How to run
 
@@ -106,6 +106,16 @@ Using Claude Code instead? Paste the prompt in [docs/SETUP_WITH_CLAUDE.md](docs/
    - Arrow keys / W A S D drive from the computer's keyboard as well: start a
      mission, choose Assisted or Manual, then *hold* a key.
    - If Windows asks, allow Python through the firewall on private networks.
+
+6. (optional) Mission reports to the team's Google Drive folder
+   - **Send report** (toolbar / File, Ctrl+S) saves `reports/Mission #n - date time - env (machine)/`
+     with `report.html` (statistics + both maps), the map PNGs and `metrics.json`;
+     with *auto-send* on (default) this happens by itself when a mission ends.
+   - One teammate sets up the Drive bridge once (5 minutes, no Google login in
+     the program): [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md). After that
+     every report from every computer lands in the shared folder; offline
+     reports wait in `reports/pending.json` and go out when the network returns.
+   - Click either map to open it in a large live window.
 
 `python main.py --pygame` starts the older single-window Pygame interface.
 
