@@ -1,10 +1,15 @@
 """The main window: menus, toolbar, setup dock, two maps, bottom tabs, status bar."""
 from __future__ import annotations
 
+import os
+
 from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence
-from PySide6.QtWidgets import (QApplication, QDockWidget, QLabel, QMainWindow, QScrollArea, QSplitter, QTabWidget,
-                               QToolBar, QVBoxLayout, QWidget)
+from PySide6.QtCore import QBuffer, QIODevice, QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QDialogButtonBox, QDockWidget, QFormLayout, QLabel,
+                               QLineEdit, QMainWindow, QScrollArea, QSplitter, QTabWidget, QToolBar, QVBoxLayout,
+                               QWidget)
 
 from ..ai.brain import AIBrain
 from ..mission import Mission
@@ -12,6 +17,8 @@ from ..ui import theme as T
 from .mapview import MapWidget
 from .panels import (LEGEND_HTML, AboutDialog, ControlsDialog, GuideDialog, MotorTab, SensorsTab, SetupPanel,
                      StatsTab)
+from ..report import ReportUploader, build_report, load_config, save_config, REPORTS_DIR
+from .popup import MapPopup
 from .radio import RadioTab
 from .theme_qt import apply_theme, ensure_icon
 from ..teleop.server import ConsoleServer
@@ -33,6 +40,8 @@ class MainWindow(QMainWindow):
         self.settings = QSettings("RoboticsTeamProject", "RoverSimulator")
         self.server: ConsoleServer | None = None
         self._keys = set()
+        self.uploader = ReportUploader()
+        self._report_sent_for = None       # mission object that already got its automatic report
 
         # ---- central: the two maps + legend
         central = QWidget()
@@ -40,6 +49,9 @@ class MainWindow(QMainWindow):
         v.setContentsMargins(6, 6, 6, 0)
         self.map_world = MapWidget("TRUE WORLD  (the robot never sees this)")
         self.map_belief = MapWidget("ROBOT'S MAP  (built from its own sensors)")
+        self.map_world.clicked.connect(lambda: self._toggle_popup("world"))
+        self.map_belief.clicked.connect(lambda: self._toggle_popup("belief"))
+        self.popups = {}
         split = QSplitter(Qt.Orientation.Horizontal)
         split.addWidget(self.map_world)
         split.addWidget(self.map_belief)
@@ -94,6 +106,13 @@ class MainWindow(QMainWindow):
         self._build_statusbar()
 
         QApplication.instance().installEventFilter(self)
+        self.report_timer = QTimer(self)
+        self.report_timer.setInterval(30000)
+        self.report_timer.timeout.connect(lambda: self.uploader.flush(self._report_status))
+        self.report_timer.start()
+        QTimer.singleShot(3000, lambda: self.uploader.flush(self._report_status))
+        if self.uploader.pending:
+            self.st_report.setText(f"{len(self.uploader.pending)} report(s) waiting to upload   ")
         self.timer = QTimer(self)
         self.timer.setInterval(16)
         self.timer.timeout.connect(self._on_tick)
@@ -107,6 +126,12 @@ class MainWindow(QMainWindow):
         self.act_restart = QAction("&Restart mission", self, shortcut=QKeySequence("R"), triggered=self.restart_mission)
         self.act_exit = QAction("E&xit", self, shortcut=QKeySequence("Ctrl+Q"), triggered=self.close)
         m_file.addActions([self.act_new, self.act_restart])
+        m_file.addSeparator()
+        self.act_report = QAction("&Send report", self, shortcut=QKeySequence("Ctrl+S"), triggered=self.send_report)
+        self.act_report.setToolTip("Save a report of this mission (statistics + maps) and upload it to the team's Drive folder")
+        m_file.addAction(self.act_report)
+        m_file.addAction(QAction("Open reports &folder", self, triggered=lambda: (os.makedirs(REPORTS_DIR, exist_ok=True), QDesktopServices.openUrl(QUrl.fromLocalFile(REPORTS_DIR)))))
+        m_file.addAction(QAction("Report se&ttings...", self, triggered=self._report_settings))
         m_file.addSeparator()
         m_file.addAction(self.act_exit)
 
@@ -168,6 +193,8 @@ class MainWindow(QMainWindow):
         tb.addSeparator()
         tb.addAction(self.act_lights)
         tb.addSeparator()
+        tb.addAction(self.act_report)
+        tb.addSeparator()
         tb.addAction(self.act_dark)
         self.addToolBar(tb)
 
@@ -178,7 +205,9 @@ class MainWindow(QMainWindow):
         self.st_cov = QLabel("")
         self.st_beh = QLabel("")
         self.st_link = QLabel("")
+        self.st_report = QLabel("")
         sb.addWidget(self.st_status, 1)
+        sb.addPermanentWidget(self.st_report)
         sb.addPermanentWidget(self.st_link)
         sb.addPermanentWidget(self.st_beh)
         sb.addPermanentWidget(self.st_cov)
@@ -203,6 +232,8 @@ class MainWindow(QMainWindow):
         self.motor_tab.set_mission(self.mission)
         self.stats_tab.set_mission(self.mission)
         self.radio_tab.set_mission(self.mission)
+        for pop in self.popups.values():
+            pop.set_mission(self.mission, layers)
         self.setWindowTitle(f"{T.ROVER_NAME} - {T.ENV_TITLES[cfg['env']]} / {self.mission.explorer.name} / {cfg['localisation']}")
 
     def restart_mission(self):
@@ -225,6 +256,74 @@ class MainWindow(QMainWindow):
         if self.mission is not None and not self.mission.done:
             self.mission.returning = True
             self.mission.stats["return_reason"] = "operator"
+
+    # -------------------------------------------------------------- reports
+    def _grab_png(self, widget) -> bytes:
+        pix = widget.grab()
+        buf = QBuffer()
+        buf.open(QIODevice.OpenModeFlag.WriteOnly)
+        pix.save(buf, "PNG")
+        return bytes(buf.data())
+
+    def send_report(self):
+        m = self.mission
+        if m is None:
+            self.st_report.setText("start a mission first   ")
+            return
+        images = {"true_world.png": self._grab_png(self.map_world), "robot_map.png": self._grab_png(self.map_belief)}
+        folder = build_report(m, images)
+        self._report_sent_for = m
+        if self.uploader.configured:
+            self.uploader.queue(folder)
+            self.st_report.setText("report saved - uploading...   ")
+            self.uploader.flush(self._report_status)
+        else:
+            self.st_report.setText(f"report saved locally ({os.path.basename(folder)}) - set the Drive bridge in File > Report settings   ")
+
+    def _report_status(self, text):
+        # called from the upload thread: hop back to the GUI thread
+        QTimer.singleShot(0, lambda: self.st_report.setText(text + "   "))
+
+    def _report_settings(self):
+        cfg = load_config()
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Report settings")
+        lay = QFormLayout(dlg)
+        url = QLineEdit(cfg.get("upload_url", ""))
+        url.setPlaceholderText("https://script.google.com/macros/s/.../exec")
+        url.setMinimumWidth(460)
+        auto = QCheckBox("Send a report automatically when a mission ends")
+        auto.setChecked(bool(cfg.get("auto_send", True)))
+        hint = QLabel('The URL comes from the Google Apps Script bridge described in docs/DRIVE_REPORTS.md. '
+                      'Reports are always saved under reports/ as well.')
+        hint.setWordWrap(True)
+        hint.setObjectName("hint")
+        lay.addRow("Drive bridge URL:", url)
+        lay.addRow("", auto)
+        lay.addRow(hint)
+        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
+        bb.accepted.connect(dlg.accept)
+        bb.rejected.connect(dlg.reject)
+        lay.addRow(bb)
+        if dlg.exec():
+            cfg["upload_url"] = url.text().strip()
+            cfg["auto_send"] = auto.isChecked()
+            save_config(cfg)
+            self.uploader.cfg = cfg
+            self.uploader.flush(self._report_status)
+
+    # ----------------------------------------------------------- map pop-up
+    def _toggle_popup(self, kind):
+        if self.mission is None:
+            return
+        pop = self.popups.get(kind)
+        if pop is not None and pop.isVisible():
+            pop.close()
+            return
+        title = "True world (the robot never sees this)" if kind == "world" else "Robot's map (built from its own sensors)"
+        pop = MapPopup(self, title, self.mission, kind, self.setup.layers())
+        self.popups[kind] = pop
+        pop.show()
 
     # ----------------------------------------------------------- teleop
     def _mode_changed(self, _):
@@ -312,6 +411,8 @@ class MainWindow(QMainWindow):
                 a.blockSignals(False)
         self.map_world.layers = layers
         self.map_belief.layers = layers
+        for pop in self.popups.values():
+            pop.view.layers = layers
 
     # ------------------------------------------------------------------ loop
     def _on_tick(self):
@@ -329,9 +430,13 @@ class MainWindow(QMainWindow):
                 self.motor_tab.push_sample()
                 if m.done:
                     break
+        if m.done and self._report_sent_for is not m and self.uploader.cfg.get("auto_send", True):
+            self.send_report()
         self._tick += 1
         self.map_world.update()
         self.map_belief.update()
+        for pop in self.popups.values():
+            pop.refresh()
         if self._tick % 3 == 0:
             idx = self.tabs.currentIndex()
             if idx == 0:

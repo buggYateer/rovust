@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
@@ -24,9 +24,12 @@ C_FAULT = QColor(220, 0, 0)
 
 class MapWidget(QWidget):
     """Draws a (h, w, 3) RGB array scaled to fit, then calls an overlay painter."""
+    clicked = Signal()
 
     def __init__(self, title: str, parent=None):
         super().__init__(parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setToolTip("Click to open a large live view")
         self.title = title
         self.mission = None
         self.layers = {}
@@ -42,6 +45,11 @@ class MapWidget(QWidget):
         self.layers = layers
         self._world_cache = None
         self.update()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton and self.mission is not None:
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
 
     # ---------------------------------------------------------- transforms
     def _geometry(self):
