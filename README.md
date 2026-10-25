@@ -12,38 +12,62 @@ Robotics course — team project, supervised by **Dr. Elshaimaa Nabil Nada**.
 Full proposal: [docs/Task1_v2.md](docs/Task1_v2.md). Design notes and sensor
 placement: [docs/DESIGN.md](docs/DESIGN.md).
 
-## Quick start
+## How to run (for the team)
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate            # Windows   (source .venv/bin/activate on Linux/macOS)
-pip install -r requirements.txt
-python main.py
-```
+**Requirements:** Python 3.12 or newer (we use 3.15), Git, Windows / Linux / macOS.
 
-Pick an environment, a strategy and a localisation mode, press **START MISSION**.
-In the simulator: `SPACE` pause · `1–4` speed ×1/×4/×8/×16 · `S` sonar rays ·
-`I` IR beams · `T` terrain layer · `V` visited cells · `F` frontiers ·
-`L` true path · `H` headlights · **click any sensor row to inject a fault**
-(ok → stuck → dead → noisy) · `ESC` menu.
+1. Get the code
+   ```bash
+   git clone https://github.com/buggYateer/robotics-project.git
+   cd robotics-project
+   ```
+2. Create a virtual environment and install the dependencies (once)
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate            # Windows
+   source .venv/bin/activate         # Linux / macOS
+   pip install -r requirements.txt
+   ```
+3. Run the simulator
+   ```bash
+   python main.py
+   ```
+   A desktop window opens. In the **Mission setup** panel on the left choose
+   the environment, the exploration strategy, the localisation mode, AI on/off
+   and a seed, then press **Start mission**. The **Help → User guide** menu
+   inside the program explains every panel; **Help → About** has the team.
 
-> Python 3.15 + `pygame-ce` is what we tested. On Windows 11 with *Smart App
-> Control* on, the compiled parts of matplotlib / scikit-learn may be blocked;
-> turn it off or use Python 3.12.
+   Keyboard: `Space` pause · `1 2 3 4` speed ×1 ×4 ×8 ×16 · `R` restart · `H`
+   headlights · `F1` user guide. In the **Sensors** tab the *Fault* column
+   injects a fault into any sensor while the mission runs.
+
+4. (optional) Run the tests and the experiments
+   ```bash
+   pytest
+   python -m sim.experiments.pid_demo
+   python -m sim.experiments.run_batch --seeds 10
+   ```
+
+`python main.py --pygame` starts the older single-window Pygame interface.
+
+> **Windows 11 note:** if *Smart App Control* is on, the compiled parts of
+> matplotlib / scikit-learn / PySide6 may be blocked ("An Application Control
+> policy has blocked this file"). Turn it off in *Windows Security → App &
+> browser control*, or use Python 3.12 whose packages are already trusted.
 
 ## Screenshots
 
-| Start menu | Live simulator (cave) |
+| Cave – Sensors tab | Mars – Motor control tab |
 |---|---|
-| ![menu](docs/screenshots/menu.png) | ![cave](docs/screenshots/sim_cave.png) |
-| **Mars** (utility explorer, AI fault detector on) | **Underwater** (DVL, current, 12-sonar ring) |
-| ![mars](docs/screenshots/sim_mars.png) | ![underwater](docs/screenshots/sim_underwater.png) |
+| ![cave](docs/screenshots/qt_cave.png) | ![mars](docs/screenshots/qt_mars.png) |
+| **Underwater – Statistics tab** | **User guide (Help → F1)** |
+| ![underwater](docs/screenshots/qt_underwater.png) | ![guide](docs/screenshots/qt_guide.png) |
 
-Left panel: the true world the robot never sees (sonar cones, IR beams, true
-path). Right panel: the robot's own map (occupancy + terrain + hazards, fused
-estimate in green, encoders-only estimate in red, planned path, frontiers).
-Below: every sensor reading live, the PWM/encoder/PID loop of the left wheel,
-and the mission statistics.
+Left map: the true world the robot never sees (sonar cones, IR beams, cliff
+switches, true path). Right map: the robot's own map (occupancy + terrain +
+hazards, fused estimate in green, encoders-only estimate in red, planned path,
+frontiers). Bottom tabs: every sensor reading live with fault injection, the
+PWM → motor → encoder → PID loop, and the mission statistics.
 
 ![pid](docs/figures/pid_step_response.png)
 
