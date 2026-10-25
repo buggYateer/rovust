@@ -13,7 +13,7 @@ Full proposal: [docs/Task1_v2.md](docs/Task1_v2.md). Design notes and sensor
 placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
 [docs/RESULTS.md](docs/RESULTS.md).
 
-## How to run (for the team)
+## How to run
 
 **Requirements:** Python 3.12 or newer (we use 3.15), Git, Windows / Linux / macOS.
 
