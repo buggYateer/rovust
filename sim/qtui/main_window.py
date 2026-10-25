@@ -12,6 +12,7 @@ from ..ui import theme as T
 from .mapview import MapWidget
 from .panels import (LEGEND_HTML, AboutDialog, ControlsDialog, GuideDialog, MotorTab, SensorsTab, SetupPanel,
                      StatsTab)
+from .radio import RadioTab
 from .theme_qt import apply_theme, ensure_icon
 from ..teleop.server import ConsoleServer
 
@@ -75,9 +76,11 @@ class MainWindow(QMainWindow):
         self.sensors_tab = SensorsTab()
         self.motor_tab = MotorTab()
         self.stats_tab = StatsTab()
+        self.radio_tab = RadioTab()
         self.tabs.addTab(self.sensors_tab, "Sensors")
         self.tabs.addTab(self.motor_tab, "Motor control")
         self.tabs.addTab(self.stats_tab, "Statistics")
+        self.tabs.addTab(self.radio_tab, "Radio link")
         dock = QDockWidget("Telemetry", self)
         dock.setObjectName("telemetryDock")
         dock.setWidget(self.tabs)
@@ -199,6 +202,7 @@ class MainWindow(QMainWindow):
         self.sensors_tab.set_mission(self.mission)
         self.motor_tab.set_mission(self.mission)
         self.stats_tab.set_mission(self.mission)
+        self.radio_tab.set_mission(self.mission)
         self.setWindowTitle(f"{T.ROVER_NAME} - {T.ENV_TITLES[cfg['env']]} / {self.mission.explorer.name} / {cfg['localisation']}")
 
     def restart_mission(self):
@@ -243,6 +247,7 @@ class MainWindow(QMainWindow):
                 self.server.start()
                 self.setup.server_url.setText(f"On the phone or tablet (same Wi-Fi) open:\n{self.server.url}")
                 self.setup.server_btn.setText("Close console")
+                self.tabs.setCurrentWidget(self.radio_tab)
             except OSError as e:
                 self.setup.server_url.setText(f"Could not start the console: {e}")
                 self.setup.server_btn.setChecked(False)
@@ -320,8 +325,10 @@ class MainWindow(QMainWindow):
                 self.sensors_tab.refresh()
             elif idx == 1:
                 self.motor_tab.refresh()
-            else:
+            elif idx == 2:
                 self.stats_tab.refresh()
+            else:
+                self.radio_tab.refresh()
             status = m.status.upper() + (f" ({m.stats['return_reason']})" if m.stats["return_reason"] else "")
             if self.paused:
                 status += "  -  PAUSED"
@@ -362,5 +369,5 @@ def run():
     app.setWindowIcon(icon)
     w = MainWindow()
     w.setWindowIcon(icon)
-    w.show()
+    w.showMaximized()
     return app.exec()

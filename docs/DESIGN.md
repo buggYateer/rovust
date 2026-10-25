@@ -144,9 +144,19 @@ station at the start point, signal strength
 packets dropped with 50 % probability when *weak* and always when *lost*,
 delivered after the environment's latency (Mars 2 s, underwater 0.4 s). Lost
 for three seconds → `link_fallback`: autonomy takes over according to the
-operator's *Link lost* choice (wait / explore / return home) until a command
-arrives again. The console page never touches the robot directly: it only
-sends packets into this link.
+operator's *Link lost* choice (return home by default: the rover drives back
+into range on its own; or explore / wait) until a command arrives again.
+Calibration: cave range 18 m, 5 % loss per wall cell (near half ok, middle
+weak, far corner lost); underwater 16 m, 5 %, 0.4 s; Mars 60 m, 2 %, 2 s.
+
+The console page never drives the robot directly: physical commands (drive,
+lights, stop, return home) only enter this link, and the page shows a toast
+when one is dropped. Console *settings* (who drives, link-lost action, top
+speed) describe how the operator wants to work and apply at once. The stick
+response is car-like: `v = v_max · y|y|`, `ω = 1.0 · x|x| · (1 − 0.35|y|)`.
+The **Radio link** tab draws the base station, the walls on the line of
+sight and the RSSI, and logs every packet with the sender's address; the maps
+draw the line of sight coloured by the link state.
 
 ## 10. Things we learned the hard way (all reproducible with the fault buttons)
 
