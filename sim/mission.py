@@ -79,6 +79,20 @@ class Mission:
     def done(self) -> bool:
         return self.status in ("fell", "battery_dead", "returned")
 
+    def end_reason(self) -> str:
+        """One sentence for the interface when the mission is over."""
+        st = self.status
+        if st == "fell":
+            how = " while being driven in manual mode (the cliff layer was switched off)" if self.mode == "manual" else ""
+            return f"The rover fell into a pit{how}."
+        if st == "battery_dead":
+            return "The battery is empty."
+        if st == "returned":
+            why = {"explored": "the map is complete", "battery": "the battery was only just enough to get back",
+                   "link lost": "the radio link was lost", "operator": "you asked it to"}.get(self.stats["return_reason"], "")
+            return "The rover is back at the base" + (f" - {why}." if why else ".")
+        return ""
+
     def coverage(self) -> float:
         """Fraction of the reachable world the robot has mapped."""
         known = ~self.grid.unknown_mask()
