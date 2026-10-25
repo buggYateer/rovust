@@ -264,22 +264,32 @@ class MainWindow(QMainWindow):
         self.settings.setValue("dark", dark)
         self.update()
 
+    # Windows virtual-key codes of the physical W A S D keys: these do not change
+    # with the keyboard layout (an Arabic layout sends Arabic letters as text,
+    # but the key itself is still VK 0x57 etc.)
+    VK_TO_KEY = {0x57: Qt.Key.Key_W, 0x41: Qt.Key.Key_A, 0x53: Qt.Key.Key_S, 0x44: Qt.Key.Key_D}
     DRIVE_KEYS = {Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Left, Qt.Key.Key_Right,
                   Qt.Key.Key_W, Qt.Key.Key_A, Qt.Key.Key_S, Qt.Key.Key_D}
+    KEY_TURN = 0.75        # keyboard steering authority (full stick would be 1.0)
+
+    def _drive_key(self, event):
+        key = self.VK_TO_KEY.get(event.nativeVirtualKey(), event.key())
+        return key if key in self.DRIVE_KEYS else None
 
     def eventFilter(self, obj, event):
         """Driving keys work wherever the focus is (a combo box, the table...),
         as long as a mission is in assisted or manual mode."""
         from PySide6.QtCore import QEvent
         from PySide6.QtWidgets import QAbstractSpinBox, QLineEdit
-        if event.type() in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease) and event.key() in self.DRIVE_KEYS:
+        if event.type() in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease):
+            key = self._drive_key(event)
             m = self.mission
-            if m is not None and m.mode != "autonomous" and not isinstance(QApplication.focusWidget(), (QLineEdit, QAbstractSpinBox)):
+            if key is not None and m is not None and m.mode != "autonomous"                     and not isinstance(QApplication.focusWidget(), (QLineEdit, QAbstractSpinBox)):
                 if not event.isAutoRepeat():
                     if event.type() == QEvent.Type.KeyPress:
-                        self._keys.add(event.key())
+                        self._keys.add(key)
                     else:
-                        self._keys.discard(event.key())
+                        self._keys.discard(key)
                     self._key_drive()
                 return True
         return super().eventFilter(obj, event)
@@ -291,7 +301,7 @@ class MainWindow(QMainWindow):
         k = self._keys
         fwd = (1 if (Qt.Key.Key_Up in k or Qt.Key.Key_W in k) else 0) - (1 if (Qt.Key.Key_Down in k or Qt.Key.Key_S in k) else 0)
         turn = (1 if (Qt.Key.Key_Left in k or Qt.Key.Key_A in k) else 0) - (1 if (Qt.Key.Key_Right in k or Qt.Key.Key_D in k) else 0)
-        m.operator_drive(fwd, turn)
+        m.operator_drive(fwd, self.KEY_TURN * turn)
 
     def _layers_changed(self):
         layers = self.setup.layers()
