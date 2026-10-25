@@ -269,7 +269,10 @@ class MainWindow(QMainWindow):
 
     # -------------------------------------------------------------- reports
     def _grab_png(self, widget) -> bytes:
+        widget.banner_enabled = False
+        widget.repaint()
         pix = widget.grab()
+        widget.banner_enabled = True
         buf = QBuffer()
         buf.open(QIODevice.OpenModeFlag.WriteOnly)
         pix.save(buf, "PNG")

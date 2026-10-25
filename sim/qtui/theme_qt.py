@@ -131,23 +131,25 @@ def paint_icon(size: int = 256) -> QImage:
     pen = QPen(QColor(45, 212, 191), s * 0.045, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
     p.setPen(pen)
     p.setBrush(Qt.BrushStyle.NoBrush)
-    cx, cy = s * 0.5, s * 0.58
-    for k, rad in enumerate((0.30, 0.40, 0.50)):
+    # the rover sits in the lower half; the echo arcs fan out above it so the
+    # whole figure is centred on the tile
+    cx, cy = s * 0.5, s * 0.66
+    for k, rad in enumerate((0.27, 0.36, 0.45)):
         p.setOpacity(1.0 - k * 0.28)
-        p.drawArc(QRectF(cx - s * rad, cy - s * rad, 2 * s * rad, 2 * s * rad), 50 * 16, 80 * 16)
+        p.drawArc(QRectF(cx - s * rad, cy - s * rad, 2 * s * rad, 2 * s * rad), 52 * 16, 76 * 16)
     p.setOpacity(1.0)
     # wheels
     p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(QColor(230, 237, 243))
     for dx in (-1, 1):
         for dy in (-1, 1):
-            p.drawRoundedRect(QRectF(cx + dx * s * 0.19 - s * 0.045, cy + dy * s * 0.10 - s * 0.07, s * 0.09, s * 0.14), s * 0.02, s * 0.02)
+            p.drawRoundedRect(QRectF(cx + dx * s * 0.19 - s * 0.045, cy + dy * s * 0.095 - s * 0.07, s * 0.09, s * 0.14), s * 0.02, s * 0.02)
     # body
     p.setBrush(QColor(245, 165, 36))
-    p.drawRoundedRect(QRectF(cx - s * 0.15, cy - s * 0.19, s * 0.30, s * 0.38), s * 0.06, s * 0.06)
+    p.drawRoundedRect(QRectF(cx - s * 0.15, cy - s * 0.18, s * 0.30, s * 0.36), s * 0.06, s * 0.06)
     # camera "eye" at the front
     p.setBrush(QColor(20, 26, 31))
-    p.drawEllipse(QRectF(cx - s * 0.045, cy - s * 0.15, s * 0.09, s * 0.09))
+    p.drawEllipse(QRectF(cx - s * 0.045, cy - s * 0.14, s * 0.09, s * 0.09))
     p.end()
     return img
 
