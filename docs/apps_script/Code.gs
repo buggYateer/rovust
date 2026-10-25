@@ -20,7 +20,7 @@ function doPost(e) {
       if (f.mime.indexOf('text/') === 0 || f.mime === 'application/json') {
         // write the final number into the report itself
         let txt = Utilities.newBlob(bytes).getDataAsString('UTF-8');
-        txt = txt.split('Mission #?').join('Mission #' + n).split('"mission_number": "?"').join('"mission_number": ' + n);
+        txt = txt.split('Mission #new').join('Mission #' + n).split('"mission_number": "new"').join('"mission_number": ' + n);
         bytes = Utilities.newBlob(txt, f.mime).getBytes();
       }
       folder.createFile(Utilities.newBlob(bytes, f.mime, f.name));
