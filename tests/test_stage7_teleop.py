@@ -63,10 +63,12 @@ def test_link_latency_on_mars_delays_commands():
 
 
 def test_link_loss_falls_back_to_autonomy_and_returns_home():
+    from sim.config import LinkConfig
     m = Mission("cave", "dfs", seed=1)
     m.mode = "manual"
     m.on_link_loss = "home"
-    m.robot.pose.x, m.robot.pose.y = 13.0, 9.0     # deep in the cave, many walls from the base
+    m.link.cfg = LinkConfig(range_m=5.0, wall_loss=0.3)   # a very short-range radio, so the loss is certain
+    m.robot.pose.x, m.robot.pose.y = 13.0, 9.0           # deep in the cave, many walls from the base
     dropped_before = m.link.dropped
     for _ in range(200):
         m.operator_drive(1.0, 0.0)

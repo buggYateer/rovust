@@ -109,7 +109,7 @@ def cave() -> EnvConfig:
         width=72, height=52, cell_size=0.2,
         ambient_light=0.05,
         battery_wh=18.0,
-        link=LinkConfig(range_m=16.0, wall_loss=0.05, latency_s=0.0),   # rock walls eat the signal
+        link=LinkConfig(range_m=18.0, wall_loss=0.05, latency_s=0.0),   # rock eats the signal: near half ok, far corner lost
         sensors=SensorConfig(
             sonar_count=8, sonar_range=2.5, sonar_cone_deg=15.0, sonar_noise=0.04, sonar_specular_deg=72.0,
             ir_count=3, cliff_sensors=True, bumpers=True,
@@ -148,7 +148,7 @@ def underwater() -> EnvConfig:
         ambient_light=0.3,
         water_current=(0.04, -0.02), current_noise=0.02,
         battery_wh=22.0,
-        link=LinkConfig(range_m=11.0, wall_loss=0.08, latency_s=0.4),   # acoustic modem: short range, slow
+        link=LinkConfig(range_m=16.0, wall_loss=0.05, latency_s=0.4),   # acoustic modem: short range, slow
         drive=DriveConfig(kind="thrusters", slip_noise=0.08),
         sensors=SensorConfig(
             sonar_count=12, sonar_range=6.0, sonar_cone_deg=25.0, sonar_noise=0.05, sonar_specular_deg=78.0,

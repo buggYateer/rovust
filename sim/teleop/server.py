@@ -131,8 +131,13 @@ class ConsoleServer:
         elif t == "speed":
             m.operator_speed = max(0.05, min(0.6, float(cmd.get("value", 0.35))))
             ok = True
-        elif t in ("mode", "lights", "stop", "home", "link_loss"):
-            ok = m.operator_command(cmd)
+        elif t in ("mode", "link_loss"):
+            # console settings: they describe how the operator wants to work, so
+            # they apply at once (the rover follows them whenever it can hear us)
+            m._apply_operator(cmd)
+            ok = True
+        elif t in ("lights", "stop", "home"):
+            ok = m.operator_command(cmd)        # physical commands travel over the radio
         else:
             ok = False
         self.last_cmd_ok = ok
