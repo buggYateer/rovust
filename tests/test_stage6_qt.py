@@ -26,9 +26,11 @@ def test_qt_window_runs_a_mission():
         w.tabs.setCurrentIndex(i)
         w._on_tick()
         app.processEvents()
-    # inject a fault through the table's combo box
-    combo = w.sensors_tab.table.cellWidget(0, 4)
-    combo.setCurrentText("dead")
+    # inject a fault through the table's buttons
+    from PySide6.QtWidgets import QPushButton
+    cell = w.sensors_tab.table.cellWidget(0, 4)
+    dead = [b for b in cell.findChildren(QPushButton) if b.text() == "dead"][0]
+    dead.click()
     assert w.mission.robot.sensors.sensors[0].fault == "dead"
     assert AboutDialog(w) is not None and GuideDialog(w) is not None
     w.close()
