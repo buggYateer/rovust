@@ -1,0 +1,22 @@
+<section id="actuators" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">ANALYSIS · ACTUATORS</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Two DC motors, an H-bridge and a PWM signal</h2>
+<div style="display:flex;gap:40px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px">
+<p style="font-size:28px;line-height:1.5;color:#bfd0d8">The controller only ever sets a <b>duty cycle</b> between −1 and +1. Its sign chooses the H-bridge direction (SW1 + SW2 forward, SW3 + SW4 reverse); its value becomes an effective voltage.</p>
+<ul style="font-size:27px;line-height:1.55;color:#bfd0d8;padding:0 28px 0 0">
+<li>Static friction eats duties below 6 % — a dead band.</li>
+<li>Duty → speed follows a power law, not a line, so it needs a <b>calibration table</b> (lecture: measure the speed at each duty).</li>
+<li>Steady-state speed falls with load: sand and mud slow the motor; the encoders still count what the shaft does, not what the ground does.</li>
+<li>First-order response (τ = 0.15 s); 12 V supply; 30:1 gearbox; 5 cm wheels; a 4 % mismatch between the two motors, as real motors have.</li>
+<li>Underwater the same class drives two <b>thrusters</b> — “slip” is water.</li>
+</ul>
+</div>
+<div style="width:760px;display:flex;flex-direction:column;gap:12px">
+<img src="../figures/pid_step_response.png" alt="Motor calibration curves and step responses" style="width:760px;height:214px;object-fit:cover;object-position:right;border-radius:14px;border:1px solid #2f3b46">
+<p style="font-size:24px;color:#92a1af;line-height:1.4">Right-hand panel of the figure: duty cycle against steady-state wheel speed for three loads — curved, and lower under load. This is why closed-loop control is needed at all.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Analysis · Actuators — sim/robot/motor.py</p>
+<aside>The actuator model follows Actuators 1 and 2 closely: an H-bridge for direction, PWM for the average voltage, and a motor whose speed is not proportional to the duty cycle. The dead band and the load dependence are what make open-loop control useless — the same duty gives a different speed on sand — and that motivates the next slide.</aside>
+</section>

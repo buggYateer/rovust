@@ -17,13 +17,53 @@ from .. import meta as T
 from .mapview import MapWidget
 from .panels import (LEGEND_HTML, AboutDialog, ControlsDialog, GuideDialog, MotorTab, SensorsTab, SetupPanel,
                      StatsTab)
-from ..report import ReportUploader, build_report, load_config, save_config, REPORTS_DIR
+from ..report import ReportUploader, build_report, default_title, load_config, save_config, REPORTS_DIR
 from .popup import MapPopup
 from .radio import RadioTab
 from .theme_qt import apply_theme, ensure_icon
 from ..teleop.server import ConsoleServer
 
 SPEEDS = [1, 4, 8, 16]
+
+
+class ReportNameDialog(QDialog):
+    """Asked before a manual "Send report": name the report, or send it with
+    the automatic name (date, environment, machine). The mission number is
+    always added by the Drive folder."""
+
+    def __init__(self, default: str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Send report")
+        self.setMinimumWidth(460)
+        lay = QVBoxLayout(self)
+        lay.addWidget(QLabel("Name this report, or send it with the automatic name."))
+        self.edit = QLineEdit()
+        self.edit.setPlaceholderText(default)
+        self.edit.setToolTip("Leave empty to use the automatic name")
+        lay.addWidget(self.edit)
+        hint = QLabel(f"Saved as  Mission #<n> - <name>   (default: {default})")
+        hint.setObjectName("muted")
+        hint.setWordWrap(True)
+        lay.addWidget(hint)
+        box = QDialogButtonBox()
+        self.btn_named = box.addButton("Send with this name", QDialogButtonBox.ButtonRole.AcceptRole)
+        self.btn_auto = box.addButton("Send with automatic name", QDialogButtonBox.ButtonRole.ActionRole)
+        box.addButton(QDialogButtonBox.StandardButton.Cancel)
+        box.accepted.connect(self.accept)
+        box.rejected.connect(self.reject)
+        self.btn_auto.clicked.connect(self._use_auto)
+        self.edit.returnPressed.connect(self.accept)
+        self.edit.textChanged.connect(lambda t: self.btn_named.setEnabled(bool(t.strip())))
+        self.btn_named.setEnabled(False)
+        lay.addWidget(box)
+        self._auto = False
+
+    def _use_auto(self):
+        self._auto = True
+        self.accept()
+
+    def title(self) -> str | None:
+        return None if self._auto else (self.edit.text().strip() or None)
 
 
 class MainWindow(QMainWindow):
@@ -130,7 +170,7 @@ class MainWindow(QMainWindow):
         self.act_exit = QAction("E&xit", self, shortcut=QKeySequence("Ctrl+Q"), triggered=self.close)
         m_file.addActions([self.act_new, self.act_restart])
         m_file.addSeparator()
-        self.act_report = QAction("&Send report", self, shortcut=QKeySequence("Ctrl+S"), triggered=self.send_report)
+        self.act_report = QAction("&Send report", self, shortcut=QKeySequence("Ctrl+S"), triggered=lambda: self.send_report(ask=True))
         self.act_report.setToolTip("Save a report of this mission (statistics + maps) and upload it to the team's Drive folder")
         m_file.addAction(self.act_report)
         m_file.addAction(QAction("Open reports &folder", self, triggered=lambda: (os.makedirs(REPORTS_DIR, exist_ok=True), QDesktopServices.openUrl(QUrl.fromLocalFile(REPORTS_DIR)))))
@@ -281,13 +321,22 @@ class MainWindow(QMainWindow):
         pix.save(buf, "PNG")
         return bytes(buf.data())
 
-    def send_report(self):
+    def send_report(self, ask: bool = False):
+        """Save (and upload) a report of the running mission. With ``ask`` the
+        operator may type a name for it; the automatic send at the end of a
+        mission uses the default name."""
         m = self.mission
         if m is None:
             self.st_report.setText("start a mission first   ")
             return
+        title = None
+        if ask:
+            dlg = ReportNameDialog(default_title(m), self)
+            if dlg.exec() != QDialog.DialogCode.Accepted:
+                return
+            title = dlg.title()
         images = {"true_world.png": self._grab_png(self.map_world), "robot_map.png": self._grab_png(self.map_belief)}
-        folder = build_report(m, images)
+        folder = build_report(m, images, title=title)
         self._report_sent_for = m
         if self.uploader.configured:
             self.uploader.queue(folder)

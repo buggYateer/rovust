@@ -103,8 +103,8 @@ Then: pick an environment, a strategy and a localisation mode → **Start missio
 **Open console for phone / tablet**, open the address it shows in the phone's
 browser (same Wi-Fi). Arrow keys / W A S D drive from the keyboard as well.
 
-**Mission reports:** every finished mission (or **Send report**) saves
-`reports/Mission #n - date time - env/` with an HTML report and both maps, and
+**Mission reports:** every finished mission (or **Send report**, which lets you
+name the report) saves `reports/Mission #n - name/` with an HTML report and both maps, and
 uploads it to the team's Drive folder; offline reports go out when the network
 is back. Setup of the Drive bridge: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md).
 
@@ -150,6 +150,8 @@ python -m sim.experiments.run_batch --ablation            # one sensor off at a 
 
 - [Proposal (Task 1)](docs/Task1_v2.md) · [Design notes & sensor placement](docs/DESIGN.md) · [Results](docs/RESULTS.md)
 - [Drive reports bridge](docs/DRIVE_REPORTS.md) · [Setup with Claude](docs/SETUP_WITH_CLAUDE.md)
+- **Presentation (30 slides):** [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [PowerPoint with Egyptian-Arabic speaker notes](docs/presentation/PyRov_presentation_ar_notes.pptx) · [PDF](docs/presentation/PyRov_presentation.pdf) · [web viewer](docs/presentation/PyRov_presentation.html) (N = notes, L = EN/مصري) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) — rebuilt with `python tools/build_presentation.py`
+- [Promo trailer](docs/media/trailer.html) — 75 s animated page with an English voice-over spoken by the browser (open the file, press Play)
 - **[دليل الفريق بالعربي (HTML تفاعلي)](docs/team_guide_ar.html)** — شرح كل جزء في المشروع وربطه بالمنهج وسيناريو العرض
 - [رحلة بناء المشروع](docs/JOURNEY_ar.md) — الأفكار والمشاكل والإصلاحات بالترتيب
 

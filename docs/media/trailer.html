@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PyRov — trailer</title>
+<link rel="icon" href="../../assets/icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#0b0f13;--bg2:#11161b;--panel:#1b232a;--line:#2f3b46;--text:#e6edf3;--muted:#92a1af;--soft:#bfd0d8;--teal:#2dd4bf;--amber:#f5a524;--red:#ef5a5a}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',Segoe UI,Arial,sans-serif;overflow:hidden}
+#film{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#screen{position:relative;flex:none;width:1600px;height:900px;transform-origin:center;overflow:hidden;background:var(--bg);box-shadow:0 30px 120px rgba(0,0,0,.7)}
+#screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .9s ease;padding:110px 120px;display:flex;flex-direction:column;justify-content:center;gap:28px}
+.scene.active{opacity:1;visibility:visible}
+.eyebrow{font:600 20px/1 'JetBrains Mono',monospace;letter-spacing:4px;color:var(--teal);text-transform:uppercase}
+h1,h2{font-family:'Space Grotesk',Arial,sans-serif;font-weight:700;letter-spacing:-1px;line-height:1.02}
+h1{font-size:150px}
+h2{font-size:72px}
+.lead{font-size:34px;line-height:1.35;color:var(--soft);max-width:1100px}
+/* reveal helpers: elements with .r animate when the scene becomes active */
+.r{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.active .r{opacity:1;transform:none}
+.active .r.d1{transition-delay:.35s}.active .r.d2{transition-delay:.7s}.active .r.d3{transition-delay:1.05s}.active .r.d4{transition-delay:1.4s}.active .r.d5{transition-delay:1.75s}.active .r.d6{transition-delay:2.1s}
+
+/* scene 1: dark */
+#s1{background:radial-gradient(ellipse at 30% 70%,#132a2a 0%,var(--bg) 60%)}
+#s1 .stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 30%,#9ab 50%,transparent 51%),radial-gradient(1px 1px at 70% 20%,#9ab 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 80%,#9ab 50%,transparent 51%),radial-gradient(1px 1px at 85% 65%,#9ab 50%,transparent 51%),radial-gradient(1px 1px at 55% 45%,#9ab 50%,transparent 51%),radial-gradient(1px 1px at 10% 10%,#9ab 50%,transparent 51%);opacity:.35}
+#s1 .q{font-family:'Space Grotesk',Arial,sans-serif;font-size:84px;font-weight:700;line-height:1.05}
+#s1 .q span{display:block}
+#s1 .q .dim{color:var(--muted)}
+/* scanning sweep */
+.sweep{position:absolute;left:50%;top:50%;width:1400px;height:1400px;margin:-700px 0 0 -700px;border-radius:50%;background:conic-gradient(from 0deg,rgba(45,212,191,.0) 0deg,rgba(45,212,191,.0) 300deg,rgba(45,212,191,.18) 360deg);animation:spin 4s linear infinite;opacity:.6}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* scene 2: title */
+#s2{align-items:center;text-align:center;background:radial-gradient(ellipse at 50% 60%,#163434 0%,var(--bg) 60%)}
+#s2 img{width:220px;height:220px;border-radius:52px;box-shadow:0 20px 60px rgba(45,212,191,.25)}
+#s2 .chain{display:flex;gap:18px;align-items:center;margin-top:16px}
+#s2 .chain .b{font:600 19px/1 'JetBrains Mono',monospace;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px}
+#s2 .chain .a{color:var(--teal);font-size:24px}
+
+/* scene 3: sensors */
+#s3{flex-direction:row;align-items:center;gap:80px}
+#s3 .txt{flex:1;min-width:0}
+#s3 h2{font-size:62px}
+#s3 .rover{position:relative;width:540px;height:540px;flex-shrink:0;margin:10px}
+#s3 .ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(45,212,191,.35)}
+#s3 .ring.p{animation:pulse 2.4s ease-out infinite}
+#s3 .ring.p2{animation-delay:.8s}#s3 .ring.p3{animation-delay:1.6s}
+@keyframes pulse{0%{transform:scale(.35);opacity:.9}100%{transform:scale(1.05);opacity:0}}
+#s3 .body{position:absolute;left:50%;top:50%;width:210px;height:280px;margin:-140px 0 0 -105px;border-radius:40px 40px 32px 32px;background:linear-gradient(180deg,#2a3640,#1b232a);border:2px solid #3a4854}
+#s3 .wheel{position:absolute;width:34px;height:96px;border-radius:12px;background:#0d1114;border:2px solid #3a4854}
+#s3 .dot{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal)}
+#s3 .dot.g{background:#4ade80;box-shadow:0 0 10px #4ade80;width:14px;height:14px}
+#s3 .dot.rd{background:var(--red);box-shadow:0 0 10px var(--red);width:14px;height:14px}
+#s3 ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;font-size:25px;color:var(--soft)}
+#s3 li::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--teal);margin-right:14px;vertical-align:middle}
+
+/* scene 4: worlds */
+#s4 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:10px}
+#s4 .card{border-radius:22px;padding:34px 34px 30px;min-height:330px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;border:1px solid rgba(255,255,255,.08)}
+#s4 .card h3{font-family:'Space Grotesk',Arial,sans-serif;font-size:44px;font-weight:700}
+#s4 .card p{font-size:24px;line-height:1.4;color:rgba(255,255,255,.78)}
+#s4 .cave{background:linear-gradient(160deg,#3a2c22 0%,#15110e 70%)}
+#s4 .mars{background:linear-gradient(160deg,#8a3a24 0%,#2a120b 70%)}
+#s4 .sea{background:linear-gradient(160deg,#1a4e78 0%,#07161f 70%)}
+
+/* scene 5: map */
+#s5{align-items:center}
+#s5 img{width:1360px;border-radius:18px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#s5 .cap{display:flex;gap:40px;font-size:24px;color:var(--muted)}
+#s5 .cap b{color:var(--text);font-weight:600}
+
+/* scene 6: remote */
+#s6{flex-direction:row;align-items:center;gap:70px}
+#s6 .phone{width:400px;flex-shrink:0;border-radius:36px;border:10px solid #202a33;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;background:#000}
+#s6 .phone img{width:100%;display:block}
+#s6 .txt{flex:1;display:flex;flex-direction:column;gap:22px}
+#s6 .link{display:flex;align-items:center;gap:14px;font:600 26px 'JetBrains Mono',monospace;color:var(--muted)}
+#s6 .bars{display:flex;gap:6px;align-items:flex-end;height:44px}
+#s6 .bars i{display:block;width:14px;background:var(--teal);border-radius:3px;transition:background .4s,opacity .4s}
+#s6 .bars i:nth-child(1){height:30%}#s6 .bars i:nth-child(2){height:50%}#s6 .bars i:nth-child(3){height:70%}#s6 .bars i:nth-child(4){height:90%}#s6 .bars i:nth-child(5){height:100%}
+#s6.lost .bars i{background:var(--red);opacity:.25}
+#s6.lost .bars i:nth-child(1){opacity:1}
+#s6 .status{font-size:30px;color:var(--soft);min-height:44px}
+#s6 .badge{align-self:flex-start;font:600 24px/1 'JetBrains Mono',monospace;letter-spacing:3px;color:#0b1114;background:var(--teal);padding:16px 22px;border-radius:12px;opacity:0;transform:scale(.9);transition:opacity .5s,transform .5s cubic-bezier(.2,.9,.3,1.4)}
+#s6.home .badge{opacity:1;transform:none}
+#s6.lost .lostword{color:var(--red)}
+
+/* scene 7: numbers */
+#s7 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:10px}
+#s7 .n{background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:36px 34px}
+#s7 .n b{display:block;font-family:'Space Grotesk',Arial,sans-serif;font-size:120px;font-weight:700;color:var(--teal);line-height:1;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+#s7 .n b small{font-size:56px;letter-spacing:0}
+#s7 .n > span{display:block;font-size:26px;color:var(--soft);margin-top:14px;line-height:1.35}
+
+/* scene 8: end */
+#s8{align-items:center;text-align:center;background:radial-gradient(ellipse at 50% 40%,#163434 0%,var(--bg) 60%)}
+#s8 .logo{display:flex;align-items:center;gap:30px}
+#s8 img{width:120px;height:120px;border-radius:28px}
+#s8 .team{display:grid;grid-template-columns:repeat(3,auto);gap:10px 48px;font-size:24px;color:var(--soft);margin-top:10px}
+#s8 .course{font-size:24px;color:var(--muted);margin-top:16px}
+
+/* chrome: progress, captions, controls */
+#progress{position:absolute;left:0;top:0;height:5px;width:0;background:var(--teal);z-index:5;transition:width .3s linear}
+#caption{position:absolute;left:0;right:0;bottom:48px;text-align:center;z-index:5;padding:0 140px;pointer-events:none}
+#caption span{display:inline-block;background:rgba(5,8,10,.78);color:#fff;font-size:30px;line-height:1.35;padding:12px 22px;border-radius:12px;max-width:1300px}
+#caption.off{display:none}
+#overlay{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;background:rgba(5,8,10,.82);backdrop-filter:blur(6px)}
+#overlay.hidden{display:none}
+#overlay h1{font-size:110px}
+#overlay p{font-size:26px;color:var(--muted);max-width:760px;text-align:center;line-height:1.5}
+#overlay .play{font:600 28px 'IBM Plex Sans',sans-serif;color:#0b1114;background:var(--teal);border:0;border-radius:999px;padding:22px 54px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 20px 50px rgba(45,212,191,.3)}
+#overlay .play:hover{filter:brightness(1.08)}
+#overlay .opts{display:flex;gap:16px;align-items:center;font-size:20px;color:var(--soft)}
+#overlay select{font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 12px;max-width:520px}
+#ctrl{position:absolute;right:28px;bottom:26px;z-index:6;display:flex;gap:10px;opacity:0;transition:opacity .3s}
+#screen:hover #ctrl{opacity:1}
+#ctrl button{font:500 15px 'IBM Plex Sans',sans-serif;color:var(--text);background:rgba(27,35,42,.9);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+#ctrl button:hover{border-color:var(--teal)}
+.note{position:fixed;left:16px;bottom:12px;font-size:12px;color:#5a6a76;z-index:20}
+</style>
+</head>
+<body>
+<div id="film"><div id="screen">
+<div id="progress"></div>
+
+<section class="scene" id="s1">
+  <div class="stars"></div><div class="sweep"></div>
+  <p class="eyebrow r">No map · No GPS · No signal</p>
+  <p class="q"><span class="r d1">Somewhere no human can drive,</span><span class="r d2 dim">a rover has to find its own way.</span></p>
+</section>
+
+<section class="scene" id="s2">
+  <img class="r" src="../../assets/icon.png" alt="PyRov icon">
+  <h1 class="r d1">PyRov</h1>
+  <p class="lead r d2" style="text-align:center">An exploration rover, built in Python<br>from the motors up.</p>
+  <div class="chain r d3"><span class="b">PWM</span><span class="a">→</span><span class="b">DC motor</span><span class="a">→</span><span class="b">encoder</span><span class="a">→</span><span class="b">PID</span><span class="a">→</span><span class="b">sensors</span><span class="a">→</span><span class="b">map</span><span class="a">→</span><span class="b">decision</span></div>
+</section>
+
+<section class="scene" id="s3">
+  <div class="txt">
+    <p class="eyebrow r">Sensing</p>
+    <h2 class="r d1">Twenty sensors.<br>Each one placed for a reason.</h2>
+    <ul style="margin-top:26px">
+      <li class="r d2">8 sonars around the body</li><li class="r d2">3 infrared beams, forward</li>
+      <li class="r d3">6 cliff switches, front · side · rear</li><li class="r d3">gyro + compass or sun sensor</li>
+      <li class="r d4">camera with terrain AI</li><li class="r d4">ground-speed sensor, battery, gas, light</li>
+    </ul>
+  </div>
+  <div class="rover">
+    <div class="ring p"></div><div class="ring p p2"></div><div class="ring p p3"></div>
+    <div class="body"></div>
+    <div class="wheel" style="left:120px;top:150px"></div><div class="wheel" style="right:120px;top:150px"></div>
+    <div class="wheel" style="left:120px;bottom:150px"></div><div class="wheel" style="right:120px;bottom:150px"></div>
+    <!-- sonars (teal) -->
+    <div class="dot" style="left:271px;top:128px"></div><div class="dot" style="left:206px;top:146px"></div><div class="dot" style="left:336px;top:146px"></div>
+    <div class="dot" style="left:176px;top:270px"></div><div class="dot" style="left:366px;top:270px"></div>
+    <div class="dot" style="left:206px;top:396px"></div><div class="dot" style="left:336px;top:396px"></div><div class="dot" style="left:271px;top:412px"></div>
+    <!-- cliff (green) -->
+    <div class="dot g" style="left:214px;top:125px"></div><div class="dot g" style="left:332px;top:125px"></div>
+    <div class="dot g" style="left:176px;top:300px"></div><div class="dot g" style="left:370px;top:300px"></div>
+    <div class="dot g" style="left:214px;top:420px"></div><div class="dot g" style="left:332px;top:420px"></div>
+    <!-- IR (red) -->
+    <div class="dot rd" style="left:240px;top:140px"></div><div class="dot rd" style="left:273px;top:140px"></div><div class="dot rd" style="left:306px;top:140px"></div>
+  </div>
+</section>
+
+<section class="scene" id="s4">
+  <p class="eyebrow r">Three worlds · one brain</p>
+  <h2 class="r d1">The same robot. Only the configuration changes.</h2>
+  <div class="cards">
+    <div class="card cave r d2"><h3>Cave</h3><p>Branching corridors, darkness, pits and gas. Short sonar range, headlights, a compass disturbed by iron.</p></div>
+    <div class="card mars r d3"><h3>Mars</h3><p>Open terrain, rock fields, sand that makes the wheels slip. No magnetic field: a sun sensor gives heading.</p></div>
+    <div class="card sea r d4"><h3>Underwater</h3><p>Reef walls and current. Thrusters instead of wheels, sonar instead of light, a Doppler log instead of encoders.</p></div>
+  </div>
+</section>
+
+<section class="scene" id="s5">
+  <img class="r" src="demo.gif" alt="Live run: true cave on the left, the rover's own map on the right">
+  <div class="cap r d1"><span><b>Left</b> the true cave it never sees</span><span><b>Right</b> the map it builds by itself</span><span><b>Teal</b> where it decides to look next</span></div>
+</section>
+
+<section class="scene" id="s6">
+  <div class="phone r"><img src="../screenshots/console_phone_light.jpg" alt="Phone console"></div>
+  <div class="txt">
+    <p class="eyebrow r">Remote control</p>
+    <h2 class="r d1">Drive it from your phone<br>over a simulated radio link.</h2>
+    <div class="link r d2"><div class="bars"><i></i><i></i><i></i><i></i><i></i></div><span class="lostword">LINK</span></div>
+    <p class="status r d2" id="s6status">Every command travels through a link that weakens with distance and walls.</p>
+    <div class="badge">AUTONOMY · RETURNING HOME</div>
+  </div>
+</section>
+
+<section class="scene" id="s7">
+  <p class="eyebrow r">Measured, not assumed</p>
+  <h2 class="r d1">What 264 runs say.</h2>
+  <div class="nums">
+    <div class="n r d2"><b><span data-count="264">0</span></b><span>headless runs across three worlds, every seed a different map</span></div>
+    <div class="n r d3"><b><span data-count="97">0</span><small>%</small></b><span>of the reachable area mapped by the AI utility explorer</span></div>
+    <div class="n r d4"><b><span data-count="4">0</span><small>cm</small></b><span>localisation error with sensor fusion, against metres for encoders alone</span></div>
+  </div>
+</section>
+
+<section class="scene" id="s8">
+  <div class="logo r"><img src="../../assets/icon.png" alt=""><h1 style="font-size:120px">PyRov</h1></div>
+  <p class="lead r d1" style="text-align:center">Multi-Environment Autonomous Exploration Rover</p>
+  <div class="team r d2">
+    <span>Ahmed Hamed Mohamed</span><span>Aml Hesham Hosny</span><span>Tassneem Amin Gamil</span>
+    <span>Kholoud Waleed Attia</span><span>Donia Essam Fathy</span><span>Mazen Mohamed Hussien</span>
+    <span>Mohamed Osama Salah</span><span>Mohamed Elsayed Mohamed</span><span>Mahmoud Ahmed Abdelghani</span>
+  </div>
+  <p class="course r d3">Robotics — Team Project · Dr. Elshaimaa Nabil Nada · Faculty of Engineering, Computer and Systems Department</p>
+</section>
+
+<div id="caption"><span id="captxt"></span></div>
+<div id="ctrl"><button id="bcap">Captions</button><button id="breplay">Replay</button><button id="bfull">Fullscreen</button></div>
+
+<div id="overlay">
+  <h1>PyRov</h1>
+  <p>A 75-second trailer with an English voice-over spoken by your browser. Sound starts when you press play.</p>
+  <button class="play" id="play">&#9654; Play trailer</button>
+  <div class="opts"><label>Voice <select id="voice"></select></label><label><input type="checkbox" id="mute"> captions only</label></div>
+</div>
+</div></div>
+<p class="note">Voice-over uses the browser's speech synthesis (Edge has the most natural English voices).</p>
+
+<script>
+const SCRIPT = [
+  {id:'s1', text:"Somewhere no human can drive. No map. No GPS. No signal. A rover has to find its own way.", min:7},
+  {id:'s2', text:"Meet PyRov: an exploration rover built in Python, from the motors up. PWM, DC motors, encoders, PID control. Then the sensors. Then the map. Then the decision.", min:10},
+  {id:'s3', text:"Twenty sensors, and each one is placed for a reason. Eight sonars around the body. Infrared beams facing forward. Six cliff switches, so it never backs into a crater. A gyro, a compass, and a camera that learns the terrain.", min:12},
+  {id:'s4', text:"Three worlds, one brain. A dark cave. The surface of Mars. A flooded site under water. The same robot, only the configuration changes.", min:10},
+  {id:'s5', text:"It builds its own map as it goes, and decides where to look next. On the left, the true cave it never sees. On the right, what it believes.", min:10},
+  {id:'s6', text:"Drive it from your phone over a simulated radio link. Go deep into the cave, and the signal fades. The link is lost. Three seconds later, PyRov takes over, and finds its own way home.", min:13,
+   cues:[[0.45,'lost',"Link lost. The console tells you. The rover waits three seconds…"],[0.75,'home',"…then drives itself back into range."]]},
+  {id:'s7', text:"Measured, not assumed. Two hundred and sixty-four runs. Ninety-seven percent of the reachable area mapped. Localisation to a few centimetres, where encoders alone drift by metres.", min:11},
+  {id:'s8', text:"PyRov. A team project for the Robotics course, Faculty of Engineering, Computer and Systems Department.", min:8},
+];
+const scenes = Object.fromEntries([...document.querySelectorAll('.scene')].map(s=>[s.id,s]));
+const screen = document.getElementById('screen'), overlay=document.getElementById('overlay');
+const captxt=document.getElementById('captxt'), caption=document.getElementById('caption'), progress=document.getElementById('progress');
+const voiceSel=document.getElementById('voice'), mute=document.getElementById('mute');
+let voices=[], running=false, idx=0, timers=[];
+
+function fit(){ const s=Math.min(innerWidth/1600, innerHeight/900); screen.style.transform=`scale(${s})`; }
+addEventListener('resize',fit); fit();
+
+function loadVoices(){
+  voices=(speechSynthesis.getVoices()||[]).filter(v=>/^en/i.test(v.lang));
+  const pref=['Aria','Guy','Jenny','Ryan','Sonia','Google US English','Google UK English Male','Zira','David'];
+  voices.sort((a,b)=>score(b)-score(a));
+  function score(v){ let s=0; pref.forEach((p,i)=>{ if(v.name.includes(p)) s=Math.max(s,100-i);}); if(/Natural|Online/i.test(v.name)) s+=50; return s; }
+  voiceSel.innerHTML=voices.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join('')||'<option value="">no English voice found — captions only</option>';
+}
+if('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; } else { mute.checked=true; mute.disabled=true; loadVoices(); }
+
+function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+function setScene(i){
+  Object.values(scenes).forEach(s=>{ s.classList.remove('active','lost','home'); });
+  const sc=SCRIPT[i]; scenes[sc.id].classList.add('active');
+  progress.style.width=((i+1)/SCRIPT.length*100)+'%';
+  if(sc.id==='s7') scenes.s7.querySelectorAll('[data-count]').forEach(el=>count(el));
+}
+function count(el){ const target=+el.dataset.count, t0=performance.now(), dur=1800+Math.random()*400;
+  (function tick(){ const p=Math.min(1,(performance.now()-t0)/dur); el.textContent=Math.round(target*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(tick); })(); }
+
+function playScene(i){
+  if(!running) return;
+  if(i>=SCRIPT.length){ running=false; overlay.classList.remove('hidden'); overlay.querySelector('.play').innerHTML='&#8635; Replay'; return; }
+  idx=i; const sc=SCRIPT[i]; setScene(i); captxt.textContent=sc.text;
+  clearTimers();
+  // estimate duration for cue timing and for captions-only mode (~2.6 words / s)
+  const est=Math.max(sc.min, sc.text.split(/\s+/).length/2.6+1.2)*1000;
+  (sc.cues||[]).forEach(([f,cls,msg])=>timers.push(setTimeout(()=>{ scenes[sc.id].classList.add(cls); const st=document.getElementById(sc.id+'status'); if(st) st.textContent=msg; }, f*est)));
+  const useVoice = !mute.checked && voices.length && 'speechSynthesis' in window;
+  let done=false; const next=()=>{ if(done) return; done=true; timers.push(setTimeout(()=>playScene(i+1), 700)); };
+  if(useVoice){
+    const u=new SpeechSynthesisUtterance(sc.text); u.voice=voices[+voiceSel.value||0]; u.rate=0.98; u.pitch=1; u.lang=u.voice.lang;
+    const minEnd=performance.now()+sc.min*1000;
+    u.onend=()=>{ const wait=Math.max(0,minEnd-performance.now()); timers.push(setTimeout(next,wait)); };
+    u.onerror=()=>timers.push(setTimeout(next, est));
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    timers.push(setTimeout(next, est*2.5));   // safety net if the browser never fires onend
+  } else {
+    timers.push(setTimeout(next, est));
+  }
+}
+function start(){ overlay.classList.add('hidden'); running=true; playScene(0); }
+document.getElementById('play').onclick=start;
+document.getElementById('breplay').onclick=()=>{ speechSynthesis.cancel(); clearTimers(); running=true; playScene(0); };
+document.getElementById('bcap').onclick=()=>caption.classList.toggle('off');
+document.getElementById('bfull').onclick=()=>document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+addEventListener('keydown',e=>{ if(e.key===' '&&!running&&!overlay.classList.contains('hidden')){start();e.preventDefault();}
+  else if(e.key==='ArrowRight'&&running){ speechSynthesis.cancel(); clearTimers(); playScene(idx+1);}
+  else if(e.key==='ArrowLeft'&&running){ speechSynthesis.cancel(); clearTimers(); playScene(Math.max(0,idx-1)); }
+  else if(e.key==='c'||e.key==='C') caption.classList.toggle('off'); });
+addEventListener('beforeunload',()=>speechSynthesis.cancel());
+setScene(0);
+</script>
+</body>
+</html>

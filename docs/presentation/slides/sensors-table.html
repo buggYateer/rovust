@@ -1,0 +1,19 @@
+<section id="sensors-table" data-transition="fade" style="background:#11161b;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">ANALYSIS · SENSORS</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">The sensor suite, classified the way the course classifies it</h2>
+<table style="font-size:25px;color:#e6edf3">
+<tr style="background:#1b232a"><th style="width:22%;color:#92a1af">Sensor</th><th style="width:26%;color:#92a1af">Class</th><th style="width:40%;color:#92a1af">Why it is on the rover</th><th style="width:12%;color:#92a1af">Where</th></tr>
+<tr><td>Sonar ring 8× (12× underwater)</td><td>external · active · digital (ToF)</td><td>Main mapping sensor; cone, specular loss, cross-talk modelled</td><td>all</td></tr>
+<tr style="background:#161d23"><td>IR PSD 3× facing forward</td><td>external · active · analog → LUT</td><td>Covers the body width the sonar cones miss; calibrated lookup table</td><td>cave, Mars</td></tr>
+<tr><td>Cliff switches 6×</td><td>external · active · binary</td><td>No horizontal sensor sees a hole; front, side and rear pairs</td><td>cave, Mars</td></tr>
+<tr style="background:#161d23"><td>Bumpers 2×</td><td>external · passive · binary</td><td>Last line of defence; the pair says which way to turn</td><td>all</td></tr>
+<tr><td>Encoders 2×</td><td>internal · passive · digital</td><td>Speed feedback and dead reckoning</td><td>all</td></tr>
+<tr style="background:#161d23"><td>Compass / sun sensor</td><td>internal · passive · digital</td><td>Absolute heading bounds gyro drift; Mars has no magnetic field</td><td>cave, water / Mars</td></tr>
+<tr><td>Gyro + accelerometer</td><td>internal · passive · digital</td><td>Yaw rate with learned bias; tilt for the slope guard</td><td>all</td></tr>
+<tr style="background:#161d23"><td>Camera</td><td>external · passive · digital</td><td>16×16 ground patch for the terrain classifier</td><td>all</td></tr>
+<tr><td>Optical flow / DVL</td><td>external · active · digital</td><td>True ground speed — immune to wheel slip; sole odometry under water</td><td>all</td></tr>
+<tr style="background:#161d23"><td>Battery · light · gas · pressure</td><td>internal / external · analog</td><td>Return-home decision, headlights, gas cost zones, depth</td><td>per world</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Analysis · Sensors — every analog sensor passes a modelled 10-bit A/D converter</p>
+<aside>Every sensor carries its classification from Sensors 1: local or global, internal or external, active or passive, binary, analog or digital. The suite is not the same in every world: Mars has a sun sensor instead of a compass, underwater has a Doppler velocity log instead of encoders and no infrared because light does not travel. The code that reads them never changes — only the configuration says what is mounted.</aside>
+</section>

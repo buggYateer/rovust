@@ -2,7 +2,9 @@
 and the sensor / link state, saved under reports/ and (optionally) uploaded
 to the team's shared Google Drive folder through a small Apps Script bridge.
 
-Folder name:  Mission #<n> - <YYYY-MM-DD HH-MM> - <environment> (<machine>)
+Folder name:  Mission #<n> - <title>
+where <title> is a name the operator typed when sending, or by default
+<YYYY-MM-DD HH-MM-SS> - <environment> (<machine>).
 
 The number is assigned by the Drive bridge when the report is uploaded (it
 looks at the folders already in the shared folder and takes the next one),
@@ -22,6 +24,7 @@ import html
 import json
 import os
 import platform
+import re
 import socket
 import threading
 import urllib.error
@@ -77,19 +80,37 @@ def machine_tag() -> str:
 PENDING_NUMBER = "new"
 
 
-def build_report(mission, images: dict[str, bytes], extra: dict | None = None) -> str:
+_BAD_CHARS = re.compile(r'[<>:"/\|?*\x00-\x1f]')
+
+
+def default_title(mission, stamp: datetime | None = None) -> str:
+    """The automatic report title: <date time> - <environment> (<machine>)."""
+    stamp = stamp or datetime.now()
+    return f"{stamp.strftime('%Y-%m-%d %H-%M-%S')} - {mission.cfg.name} ({machine_tag()})"
+
+
+def clean_title(title: str | None) -> str:
+    """Make a typed title safe as a folder name (Windows forbids the characters < > : " / | ? * and backslash);
+    returns "" when nothing usable is left."""
+    t = _BAD_CHARS.sub("", title or "").strip(" .")
+    return " ".join(t.split())[:80]
+
+
+def build_report(mission, images: dict[str, bytes], extra: dict | None = None, title: str | None = None) -> str:
     """Write the report folder and return its path. ``images`` maps a file
-    name (true_world.png, robot_map.png, ...) to PNG bytes. The mission
-    number stays "?" until the Drive bridge assigns one."""
+    name (true_world.png, robot_map.png, ...) to PNG bytes. ``title`` is the
+    operator's name for the report (default: date, environment, machine).
+    The mission number stays "new" until the Drive bridge assigns one."""
     n = PENDING_NUMBER
     stamp = datetime.now()
-    folder_name = f"Mission #{n} - {stamp.strftime('%Y-%m-%d %H-%M-%S')} - {mission.cfg.name} ({machine_tag()})"
+    title = clean_title(title) or default_title(mission, stamp)
+    folder_name = f"Mission #{n} - {title}"
     folder = os.path.join(REPORTS_DIR, folder_name)
     os.makedirs(folder, exist_ok=True)
 
     metrics = mission.metrics()
     metrics.update({
-        "mission_number": n, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
+        "mission_number": n, "title": title, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
         "localisation": mission.estimator.mode, "mode": mission.mode, "on_link_loss": mission.on_link_loss,
         "link_delivered": mission.link.delivered, "link_dropped": mission.link.dropped,
         "link_losses": mission.stats.get("link_losses", 0), "end_reason": mission.end_reason(),
@@ -156,7 +177,7 @@ figcaption{{color:#5c6b78;font-size:13px;margin-top:6px}} ul{{columns:3;margin:0
 @media(max-width:700px){{.maps{{grid-template-columns:1fr}} ul{{columns:1}}}}
 </style></head><body>
 <div class="card"><h1>{T.ROVER_NAME} &mdash; Mission #{m['mission_number']}</h1>
-<p class="sub">{m['timestamp'].replace('T', ' ')} &middot; recorded on {html.escape(m['machine'])}</p>
+<p class="sub">{html.escape(m.get('title', ''))} &middot; {m['timestamp'].replace('T', ' ')} &middot; recorded on {html.escape(m['machine'])}</p>
 <table>{table}</table></div>
 <div class="card"><div class="maps">{img('true_world.png', 'True world: terrain, true path (yellow), sonar and IR beams')}{img('robot_map.png', "The rover's own map: occupancy, terrain and hazards; fused estimate (green), encoders only (red)")}</div></div>
 <div class="card"><p class="foot"><b>{html.escape(T.COURSE)}</b> &middot; Supervisor {html.escape(T.DOCTOR)} &middot; Faculty of Engineering &ndash; Computer and Systems Department</p>
@@ -216,7 +237,7 @@ class ReportUploader:
             with open(path, "rb") as f:
                 files.append({"name": name, "mime": mime, "b64": base64.b64encode(f.read()).decode()})
         base = os.path.basename(folder)
-        suffix = base.split(" - ", 1)[1] if " - " in base else base      # "<date> - <env> (<machine>)"
+        suffix = base.split(" - ", 1)[1] if " - " in base else base      # the title after "Mission #new - "
         body = json.dumps({"name": base, "suffix": suffix, "files": files}).encode()
         req = urllib.request.Request(self.cfg["upload_url"], data=body, headers={"Content-Type": "application/json"})
         try:
