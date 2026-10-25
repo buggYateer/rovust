@@ -76,12 +76,15 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)   # never a sideways scroller
         scroll.setWidget(self.setup)
-        scroll.setMinimumWidth(290)
+        scroll.setMinimumWidth(320)
+        self.setup.setMinimumWidth(0)
         dock.setWidget(scroll)
         dock.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)
         self.setup_dock = dock
+        self.resizeDocks([dock], [360], Qt.Orientation.Horizontal)
 
         # ---- bottom dock: tabs
         self.tabs = QTabWidget()
