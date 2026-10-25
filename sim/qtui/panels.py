@@ -33,7 +33,7 @@ class SetupPanel(QWidget):
             self.env.addItem(T.ENV_TITLES[e], e)
         self.env_desc = QLabel()
         self.env_desc.setWordWrap(True)
-        self.env_desc.setStyleSheet("color: #777;")
+        self.env_desc.setObjectName("hint")
         self.env.currentIndexChanged.connect(self._env_changed)
         f.addWidget(self.env)
         f.addWidget(self.env_desc)
@@ -68,7 +68,8 @@ class SetupPanel(QWidget):
         lay.addWidget(g)
 
         self.start_btn = QPushButton("Start mission")
-        self.start_btn.setMinimumHeight(36)
+        self.start_btn.setObjectName("primary")
+        self.start_btn.setMinimumHeight(38)
         font = self.start_btn.font()
         font.setBold(True)
         self.start_btn.setFont(font)
@@ -98,7 +99,7 @@ class SetupPanel(QWidget):
         f.addWidget(self.server_url)
         hint = QLabel("Keyboard: arrow keys or W A S D drive the rover in assisted / manual mode.")
         hint.setWordWrap(True)
-        hint.setStyleSheet("color: #777;")
+        hint.setObjectName("hint")
         f.addWidget(hint)
         lay.addWidget(g)
 
@@ -523,13 +524,22 @@ pit (only possible in <i>manual</i> mode, where the cliff layer is switched off)
 the console says why; nothing listens to commands any more. Start a new mission with <b>Restart mission</b>
 (R), <b>New mission</b> in the toolbar, or the <b>New mission</b> button on the phone.</p>
 
-<h3>6. Controls</h3>
+<h3>6. Mission reports</h3>
+<p><b>Send report</b> (toolbar, File menu, Ctrl+S) saves a report of the current mission under
+<i>reports/Mission #n - date time - environment (computer)</i>: an HTML page with all statistics and both
+maps, the map images and the raw numbers. With <i>auto-send</i> on (File &rarr; Report settings) a report is
+made by itself when a mission ends. When the team's Drive bridge is configured (docs/DRIVE_REPORTS.md), the
+folder is also uploaded to the shared Google Drive folder; if the computer is offline the report waits and is
+sent when the network is back (the status bar shows how many are waiting). Click either map to open it in a
+large live window.</p>
+
+<h3>7. Controls</h3>
 <p><b>Space</b> pause / resume &nbsp;&middot;&nbsp; <b>1 2 3 4</b> speed &times;1 &times;4 &times;8 &times;16
 &nbsp;&middot;&nbsp; <b>R</b> restart &nbsp;&middot;&nbsp; <b>H</b> headlights. Map layers can be switched
 in the left panel or the View menu. The panels are dockable: drag them to rearrange, or hide them from the
 View menu.</p>
 
-<h3>7. What to look for in a demonstration</h3>
+<h3>8. What to look for in a demonstration</h3>
 <ul>
 <li>Switch to <i>Assisted</i>, open the console on a tablet, and drive into a wall: the rover refuses.
 Switch to <i>Manual</i> and do it again.</li>
