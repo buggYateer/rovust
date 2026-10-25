@@ -241,7 +241,7 @@ class App:
         s = self.screen
         m = self.mission
         s.fill(T.BG)
-        status_col = {"exploring": T.GOOD, "returning": T.WARN, "returned": T.ACCENT, "fell": T.BAD, "battery_dead": T.BAD}[m.status]
+        status_col = {"exploring": T.GOOD, "returning": T.WARN, "returned": T.ACCENT, "fell": T.BAD, "battery_dead": T.BAD}.get(m.status, T.MUTED)
         T.text(s, f"{T.ENV_TITLES[m.cfg.name]}   |   {m.explorer.name}   |   {m.estimator.mode}", (20, 8), 20, T.WHITE, bold=True)
         T.text(s, f"t = {m.time:6.1f} s    x{self.speed}{'   PAUSED' if self.paused else ''}", (600, 12), 16, T.MUTED)
         T.text(s, m.status.upper() + (f"  ({m.stats['return_reason']})" if m.stats['return_reason'] else ""), (900, 12), 16, status_col, bold=True)
