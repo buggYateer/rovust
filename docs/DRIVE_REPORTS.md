@@ -6,7 +6,7 @@ saved locally under `reports/Mission #<n> - <date time> - <environment> (<machin
 **The mission number is given by the Drive folder itself:** the bridge looks
 at the folders already there and uses the next number, so numbers are unique
 for the whole team (a report that has not been uploaded yet is called
-`Mission #? - ...`)
+`Mission #new - ...`)
 and, once the bridge below is set up, uploaded into **one shared Drive
 folder** for the whole team — from any teammate's computer, with no Google
 login in the program. If the computer is offline, the report waits in
@@ -46,7 +46,7 @@ function doPost(e) {
       if (f.mime.indexOf('text/') === 0 || f.mime === 'application/json') {
         // write the final number into the report itself
         let txt = Utilities.newBlob(bytes).getDataAsString('UTF-8');
-        txt = txt.split('Mission #?').join('Mission #' + n).split('"mission_number": "?"').join('"mission_number": ' + n);
+        txt = txt.split('Mission #new').join('Mission #' + n).split('"mission_number": "new"').join('"mission_number": ' + n);
         bytes = Utilities.newBlob(txt, f.mime).getBytes();
       }
       folder.createFile(Utilities.newBlob(bytes, f.mime, f.name));

@@ -7,7 +7,7 @@ Folder name:  Mission #<n> - <YYYY-MM-DD HH-MM> - <environment> (<machine>)
 The number is assigned by the Drive bridge when the report is uploaded (it
 looks at the folders already in the shared folder and takes the next one),
 so numbers are unique across the whole team. Until then the local copy is
-called "Mission #? - ...".
+called "Mission #new - ...".
 
 Upload is fire-and-forget with a local queue: a report that cannot be sent
 (no network, bridge not configured) stays in reports/pending.json and is
@@ -74,7 +74,7 @@ def machine_tag() -> str:
         return platform.node() or "pc"
 
 
-PENDING_NUMBER = "?"
+PENDING_NUMBER = "new"
 
 
 def build_report(mission, images: dict[str, bytes], extra: dict | None = None) -> str:
@@ -239,7 +239,7 @@ class ReportUploader:
             if os.path.exists(path):
                 with open(path, encoding="utf-8") as f:
                     txt = f.read()
-                txt = txt.replace(f"Mission #{PENDING_NUMBER}", f"Mission #{number}").replace('"mission_number": "?"', f'"mission_number": {number}')
+                txt = txt.replace(f"Mission #{PENDING_NUMBER}", f"Mission #{number}").replace('"mission_number": "new"', f'"mission_number": {number}')
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(txt)
         new_path = os.path.join(os.path.dirname(folder), final_name)
