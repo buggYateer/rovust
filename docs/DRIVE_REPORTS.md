@@ -2,7 +2,11 @@
 
 Every mission can produce a report (`report.html` with the statistics and
 both maps, `true_world.png`, `robot_map.png`, `metrics.json`). Reports are
-saved locally under `reports/Mission #<n> - <date time> - <environment> (<machine>)/`
+saved locally under `reports/Mission #<n> - <date time> - <environment> (<machine>)/`.
+**The mission number is given by the Drive folder itself:** the bridge looks
+at the folders already there and uses the next number, so numbers are unique
+for the whole team (a report that has not been uploaded yet is called
+`Mission #? - ...`)
 and, once the bridge below is set up, uploaded into **one shared Drive
 folder** for the whole team — from any teammate's computer, with no Google
 login in the program. If the computer is offline, the report waits in
@@ -17,7 +21,7 @@ account and writes into *your* folder. One person does this once.
    `https://drive.google.com/drive/folders/1AbC...xyz` — copy the part after
    `folders/`: that is the **folder ID**.
 2. Go to <https://script.google.com> → **New project**. Replace the contents
-   of `Code.gs` with:
+   of `Code.gs` with the code below (also in `docs/apps_script/Code.gs`):
 
 ```javascript
 const ROOT_FOLDER_ID = '1NJFC1WdeRxKdd7GiRqP2NmEqSGIGlvxe';   // the team folder
@@ -26,10 +30,28 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
-    const folder = root.createFolder(data.name);
-    data.files.forEach(f => folder.createFile(
-      Utilities.newBlob(Utilities.base64Decode(f.b64), f.mime, f.name)));
-    return json({ ok: true, url: folder.getUrl() });
+    // next mission number = highest "Mission #n" already in the folder + 1
+    let n = 0;
+    const it = root.getFolders();
+    while (it.hasNext()) {
+      const m = it.next().getName().match(/^Mission #(\d+)/);
+      if (m) n = Math.max(n, parseInt(m[1], 10));
+    }
+    n += 1;
+    const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
+    const name = 'Mission #' + n + ' - ' + suffix;
+    const folder = root.createFolder(name);
+    data.files.forEach(f => {
+      let bytes = Utilities.base64Decode(f.b64);
+      if (f.mime.indexOf('text/') === 0 || f.mime === 'application/json') {
+        // write the final number into the report itself
+        let txt = Utilities.newBlob(bytes).getDataAsString('UTF-8');
+        txt = txt.split('Mission #?').join('Mission #' + n).split('"mission_number": "?"').join('"mission_number": ' + n);
+        bytes = Utilities.newBlob(txt, f.mime).getBytes();
+      }
+      folder.createFile(Utilities.newBlob(bytes, f.mime, f.name));
+    });
+    return json({ ok: true, number: n, name: name, url: folder.getUrl() });
   } catch (err) {
     return json({ ok: false, error: String(err) });
   }
@@ -79,5 +101,10 @@ Or in the program: **File → Report settings…**, paste the URL, Save.
 - **File → Open reports folder** shows the local copies.
 
 Anyone who has the URL can add files to the folder, so share it only inside
-the team. To change the script later, use **Deploy → Manage deployments →
-Edit → New version**: the URL stays the same.
+the team.
+
+## Updating the script
+
+When `Code.gs` changes in this repository, paste the new code into the Apps
+Script editor, save, then **Deploy → Manage deployments → ✎ (edit) → Version:
+New version → Deploy**. The URL stays the same, so nothing changes in PyRov.

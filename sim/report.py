@@ -4,6 +4,11 @@ to the team's shared Google Drive folder through a small Apps Script bridge.
 
 Folder name:  Mission #<n> - <YYYY-MM-DD HH-MM> - <environment> (<machine>)
 
+The number is assigned by the Drive bridge when the report is uploaded (it
+looks at the folders already in the shared folder and takes the next one),
+so numbers are unique across the whole team. Until then the local copy is
+called "Mission #? - ...".
+
 Upload is fire-and-forget with a local queue: a report that cannot be sent
 (no network, bridge not configured) stays in reports/pending.json and is
 retried every 30 s and at the next start, so nothing is lost when the laptop
@@ -69,12 +74,16 @@ def machine_tag() -> str:
         return platform.node() or "pc"
 
 
+PENDING_NUMBER = "?"
+
+
 def build_report(mission, images: dict[str, bytes], extra: dict | None = None) -> str:
     """Write the report folder and return its path. ``images`` maps a file
-    name (true_world.png, robot_map.png, ...) to PNG bytes."""
-    n = next_mission_number()
+    name (true_world.png, robot_map.png, ...) to PNG bytes. The mission
+    number stays "?" until the Drive bridge assigns one."""
+    n = PENDING_NUMBER
     stamp = datetime.now()
-    folder_name = f"Mission #{n} - {stamp.strftime('%Y-%m-%d %H-%M')} - {mission.cfg.name} ({machine_tag()})"
+    folder_name = f"Mission #{n} - {stamp.strftime('%Y-%m-%d %H-%M-%S')} - {mission.cfg.name} ({machine_tag()})"
     folder = os.path.join(REPORTS_DIR, folder_name)
     os.makedirs(folder, exist_ok=True)
 
@@ -204,16 +213,43 @@ class ReportUploader:
             mime = {"html": "text/html", "png": "image/png", "json": "application/json", "csv": "text/csv"}.get(name.rsplit(".", 1)[-1], "application/octet-stream")
             with open(path, "rb") as f:
                 files.append({"name": name, "mime": mime, "b64": base64.b64encode(f.read()).decode()})
-        body = json.dumps({"name": os.path.basename(folder), "files": files}).encode()
+        base = os.path.basename(folder)
+        suffix = base.split(" - ", 1)[1] if " - " in base else base      # "<date> - <env> (<machine>)"
+        body = json.dumps({"name": base, "suffix": suffix, "files": files}).encode()
         req = urllib.request.Request(self.cfg["upload_url"], data=body, headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=90) as resp:
                 answer = json.loads(resp.read() or b"{}")
             if answer.get("ok"):
-                return True, answer.get("url", "")
+                final = answer.get("name") or base
+                self._apply_number(folder, final, answer.get("number"))
+                return True, final
             return False, answer.get("error", "bridge refused the report")
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as e:
             return False, str(e)
+
+    @staticmethod
+    def _apply_number(folder: str, final_name: str, number) -> str:
+        """Rename the local copy to the name the bridge chose and write the
+        number into the report files."""
+        if number is None:
+            return folder
+        for fn in ("report.html", "metrics.json"):
+            path = os.path.join(folder, fn)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    txt = f.read()
+                txt = txt.replace(f"Mission #{PENDING_NUMBER}", f"Mission #{number}").replace('"mission_number": "?"', f'"mission_number": {number}')
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(txt)
+        new_path = os.path.join(os.path.dirname(folder), final_name)
+        try:
+            if new_path != folder and not os.path.exists(new_path):
+                os.rename(folder, new_path)
+                return new_path
+        except OSError:
+            pass
+        return folder
 
     def flush(self, status_cb=None) -> None:
         """Try to send everything pending. Runs in a worker thread."""
@@ -229,12 +265,17 @@ class ReportUploader:
                         status_cb(self.last_result)
                     return
                 for folder in list(self.pending):
+                    if not os.path.isdir(folder):
+                        with self.lock:
+                            self.pending.remove(folder)
+                            self._save_pending()
+                        continue
                     ok, info = self.send_folder(folder)
                     if ok:
                         with self.lock:
                             self.pending.remove(folder)
                             self._save_pending()
-                        self.last_result = f"report uploaded: {os.path.basename(folder)}"
+                        self.last_result = f"report uploaded as {info}"
                     else:
                         self.last_result = f"upload failed ({info}) - will retry"
                         break
