@@ -23,7 +23,7 @@
     background: var(--bg); color: var(--text);
     font: 15px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
     font-variant-numeric: tabular-nums;
-    touch-action: none; user-select: none;
+    touch-action: pan-y; user-select: none;
     display: grid; grid-template-rows: auto 1fr; height: 100dvh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
@@ -56,11 +56,11 @@
   main { display: grid; grid-template-columns: minmax(300px, 46%) 1fr; gap: 14px; padding: 14px; min-height: 0; }
   .stickpane { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 0; }
-  .side { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 0; }
+  .side { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 0; overflow-y: auto; }
 
   /* ------------------------------------------------------------ stick */
   #stickwrap { display: grid; place-items: center; padding: 10px; }
-  #stick { width: min(100%, 100vh - 230px); aspect-ratio: 1; max-height: 100%; touch-action: none; }
+  #stick { display: block; width: min(100%, calc(100vh - 170px)); aspect-ratio: 1; max-height: 100%; touch-action: none; }
   .stickfoot { display: flex; align-items: center; gap: 14px; padding: 0 6px 6px; color: var(--muted); font-size: 13px; }
   .stickfoot b { color: var(--text); font-weight: 600; min-width: 70px; display: inline-block; }
   input[type=range] { flex: 1; accent-color: var(--amber); }
@@ -106,6 +106,32 @@
     .controls { order: 4; }
     header h1 small { display: none; }
   }
+  /* phone held sideways: little height, keep the stick usable and let the right column scroll */
+  @media (orientation: landscape) and (max-height: 520px) {
+    header { padding: 6px 12px; gap: 12px; }
+    header h1 { font-size: 15px; }
+    main { padding: 8px; gap: 8px; }
+    .stickpane { grid-template-rows: 1fr auto; }
+    #stickwrap { padding: 4px; }
+    #stick { width: min(100%, calc(100vh - 120px)); }
+    .stickfoot { padding: 0 4px 2px; }
+    .views img#map { max-height: 26vh; }
+    #cam { width: 64px; height: 64px; }
+    .tele { padding: 8px 12px; gap: 6px 12px; }
+    .tele div b { font-size: 15px; }
+    .controls { padding: 8px; gap: 6px; }
+    .seg button, .btn { padding: 8px 6px; }
+  }
+  /* compact phone mode: joystick, the three numbers that matter, and the buttons */
+  .iconbtn.more { display: none; width: auto; padding: 0 10px; font-size: 13px; }
+  @media (max-width: 760px), (max-height: 520px) {
+    .iconbtn.more { display: inline-block; }
+    body.compact .views, body.compact .tele .extra, body.compact #loss, body.compact #losslabel, body.compact #modehint { display: none; }
+    body.compact .tele { grid-template-columns: repeat(3, 1fr); }
+    body.compact header .status { display: none; }
+    body.compact .side { grid-template-rows: auto 1fr; }
+    body.compact .tele { overflow: visible; }
+  }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   button:focus-visible, input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 </style>
@@ -117,12 +143,13 @@
   <div class="meter" title="battery"><span class="batt" id="battwrap"><i id="batt" style="width:100%"></i></span><b id="battpct">—</b></div>
   <div class="spacer"></div>
   <span class="status" id="status">—</span>
+  <button class="iconbtn more" id="morebtn" title="Show map and statistics">More</button>
   <button class="iconbtn" id="themebtn" title="Switch light / dark">◐</button>
 </header>
 
 <main>
   <section class="stickpane">
-    <div class="panel" id="stickwrap"><canvas id="stick" width="600" height="600" aria-label="joystick with sonar ring"></canvas></div>
+    <div class="panel" id="stickwrap"><canvas id="stick" width="420" height="420" aria-label="joystick with sonar ring"></canvas></div>
     <div class="stickfoot">
       <span>Top speed <b id="speedval">0.35 m/s</b></span>
       <input type="range" id="speed" min="0.05" max="0.6" step="0.05" value="0.35" aria-label="top speed">
@@ -138,10 +165,10 @@
     <div class="panel tele">
       <div><span>Driving</span><b id="beh">—</b></div>
       <div><span>Speed</span><b id="vel">—</b></div>
-      <div><span>Mapped</span><b id="cov">—</b></div>
       <div><span>Nearest ahead</span><b id="front">—</b></div>
-      <div><span>Distance driven</span><b id="dist">—</b></div>
-      <div><span>Bumps / cliffs</span><b id="events">—</b></div>
+      <div class="extra"><span>Mapped</span><b id="cov">—</b></div>
+      <div class="extra"><span>Distance driven</span><b id="dist">—</b></div>
+      <div class="extra"><span>Bumps / cliffs</span><b id="events">—</b></div>
       <div id="notice"></div>
     </div>
 
@@ -153,7 +180,7 @@
         <button data-mode="autonomous">Autonomous</button>
       </div>
       <div class="hint" id="modehint">Assisted: you steer, the rover still stops for walls and cliffs.</div>
-      <div class="label">If the link drops for 3 s</div>
+      <div class="label" id="losslabel">If the link drops for 3 s</div>
       <div class="seg loss" id="loss">
         <button data-loss="hold">Wait</button>
         <button data-loss="explore">Explore alone</button>
@@ -170,99 +197,116 @@
 
 <script>
 (() => {
-  // ---------------------------------------------------------------- theme
+  const $ = (id) => document.getElementById(id);
   const root = document.documentElement;
+  const phone = matchMedia('(max-width: 760px), (max-height: 520px)').matches;
+
+  // ---------------------------------------------------------------- theme
   const saved = (() => { try { return localStorage.getItem('rover-theme'); } catch { return null; } })();
   if (saved) root.dataset.theme = saved;
   else if (matchMedia('(prefers-color-scheme: light)').matches) root.dataset.theme = 'light';
-  document.getElementById('themebtn').onclick = () => {
+  let C = {};
+  function readColors() {
+    const cs = getComputedStyle(root);
+    for (const k of ['bg', 'line', 'muted', 'teal', 'amber', 'red', 'stick', 'stick-knob']) C[k] = cs.getPropertyValue('--' + k).trim();
+  }
+  readColors();
+  $('themebtn').onclick = () => {
     root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
     try { localStorage.setItem('rover-theme', root.dataset.theme); } catch {}
-    draw();
+    readColors(); requestDraw();
   };
-  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+
+  // --------------------------------------------------------- compact mode
+  let compact = phone;
+  const savedCompact = (() => { try { return localStorage.getItem('rover-compact'); } catch { return null; } })();
+  if (savedCompact !== null) compact = savedCompact === '1';
+  function applyCompact() {
+    document.body.classList.toggle('compact', compact && phone);
+    $('morebtn').textContent = compact ? 'More' : 'Less';
+    if (!compact) refreshImages();
+  }
+  $('morebtn').onclick = () => { compact = !compact; try { localStorage.setItem('rover-compact', compact ? '1' : '0'); } catch {} applyCompact(); };
+  applyCompact();
 
   // ------------------------------------------------------------- helpers
-  const $ = (id) => document.getElementById(id);
-  const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(() => {});
+  const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(() => {});
 
   // ------------------------------------------------------------- joystick
   const cv = $('stick'), ctx = cv.getContext('2d');
-  let stick = { x: 0, y: 0, active: false }, state = null, lastSend = 0;
+  let stick = { x: 0, y: 0, active: false }, state = null, lastSend = 0, drawPending = false;
+
+  function requestDraw() {
+    if (drawPending) return;
+    drawPending = true;
+    requestAnimationFrame(() => { drawPending = false; draw(); });
+  }
 
   function draw() {
-    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.30, knob = W * 0.10;
+    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.30, knob = W * 0.11;
     ctx.clearRect(0, 0, W, H);
-    // sonar ring: one arc per sensor, mounted angle 0 = straight ahead (up on screen)
     const sonar = state ? state.sonar : [];
     const n = sonar.length || 8, step = 2 * Math.PI / n;
     for (let i = 0; i < n; i++) {
       const s = sonar[i] || { a: i * 360 / n, d: 1, max: 1, ok: true };
       const frac = Math.min(1, s.d / s.max);
-      const a = -Math.PI / 2 - (s.a * Math.PI / 180);       // robot frame -> screen (left = CCW)
+      const a = -Math.PI / 2 - (s.a * Math.PI / 180);
       const inner = r + 6, outer = inner + (R - inner) * (1 - frac) + 8;
       ctx.beginPath();
       ctx.arc(cx, cy, outer, a - step / 2 + 0.02, a + step / 2 - 0.02);
       ctx.arc(cx, cy, inner, a + step / 2 - 0.02, a - step / 2 + 0.02, true);
       ctx.closePath();
-      let col = css('--line');
-      if (!s.ok) col = css('--red');
-      else if (frac < 0.18) col = css('--red');
-      else if (frac < 0.4) col = css('--amber');
-      else if (frac < 0.98) col = css('--teal');
+      let col = C.line;
+      if (!s.ok || frac < 0.18) col = C.red;
+      else if (frac < 0.4) col = C.amber;
+      else if (frac < 0.98) col = C.teal;
       ctx.globalAlpha = frac < 0.98 || !s.ok ? 0.85 : 0.35;
       ctx.fillStyle = col; ctx.fill();
     }
     ctx.globalAlpha = 1;
-    // outer rim
-    ctx.beginPath(); ctx.arc(cx, cy, R + 10, 0, 2 * Math.PI); ctx.strokeStyle = css('--line'); ctx.lineWidth = 2; ctx.stroke();
-    // stick base
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.fillStyle = css('--stick'); ctx.fill();
-    // heading tick (forward)
+    ctx.beginPath(); ctx.arc(cx, cy, R + 10, 0, 2 * Math.PI); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.fillStyle = C.stick; ctx.fill();
     ctx.beginPath(); ctx.moveTo(cx, cy - r + 10); ctx.lineTo(cx - 8, cy - r + 26); ctx.lineTo(cx + 8, cy - r + 26); ctx.closePath();
-    ctx.fillStyle = css('--muted'); ctx.fill();
-    // cliff dots (front-left, front-right, left, right, rear-left, rear-right)
+    ctx.fillStyle = C.muted; ctx.fill();
     const cl = state ? state.cliff : [];
     const pos = [[-0.45, -0.95], [0.45, -0.95], [-0.95, 0], [0.95, 0], [-0.45, 0.95], [0.45, 0.95]];
-    cl.forEach((on, i) => { if (!pos[i]) return; ctx.beginPath(); ctx.arc(cx + pos[i][0] * r * 0.8, cy + pos[i][1] * r * 0.8, 6, 0, 2 * Math.PI); ctx.fillStyle = on ? css('--red') : css('--teal'); ctx.globalAlpha = on ? 1 : 0.5; ctx.fill(); ctx.globalAlpha = 1; });
-    // knob
+    cl.forEach((on, i) => { if (!pos[i]) return; ctx.beginPath(); ctx.arc(cx + pos[i][0] * r * 0.8, cy + pos[i][1] * r * 0.8, 6, 0, 2 * Math.PI); ctx.fillStyle = on ? C.red : C.teal; ctx.globalAlpha = on ? 1 : 0.5; ctx.fill(); ctx.globalAlpha = 1; });
     const kx = cx + stick.x * (r - knob), ky = cy - stick.y * (r - knob);
     ctx.beginPath(); ctx.arc(kx, ky, knob, 0, 2 * Math.PI);
-    ctx.fillStyle = stick.active ? css('--amber') : css('--stick-knob'); ctx.fill();
-    // centre text when idle
-    if (!stick.active) { ctx.fillStyle = css('--bg'); ctx.font = `600 ${W * 0.035}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('drive', kx, ky); }
+    ctx.fillStyle = stick.active ? C.amber : C['stick-knob']; ctx.fill();
+    if (!stick.active) { ctx.fillStyle = C.bg; ctx.font = `600 ${W * 0.04}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('drive', kx, ky); }
   }
 
   function pointer(e) {
     const b = cv.getBoundingClientRect(), s = cv.width / b.width;
     const x = (e.clientX - b.left) * s - cv.width / 2, y = (e.clientY - b.top) * s - cv.height / 2;
-    const r = cv.width * 0.30 - cv.width * 0.10;
+    const r = cv.width * 0.30 - cv.width * 0.11;
     let nx = x / r, ny = -y / r; const m = Math.hypot(nx, ny);
     if (m > 1) { nx /= m; ny /= m; }
+    if (Math.abs(nx) < 0.08) nx = 0;          // small dead zone: straight is easy to hold
+    if (Math.abs(ny) < 0.08) ny = 0;
     stick.x = nx; stick.y = ny;
   }
-  cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); stick.active = true; pointer(e); send(true); draw(); });
-  cv.addEventListener('pointermove', (e) => { if (stick.active) { pointer(e); send(); draw(); } });
-  const release = () => { stick.active = false; stick.x = stick.y = 0; send(true); draw(); };
+  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); cv.setPointerCapture(e.pointerId); stick.active = true; pointer(e); send(true); requestDraw(); });
+  cv.addEventListener('pointermove', (e) => { if (stick.active) { e.preventDefault(); pointer(e); send(); requestDraw(); } });
+  const release = () => { stick.active = false; stick.x = stick.y = 0; send(true); requestDraw(); };
   cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', release);
 
   function send(force) {
     const now = performance.now();
-    if (!force && now - lastSend < 100) return;
+    if (!force && now - lastSend < 120) return;
     lastSend = now;
     post({ type: 'drive', x: stick.x, y: stick.y });
   }
-  // keepalive while the stick is held (the rover's watchdog stops it after 1 s of silence)
-  setInterval(() => { if (stick.active) send(true); }, 400);
+  setInterval(() => { if (stick.active) send(true); }, 400);   // keep the rover's watchdog fed
 
-  // keyboard driving (tablet with keyboard / laptop)
   const keys = {};
   addEventListener('keydown', (e) => { keys[e.key] = true; keyDrive(); });
   addEventListener('keyup', (e) => { keys[e.key] = false; keyDrive(); });
   function keyDrive() {
     const y = (keys['ArrowUp'] || keys['w'] ? 1 : 0) - (keys['ArrowDown'] || keys['s'] ? 1 : 0);
     const x = (keys['ArrowRight'] || keys['d'] ? 1 : 0) - (keys['ArrowLeft'] || keys['a'] ? 1 : 0);
-    stick.x = x; stick.y = y; stick.active = !!(x || y); send(true); draw();
+    stick.x = x; stick.y = y; stick.active = !!(x || y); send(true); requestDraw();
   }
 
   // ------------------------------------------------------------- controls
@@ -271,12 +315,15 @@
   $('loss').onclick = (e) => { const b = e.target.closest('button'); if (b) post({ type: 'link_loss', action: b.dataset.loss }); };
   $('lights').onclick = () => post({ type: 'lights', on: !(state && state.headlights) });
   $('home').onclick = () => post({ type: 'home' });
-  $('stop').onclick = () => { stick.x = stick.y = 0; stick.active = false; post({ type: 'stop' }); draw(); };
+  $('stop').onclick = () => { stick.x = stick.y = 0; stick.active = false; post({ type: 'stop' }); requestDraw(); };
   const hints = { manual: 'Manual: you drive, nothing stops you — not even a cliff.', assisted: 'Assisted: you steer, the rover still stops for walls and cliffs.', autonomous: 'Autonomous: the rover explores and returns by itself.' };
 
   // ------------------------------------------------------------- polling
   const envNames = { cave: 'Cave', mars: 'Mars surface', underwater: 'Underwater site' };
+  let polling = false;
   async function poll() {
+    if (polling || document.hidden) return;        // never queue requests on a slow phone
+    polling = true;
     try {
       const s = await (await fetch('/api/state')).json();
       state = s;
@@ -291,34 +338,38 @@
       $('status').textContent = s.status + (s.fallback ? ' · rover on its own' : ''); $('status').className = 'status ' + s.status;
       $('beh').textContent = s.behaviour.toLowerCase();
       $('vel').textContent = `${s.speed.v.toFixed(2)} m/s`;
-      $('cov').textContent = Math.round(s.coverage * 100) + '%';
       const front = s.sonar.length ? Math.min(...s.sonar.filter(x => Math.abs(x.a) <= 45).map(x => x.d)) : 0;
       const fb = $('front'); fb.textContent = front.toFixed(2) + ' m'; fb.className = front < 0.4 ? 'bad' : front < 0.9 ? 'warn' : '';
-      $('dist').textContent = s.distance.toFixed(1) + ' m';
-      $('events').textContent = `${s.bumps} / ${s.cliff_events}`;
+      if (!(compact && phone)) {
+        $('cov').textContent = Math.round(s.coverage * 100) + '%';
+        $('dist').textContent = s.distance.toFixed(1) + ' m';
+        $('events').textContent = `${s.bumps} / ${s.cliff_events}`;
+        $('terrain').textContent = s.terrain ? `camera · ground looks like ${s.terrain}` : 'camera';
+      }
       [...$('modes').children].forEach(b => b.classList.toggle('on', b.dataset.mode === s.mode));
       [...$('loss').children].forEach(b => b.classList.toggle('on', b.dataset.loss === s.on_link_loss));
       $('modehint').textContent = hints[s.mode];
       $('lights').classList.toggle('on', s.headlights);
-      $('terrain').textContent = s.terrain ? `camera · ground looks like ${s.terrain}` : 'camera';
       let note = '';
       if (lk.state === 'lost') note = s.fallback ? `Link lost for ${lk.lost_for} s — the rover took over (${s.on_link_loss}).` : `Link lost — commands are not reaching the rover.`;
       else if (lk.state === 'weak') note = 'Weak link — some commands are being dropped.';
       else if (s.bumper.some(Boolean)) note = 'Bumper pressed.';
       else if (s.cliff.some(Boolean)) note = 'Cliff detected under the rover.';
       $('notice').textContent = note;
-      draw();
+      requestDraw();
     } catch (e) {
       $('env').textContent = 'cannot reach the simulator';
-    }
+    } finally { polling = false; }
   }
   function refreshImages() {
+    if (document.hidden || (compact && phone)) return;
     const t = Date.now();
     $('map').src = '/api/map.png?' + t;
     $('cam').src = '/api/camera.png?' + t;
   }
-  setInterval(poll, 200); setInterval(refreshImages, 500);
-  poll(); refreshImages(); draw();
+  setInterval(poll, phone ? 300 : 200);
+  setInterval(refreshImages, phone ? 1500 : 700);
+  poll(); refreshImages(); requestDraw();
 })();
 </script>
 </body>
