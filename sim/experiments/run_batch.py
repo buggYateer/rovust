@@ -25,6 +25,20 @@ SAMPLE_EVERY = 100   # steps between coverage samples
 
 
 def run_one(args):
+    try:
+        return _run_one(args)
+    except Exception as e:          # one broken run must not kill a 100-run batch
+        env, strategy, seed, localisation, max_steps, fault = args
+        import traceback
+        traceback.print_exc()
+        return {"env": env, "strategy": strategy, "seed": seed, "status": f"error:{type(e).__name__}",
+                "time_s": 0, "steps": 0, "coverage": 0, "path_length_m": 0, "backtracks": 0, "collisions": 0,
+                "bumps": 0, "cliff_events": 0, "energy_wh": 0, "loc_error_m": 0, "loc_error_mean_m": 0,
+                "return_reason": "", "localisation": localisation,
+                "fault": f"{fault[0]}:{fault[1]}" if fault else "", "max_steps": max_steps, "curve": ""}
+
+
+def _run_one(args):
     env, strategy, seed, localisation, max_steps, fault = args
     ai = AIBrain() if strategy == "utility" or fault else None
     m = Mission(env, strategy, seed=seed, localisation=localisation, ai=ai)
