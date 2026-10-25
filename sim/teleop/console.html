@@ -243,7 +243,7 @@
   }
 
   function draw() {
-    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.30, knob = W * 0.11;
+    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.36, knob = W * 0.12;
     ctx.clearRect(0, 0, W, H);
     const sonar = state ? state.sonar : [];
     const n = sonar.length || 8, step = 2 * Math.PI / n;
@@ -251,7 +251,7 @@
       const s = sonar[i] || { a: i * 360 / n, d: 1, max: 1, ok: true };
       const frac = Math.min(1, s.d / s.max);
       const a = -Math.PI / 2 - (s.a * Math.PI / 180);
-      const inner = r + 6, outer = inner + (R - inner) * (1 - frac) + 8;
+      const inner = r + 5, outer = inner + (R - inner) * (1 - frac) + 6;
       ctx.beginPath();
       ctx.arc(cx, cy, outer, a - step / 2 + 0.02, a + step / 2 - 0.02);
       ctx.arc(cx, cy, inner, a + step / 2 - 0.02, a - step / 2 + 0.02, true);
@@ -280,10 +280,10 @@
   function pointer(e) {
     const b = cv.getBoundingClientRect(), s = cv.width / b.width;
     const x = (e.clientX - b.left) * s - cv.width / 2, y = (e.clientY - b.top) * s - cv.height / 2;
-    const r = cv.width * 0.30 - cv.width * 0.11;
+    const r = cv.width * 0.36 - cv.width * 0.12;
     let nx = x / r, ny = -y / r; const m = Math.hypot(nx, ny);
     if (m > 1) { nx /= m; ny /= m; }
-    if (Math.abs(nx) < 0.08) nx = 0;          // small dead zone: straight is easy to hold
+    if (Math.abs(nx) < 0.12) nx = 0;          // dead zone: straight ahead is easy to hold
     if (Math.abs(ny) < 0.08) ny = 0;
     stick.x = nx; stick.y = ny;
   }
