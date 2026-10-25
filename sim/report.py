@@ -205,6 +205,8 @@ class ReportUploader:
             return False
 
     def send_folder(self, folder: str) -> tuple[bool, str]:
+        if not self.configured:
+            return False, "Drive bridge not configured"
         files = []
         for name in sorted(os.listdir(folder)):
             path = os.path.join(folder, name)
