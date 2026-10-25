@@ -1,0 +1,71 @@
+{
+  "title": "PyRov — Multi-Environment Autonomous Exploration Rover",
+  "order": [
+    "cover",
+    "abstract",
+    "intro-why",
+    "intro-course",
+    "sec-analysis",
+    "sensors-table",
+    "sensors-placement",
+    "sensors-physics",
+    "actuators",
+    "control",
+    "controller",
+    "sec-design",
+    "architecture",
+    "localisation",
+    "behaviour",
+    "exploration",
+    "ai",
+    "environments",
+    "app",
+    "remote",
+    "reports",
+    "sec-results",
+    "res-strategies",
+    "res-localisation",
+    "res-ablation",
+    "tests",
+    "sec-conclusion",
+    "conclusion",
+    "future",
+    "thanks"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Abstract and introduction: the problem of exploring unknown places without a map or GPS, and one rover for three worlds.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Analysis: the sensors, the actuators and the on-board controller the rover is built from.",
+      "start": "sec-analysis"
+    },
+    "s3": {
+      "description": "Design and implementation: architecture, localisation, behaviours, planning, AI, environments, the application and remote control.",
+      "start": "sec-design"
+    },
+    "s4": {
+      "description": "Results and tests: 264 measured runs comparing strategies, localisation and sensor ablations, plus 49 unit tests.",
+      "start": "sec-results"
+    },
+    "s5": {
+      "description": "Conclusion and future work.",
+      "start": "sec-conclusion"
+    }
+  },
+  "faces": {
+    "space-grotesk": {
+      "family": "Space Grotesk",
+      "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
+    },
+    "ibm-plex-sans": {
+      "family": "IBM Plex Sans",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"
+    }
+  }
+}

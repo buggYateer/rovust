@@ -1,0 +1,15 @@
+<section id="app" data-transition="fade" style="background:#11161b;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">IMPLEMENTATION · THE APPLICATION</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">A desktop application that shows truth and belief side by side</h2>
+<div style="display:flex;gap:28px;align-items:start">
+<img src="../screenshots/main_light.png" alt="PyRov desktop application in light mode: setup panel, true world and belief map, sensors tab" style="width:1120px;height:708px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#1b232a">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<div style="background:#1b232a;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Mission setup</b> — environment, strategy, localisation mode, AI, seed; remote control; map layers.</p></div>
+<div style="background:#1b232a;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Two maps</b> — the true world the robot never sees, and the map it builds. Click either for a large live view.</p></div>
+<div style="background:#1b232a;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Telemetry tabs</b> — every sensor live with one-click fault injection; the PWM → encoder → PID loop; statistics; the radio link.</p></div>
+<div style="background:#1b232a;border:1px solid #2f3b46;border-radius:12px;padding:16px 20px"><p style="font-size:24px;line-height:1.4"><b style="color:#2dd4bf">Light and dark</b>, a user guide inside (F1), mission reports, one-click installer for the team.</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Implementation · PySide6 / Qt — sim/qtui/</p>
+<aside>The application is a conventional desktop program, built with Qt. The left panel configures a mission; the two maps show ground truth and belief; the tabs below expose the inner loop — every sensor reading, the motor control loop, statistics and the radio link. Any sensor can be broken with one click while the mission runs, which is how we demonstrate the fault detector and the safety layers.</aside>
+</section>

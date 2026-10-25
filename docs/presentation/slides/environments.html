@@ -1,0 +1,30 @@
+<section id="environments" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">DESIGN · ENVIRONMENTS</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Three worlds, one robot — the configuration is the only difference</h2>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#11161b;border:1px solid #2f3b46;border-radius:16px;padding:0 0 24px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+<div style="background:#7a5a46;padding:16px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;color:#fff">Cave</h3></div>
+<div style="padding:0 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:25px;line-height:1.45;color:#bfd0d8">DFS-maze corridors 1.2 m wide, chambers, mud, pits against the walls, three gas pockets, darkness.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Sensing:</b> sonar 2.5 m, headlights on, compass disturbed by iron, gas and light sensors, optical flow.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Radio:</b> rock eats the signal — the far third is out of reach.</p>
+</div></div>
+<div style="flex:1;background:#11161b;border:1px solid #2f3b46;border-radius:16px;padding:0 0 24px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+<div style="background:#b4523c;padding:16px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;color:#fff">Mars surface</h3></div>
+<div style="padding:0 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:25px;line-height:1.45;color:#bfd0d8">Open terrain, rock fields, craters with rims and slopes, sand dunes with 25 % wheel slip, bedrock, ridges.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Sensing:</b> no compass — sun sensor; optical flow because the encoders lie in sand; sonar 5 m.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Radio:</b> strong but relayed — every command arrives 2 s late.</p>
+</div></div>
+<div style="flex:1;background:#11161b;border:1px solid #2f3b46;border-radius:16px;padding:0 0 24px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+<div style="background:#2a6f9e;padding:16px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;color:#fff">Underwater site</h3></div>
+<div style="padding:0 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:25px;line-height:1.45;color:#bfd0d8">Cellular-automata reef, mud flats, a steady current that pushes the body sideways.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Sensing:</b> thrusters instead of wheels, 12 sonars at 6 m, no IR (no light), DVL for ground speed, pressure for depth.</p>
+<p style="font-size:25px;line-height:1.45;color:#e6edf3"><b>Radio:</b> acoustic modem — short range, 0.4 s delay.</p>
+</div></div>
+</div>
+<p style="font-size:26px;line-height:1.5;color:#92a1af">Each world is one function in <span style="font-family:'JetBrains Mono', monospace;color:#2dd4bf">sim/config.py</span>: map size, generator, terrain costs, slip, the mounted sensors and their noise, battery, radio link. Nothing in the robot’s control, estimation or decision code knows which world it is in.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Design · config.py, world.py</p>
+<aside>The three environments stress different things. The cave is about corridors, darkness and dead ends. Mars is about open terrain, slip and the lack of a magnetic field. Under water, the whole sensor suite changes — thrusters, sonar, a Doppler log — and still the same control, estimation and decision code runs. That is the claim of the proposal, and it is what makes the comparisons in the results fair.</aside>
+</section>
