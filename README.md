@@ -24,7 +24,7 @@ where to go next and comes home before the battery runs out. The rover is
 simulated **from the actuator level up** (DC motors, PWM, encoders, PID, a full
 sensor suite) and the same robot runs unchanged in a cave, on Mars and under water.
 
-## Highlights
+## ✨ Highlights
 
 - **Three environments, one robot.** Cave (maze corridors, darkness, mud, pits,
   gas), Mars (rocks, craters, sand with 25 % wheel slip, a sun sensor instead of
@@ -54,7 +54,7 @@ sensor suite) and the same robot runs unchanged in a cave, on Mars and under wat
 - **Measured, not assumed.** 264 headless runs compare strategies, localisation
   modes and sensor ablations — see [docs/RESULTS.md](docs/RESULTS.md).
 
-## Screenshots
+## 🖼️ Screenshots
 
 | Light mode — Mars, utility explorer | Dark mode — cave, driven from a phone, Radio link tab |
 |---|---|
@@ -79,14 +79,14 @@ turns amber and red where something is close, so you drive by feel.
 | ![guide](docs/screenshots/guide.png) | ![about](docs/screenshots/about.png) |
 </details>
 
-## Quick start
+## 🚀 Quick start
 
-**Windows, one click:** download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
+**🪟 Windows, one click:** download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
 (right-click → *Save link as…*) and double-click it. It finds or installs
 Python, downloads the project where you choose, installs everything, puts a
 **PyRov** shortcut on the desktop and starts the program. Run it again to update.
 
-**By hand:**
+**⌨️ By hand:**
 
 ```bash
 git clone https://github.com/buggYateer/robotics-project.git
@@ -99,11 +99,11 @@ python main.py
 Then: pick an environment, a strategy and a localisation mode → **Start mission**.
 `Space` pause · `1–4` speed · `R` restart · `Ctrl+S` send report · `F1` user guide.
 
-**From a phone:** choose *Assisted* or *Manual* in **Remote control**, press
+**📱 From a phone:** choose *Assisted* or *Manual* in **Remote control**, press
 **Open console for phone / tablet**, open the address it shows in the phone's
 browser (same Wi-Fi). Arrow keys / W A S D drive from the keyboard as well.
 
-**Mission reports:** every finished mission (or **Send report**, which lets you
+**📝 Mission reports:** every finished mission (or **Send report**, which lets you
 name the report) saves `reports/Mission #n - name/` with an HTML report and both maps, and
 uploads it to the team's Drive folder; offline reports go out when the network
 is back. Setup of the Drive bridge: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md).
@@ -112,7 +112,7 @@ is back. Setup of the Drive bridge: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.m
 > packages — turn it off or use Python 3.12. Using Claude Code? Paste the prompt
 > in [docs/SETUP_WITH_CLAUDE.md](docs/SETUP_WITH_CLAUDE.md).
 
-## What maps to the course
+## 🎓 What maps to the course
 
 | Course topic | In PyRov |
 |---|---|
@@ -125,7 +125,7 @@ is back. Setup of the Drive bridge: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.m
 | Communication | `comms.py`, `teleop/` — radio link model, operator console |
 | AI | `sim/ai/` — terrain classifier, fault detector, utility explorer |
 
-## Results in one glance
+## 📊 Results in one glance
 
 | | Cave | Mars | Underwater |
 |---|---|---|---|
@@ -146,16 +146,45 @@ python -m sim.experiments.run_batch --localisation        # fused vs encoders vs
 python -m sim.experiments.run_batch --ablation            # one sensor off at a time
 ```
 
-## Documents
+## 📚 Documents
 
-- [Proposal (Task 1)](docs/Task1_v2.md) · [Design notes & sensor placement](docs/DESIGN.md) · [Results](docs/RESULTS.md)
-- [Drive reports bridge](docs/DRIVE_REPORTS.md) · [Setup with Claude](docs/SETUP_WITH_CLAUDE.md)
-- **Presentation (30 slides):** [Claude Slides (online, with transitions)](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) · [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [PowerPoint with Egyptian-Arabic speaker notes](docs/presentation/PyRov_presentation_ar_notes.pptx) · [PDF](docs/presentation/PyRov_presentation.pdf) · [web viewer](docs/presentation/PyRov_presentation.html) (N = notes, L = EN/مصري) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) — rebuilt with `python tools/build_presentation.py`
-- [Promo trailer](docs/media/trailer.html) — 75 s animated page with an English voice-over spoken by the browser (open the file, press Play)
-- **[دليل الفريق بالعربي (HTML تفاعلي)](docs/team_guide_ar.html)** — شرح كل جزء في المشروع وربطه بالمنهج وسيناريو العرض
-- [رحلة بناء المشروع](docs/JOURNEY_ar.md) — الأفكار والمشاكل والإصلاحات بالترتيب
+### 🎤 Presentation (30 slides)
 
-## Team
+| | Open | Best for |
+|:-:|---|---|
+| 🌐 | [**Claude Slides**](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) · [with Egyptian-Arabic notes](https://claude.ai/artifact/F9q2YYt6BtYD7pJ3d9Ddok) | presenting: transitions, animated map, speaker notes (online, sign-in) |
+| 🖥️ | [Web viewer](docs/presentation/PyRov_presentation.html) | offline backup: `F` full screen · `N` notes · `L` English / Egyptian notes |
+| 📽️ | [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [with Egyptian-Arabic notes](docs/presentation/PyRov_presentation_ar_notes.pptx) | presenter view with notes |
+| 📄 | [PDF](docs/presentation/PyRov_presentation.pdf) | any computer |
+| 📝 | [Speaker notes](docs/presentation/SPEAKER_NOTES.md) · [How to present](docs/presentation/README.md) | reading from a phone; the day-of checklist |
+
+### 🎬 Promo trailer
+
+[`docs/media/trailer.html`](docs/media/trailer.html) — a 75-second animated page with an English voice-over spoken by the browser. Open the file and press **Play**.
+
+### 📐 Design and results
+
+| | Document | Contents |
+|:-:|---|---|
+| 📋 | [Proposal (Task 1)](docs/Task1_v2.md) | the submitted proposal and hypothesis |
+| 🧭 | [Design notes](docs/DESIGN.md) | architecture, every sensor's placement and why, lessons learned |
+| 📈 | [Results](docs/RESULTS.md) | the 264 measured runs: strategies, localisation, sensor ablation |
+
+### 🛠️ Setup and tooling
+
+| | Document | Contents |
+|:-:|---|---|
+| ☁️ | [Drive reports bridge](docs/DRIVE_REPORTS.md) | one shared Drive folder for the team's mission reports, numbered by Drive |
+| 🤖 | [Setup with Claude](docs/SETUP_WITH_CLAUDE.md) | a prompt that installs and runs the project for a teammate |
+
+### 🇪🇬 بالعربي
+
+| | الملف | المحتوى |
+|:-:|---|---|
+| 📖 | [دليل الفريق (HTML تفاعلي)](docs/team_guide_ar.html) | شرح كل جزء في المشروع وربطه بالمنهج وسيناريو العرض |
+| 🛤️ | [رحلة بناء المشروع](docs/JOURNEY_ar.md) | الأفكار والمشاكل والإصلاحات بالترتيب |
+
+## 👥 Team
 
 Robotics — team project, Faculty of Engineering, Computer and Systems Department.
 Supervisor: **Dr. Elshaimaa Nabil Nada**.
