@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" alt="PyRov" width="128">
+  <img src="assets/icon.png" alt="PyRov" width="120">
 </p>
 
 <h1 align="center">PyRov</h1>
@@ -8,196 +8,154 @@ one robot, three unknown worlds — cave, Mars, underwater — simulated from th
 
 <p align="center">
   <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white">
-  <img alt="PySide6" src="https://img.shields.io/badge/UI-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
+  <img alt="PySide6" src="https://img.shields.io/badge/desktop%20app-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
   <img alt="tests" src="https://img.shields.io/badge/tests-49%20passing-2dd4bf">
   <img alt="sensors" src="https://img.shields.io/badge/sensors-20%2B%20modelled-f5a524">
-  <img alt="remote control" src="https://img.shields.io/badge/remote%20control-phone%20%2F%20tablet-8b5cf6">
+  <img alt="remote control" src="https://img.shields.io/badge/drive%20it%20from-phone%20%2F%20tablet-8b5cf6">
 </p>
 
 <p align="center">
-  <img src="docs/media/demo.gif" alt="PyRov exploring a cave: true world on the left, the map the rover builds on the right" width="860">
+  <img src="docs/media/demo.gif" alt="PyRov exploring a cave: the true world on the left, the map the rover builds on the right" width="860">
 </p>
 
-A Python simulation of an autonomous exploration rover, built **from the actuator
-and sensor level up** — DC motors, PWM, encoders, PID, a full on-board sensor
-suite — to localisation, mapping, exploration and AI terrain classification.
-One robot, three selectable environments: **cave**, **Mars surface**,
-**underwater site**. Each environment is only a configuration (map generator,
-terrain, sensor suite, noise, slip, current); the robot's control, estimation
-and decision code never changes.
+PyRov drops a rover into a place it has never seen — no map, no GPS — and lets it
+find its own way: it drives, senses, avoids walls and pits, builds a map, decides
+where to go next and comes home before the battery runs out. The rover is
+simulated **from the actuator level up** (DC motors, PWM, encoders, PID, a full
+sensor suite) and the same robot runs unchanged in a cave, on Mars and under water.
 
-Robotics course — team project, supervised by **Dr. Elshaimaa Nabil Nada**.
-Full proposal: [docs/Task1_v2.md](docs/Task1_v2.md). Design notes and sensor
-placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
-[docs/RESULTS.md](docs/RESULTS.md). Drive reports: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md).
+## Highlights
 
-## How to run
-
-### One-click (Windows)
-
-1. Download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
-   (right-click → *Save link as…*) and double-click it.
-2. It asks where to put the project (Enter = `C:\Users\<you>\PyRov`), finds or
-   installs Python, downloads the project, installs everything, puts a **PyRov**
-   shortcut on the desktop and starts the program. Run it again later to update.
-3. Next time: double-click the **PyRov** desktop shortcut, or `run.bat` in the
-   project folder.
-
-Or, in PowerShell, one line:
-
-```powershell
-irm https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.ps1 | iex
-```
-
-Using Claude Code instead? Paste the prompt in [docs/SETUP_WITH_CLAUDE.md](docs/SETUP_WITH_CLAUDE.md).
-
-### By hand
-
-**Requirements:** Python 3.12 or newer (we use 3.15), Git, Windows / Linux / macOS.
-
-1. Get the code
-   ```bash
-   git clone https://github.com/buggYateer/robotics-project.git
-   cd robotics-project
-   ```
-2. Create a virtual environment and install the dependencies (once)
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate            # Windows
-   source .venv/bin/activate         # Linux / macOS
-   pip install -r requirements.txt
-   ```
-3. Run the simulator
-   ```bash
-   python main.py
-   ```
-   A desktop window opens. In the **Mission setup** panel on the left choose
-   the environment, the exploration strategy, the localisation mode, AI on/off
-   and a seed, then press **Start mission**. The **Help → User guide** menu
-   inside the program explains every panel; **Help → About** has the team.
-
-   Keyboard: `Space` pause · `1 2 3 4` speed ×1 ×4 ×8 ×16 · `R` restart · `H`
-   headlights · `F1` user guide. In the **Sensors** tab the *Fault* column
-   injects a fault into any sensor while the mission runs.
-
-4. (optional) Run the tests and the experiments
-   ```bash
-   pytest
-   python -m sim.experiments.pid_demo
-   python -m sim.experiments.run_batch --seeds 10
-   ```
-
-5. (optional) Drive the rover yourself from a phone or tablet
-   - In **Remote control** choose *Assisted* (you steer, the safety layers stay
-     on) or *Manual* (nothing stops you), then press **Open console for phone /
-     tablet**. The panel shows an address such as `http://192.168.1.4:8080`.
-   - On a phone or tablet connected to the **same Wi-Fi**, open that address in
-     the browser. The console works in landscape (joystick left, telemetry
-     right) and portrait, has a light / dark switch, and shows the rover's
-     sonar ring around the joystick, its camera, map, link and battery.
-   - Driving commands travel over a simulated radio link: it weakens with
-     distance and walls (cave), carries a 2 s delay (Mars) or 0.4 s
-     (underwater acoustic modem), drops packets when weak, and when lost for
-     3 s the rover returns home by default (or explores alone / waits — your
-     choice in *Link lost*). The **Radio link** tab shows the signal, the walls
-     in the way, latency, packet counters and a live log of what arrives from
-     the phone. Console settings (who drives, top speed) apply at once; only
-     physical commands go over the radio.
-   - Arrow keys / W A S D drive from the computer's keyboard as well: start a
-     mission, choose Assisted or Manual, then *hold* a key.
-   - If Windows asks, allow Python through the firewall on private networks.
-
-6. (optional) Mission reports to the team's Google Drive folder
-   - **Send report** (toolbar / File, Ctrl+S) saves `reports/Mission #n - date time - env (machine)/`
-     with `report.html` (statistics + both maps), the map PNGs and `metrics.json`;
-     with *auto-send* on (default) this happens by itself when a mission ends.
-   - One teammate sets up the Drive bridge once (5 minutes, no Google login in
-     the program): [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md). After that
-     every report from every computer lands in the shared folder; offline
-     reports wait in `reports/pending.json` and go out when the network returns.
-   - Click either map to open it in a large live window.
-
-`python main.py --pygame` starts the older single-window Pygame interface.
-
-> **Windows 11 note:** if *Smart App Control* is on, the compiled parts of
-> matplotlib / scikit-learn / PySide6 may be blocked ("An Application Control
-> policy has blocked this file"). Turn it off in *Windows Security → App &
-> browser control*, or use Python 3.12 whose packages are already trusted.
+- **Three environments, one robot.** Cave (maze corridors, darkness, mud, pits,
+  gas), Mars (rocks, craters, sand with 25 % wheel slip, a sun sensor instead of
+  a compass), underwater (reef, mud, a current, thrusters, sonar and a DVL).
+  Only the configuration changes.
+- **Built like the real thing.** Two DC motors behind an H-bridge with PWM,
+  480-tick encoders, the lecture's discrete PID per wheel and a straight-driving
+  controller; every sensor has its physics (sonar cone and specular loss, IR
+  lookup-table calibration, gyro bias, cliff switches front/side/rear…), a 10-bit
+  ADC, and can be **broken at run time with one click**.
+- **It knows where it is.** Dead reckoning drifts metres; the fused estimate
+  (gyro + compass/sun + optical flow/DVL) stays within centimetres — both are
+  drawn live on the map.
+- **Subsumption behaviours** (bumper escape › cliff stop › slope › avoid › …),
+  A\* on an inflated cost map, and three exploration strategies: nearest frontier,
+  DFS with backtracking, and a **utility explorer** that wins in every world.
+- **AI where it earns its place.** A Random-Forest terrain classifier reads the
+  camera and feeds the planner's cost map; a fault detector drops sensors that
+  go bad; utility-based frontier selection.
+- **Drive it yourself — from a phone or tablet.** Assisted mode (you steer, the
+  safety layers still protect) or manual, over a **simulated radio link** that
+  weakens with distance and walls, drops packets, adds Mars-like delay, and hands
+  control back to the autonomy when it is lost.
+- **A proper desktop app**, light and dark, with a user guide inside, a Radio
+  link tab, clickable large maps, and **mission reports** (statistics + maps)
+  uploaded to the team's shared Drive folder — queued when offline.
+- **Measured, not assumed.** 264 headless runs compare strategies, localisation
+  modes and sensor ablations — see [docs/RESULTS.md](docs/RESULTS.md).
 
 ## Screenshots
 
-| Cave – Sensors tab | Mars – Motor control tab |
+| Light mode — Mars, utility explorer | Dark mode — cave, driven from a phone, Radio link tab |
 |---|---|
-| ![cave](docs/screenshots/qt_cave.png) | ![mars](docs/screenshots/qt_mars.png) |
-| **Underwater – Statistics tab** | **Radio link tab while driving from a phone (dark mode)** |
-| ![underwater](docs/screenshots/qt_underwater.png) | ![radio](docs/screenshots/qt_radio.png) |
+| ![light](docs/screenshots/main_light.png) | ![dark](docs/screenshots/main_dark_radio.png) |
+| **Motor control** — PWM → motor → encoder → PID, live | **Statistics** — coverage, path, errors, battery, AI accuracy |
+| ![motor](docs/screenshots/tab_motor.png) | ![stats](docs/screenshots/tab_stats.png) |
+| **Click a map** → large live view | **Mission over** — the reason, and what to do next |
+| ![popup](docs/screenshots/map_popup.png) | ![over](docs/screenshots/mission_over.png) |
 
-Left map: the true world the robot never sees (sonar cones, IR beams, cliff
-switches, true path). Right map: the robot's own map (occupancy + terrain +
-hazards, fused estimate in green, encoders-only estimate in red, planned path,
-frontiers). Bottom tabs: every sensor reading live with fault injection, the
-PWM → motor → encoder → PID loop, and the mission statistics.
-
-![pid](docs/figures/pid_step_response.png)
-
-## What is simulated
-
-| Layer | What the code does | Course topic |
+| Phone / tablet console — tablet, dark | Phone, light (compact) | Mission report |
 |---|---|---|
-| **Actuators** (`sim/robot/motor.py`) | Two DC motors behind an H-bridge; PWM duty → non-linear effective voltage with a static-friction dead band; first-order mechanical response; load from terrain; a `calibration_table()` that measures duty → speed | Actuators 1 & 2 |
-| **Encoders** (`encoder.py`) | 16-tick two-phase incremental encoder on the motor shaft (×30 gearbox = 480 ticks/wheel rev), direction from phase order, speed from tick delta (quantised) | Sensors 1 |
-| **Control** (`control.py`, `drive.py`) | On-off, hysteresis, P, PI, PD, PID in the lecture's incremental discrete form; a PID velocity loop per wheel; an I-controller on the encoder *position* difference so the differential drive goes straight; wheel slip the encoders cannot see | Control |
-| **Sensors** (`sim/sensors/`) | Sonar ring (cone, specular loss, cross-talk, time-of-flight), Sharp-style IR PSDs (non-linear, lookup-table calibration, minimum-range fold-back), IR cliff switches (front, side, rear), bumpers, compass with local disturbance, sun sensor, gyro with bias, accelerometer/inclinometer, camera, optical flow / DVL, battery, light, gas, pressure. Analog sensors pass a modelled 10-bit **A/D converter**. Every sensor can be faulted at run time. | Sensors 1 & 2 |
-| **Localisation** (`estimation.py`) | Dead reckoning from the encoders (drifts); fused estimate: gyro integrated and corrected by compass/sun (complementary filter, bias learned while stationary) + ground speed from optical flow / DVL | Sensors 2 |
-| **Mapping** (`mapping.py`) | Log-odds occupancy grid (one echo never makes a cell occupied), terrain-cost layer from the AI, hazard layer from the cliff sensors | Navigation |
-| **Behaviour** (`behaviors.py`) | Subsumption: `STOP > ESCAPE (bumper) > CLIFF > SLOPE > SCAN > AVOID (with hysteresis) > TELEOP (operator) > HOME (battery) > EXPLORE > WANDER` | Robot Behaviour |
-| **Communication** (`comms.py`, `teleop/`) | Radio link to a base station at the start point: signal vs distance and walls, packet loss, latency, watchdog, fallback to autonomy; phone/tablet console served over Wi-Fi; Radio link tab | Robot Behaviour (communication) |
-| **Planning** (`planning.py`) | A* on an inflated cost map (configuration space + proximity penalty + terrain cost); nearest-frontier vs DFS-with-backtracking exploration; return to start when the battery only just suffices | Navigation / decision |
-| **AI** (`sim/ai/`) | Random-Forest terrain classifier on 16×16 camera patches → planner cost map; sensor fault detector (stuck / dead / noisy) that drops a bad sensor; utility-based frontier selection (information gain / cost − hazard − battery) | — |
-| **Environments** (`config.py`, `world.py`) | Cave: maze corridors, chambers, mud, pits against the walls, gas pockets, darkness. Mars: rock fields, craters with rims and slopes, sand (25 % slip), bedrock, ridges. Underwater: cellular-automata reef, mud flats, a constant current with noise. | — |
+| ![tablet](docs/screenshots/console_tablet_dark.jpg) | ![phone](docs/screenshots/console_phone_light.jpg) | ![report](docs/screenshots/report.png) |
 
-## Experiments (headless)
+The joystick sits inside a ring of the rover's live sonar readings — the ring
+turns amber and red where something is close, so you drive by feel.
 
-```bash
-python -m sim.experiments.pid_demo                       # step responses of on-off/hysteresis/P/PI/PID + calibration curve
-python -m sim.experiments.run_batch --seeds 10           # frontier vs DFS vs utility, every environment
-python -m sim.experiments.run_batch --localisation       # fused vs encoders-only vs perfect
-python -m sim.experiments.run_batch --ablation           # switch each sensor off and measure the damage
-```
+<details>
+<summary>User guide and About (inside the program)</summary>
 
-Each batch writes `results/<name>.csv` plus `<name>_summary.png` (coverage,
-path length, backtracking, bumps, localisation error, energy) and
-`<name>_coverage.png` (coverage over time, mean ± std over seeds).
+| Help → User guide (F1) | Help → About |
+|---|---|
+| ![guide](docs/screenshots/guide.png) | ![about](docs/screenshots/about.png) |
+</details>
 
-## Tests
+## Quick start
+
+**Windows, one click:** download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
+(right-click → *Save link as…*) and double-click it. It finds or installs
+Python, downloads the project where you choose, installs everything, puts a
+**PyRov** shortcut on the desktop and starts the program. Run it again to update.
+
+**By hand:**
 
 ```bash
-pytest
+git clone https://github.com/buggYateer/robotics-project.git
+cd robotics-project
+python -m venv .venv && .venv\Scripts\activate     # source .venv/bin/activate on Linux/macOS
+pip install -r requirements.txt
+python main.py
 ```
 
-41 tests cover the motor calibration curve, encoder direction, PID steady-state
-error, driving straight with mismatched motors, world connectivity, every
-sensor's physics and faults, dead reckoning vs fusion, occupancy-grid
-precision, A*, frontier detection, mission runs in all environments,
-subsumption priorities, return-home, the terrain classifier and the fault detector.
+Then: pick an environment, a strategy and a localisation mode → **Start mission**.
+`Space` pause · `1–4` speed · `R` restart · `Ctrl+S` send report · `F1` user guide.
 
-## Layout
+**From a phone:** choose *Assisted* or *Manual* in **Remote control**, press
+**Open console for phone / tablet**, open the address it shows in the phone's
+browser (same Wi-Fi). Arrow keys / W A S D drive from the keyboard as well.
 
+**Mission reports:** every finished mission (or **Send report**) saves
+`reports/Mission #n - date time - env/` with an HTML report and both maps, and
+uploads it to the team's Drive folder; offline reports go out when the network
+is back. Setup of the Drive bridge: [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md).
+
+> Python 3.12+ · Windows 11 with *Smart App Control* on may block compiled
+> packages — turn it off or use Python 3.12. Using Claude Code? Paste the prompt
+> in [docs/SETUP_WITH_CLAUDE.md](docs/SETUP_WITH_CLAUDE.md).
+
+## What maps to the course
+
+| Course topic | In PyRov |
+|---|---|
+| Actuators, PWM, H-bridge | `sim/robot/motor.py` — non-linear duty → speed, load, calibration table |
+| Encoders, A/D | `encoder.py`, `sensors/base.py` — 2-phase incremental encoder, 10-bit ADC |
+| Control (on-off, PID) | `robot/control.py`, `drive.py` — discrete PID, driving straight, `experiments/pid_demo.py` |
+| Sensor types and placement | `sim/sensors/` — classification tags, physics, faults; [docs/DESIGN.md](docs/DESIGN.md) |
+| Robot behaviour, subsumption | `behaviors.py` — nine prioritised layers, operator in the loop |
+| Navigation, mapping, planning | `estimation.py`, `mapping.py`, `planning.py` |
+| Communication | `comms.py`, `teleop/` — radio link model, operator console |
+| AI | `sim/ai/` — terrain classifier, fault detector, utility explorer |
+
+## Results in one glance
+
+| | Cave | Mars | Underwater |
+|---|---|---|---|
+| Coverage after 400 s — utility explorer | **96 %** | **84 %** | **97 %** |
+| … DFS + backtracking | 92 % | 72 % | 92 % |
+| … nearest frontier | 69 % | 47 % | 65 % |
+| Localisation error — fused / encoders only | 0.17 m / 2.4 m | 0.09 m / 3.7 m | 0.04 m / 5.5 m |
+
+Killing the sonar collapses coverage to 5–25 %; killing the ground-speed sensor
+puts the estimate 5–16 m off; killing the cliff switches cost one rover a
+crater. Full tables and plots: [docs/RESULTS.md](docs/RESULTS.md).
+
+```bash
+pytest                                      # 49 tests
+python -m sim.experiments.pid_demo          # step responses + calibration curve
+python -m sim.experiments.run_batch --seeds 10            # strategies
+python -m sim.experiments.run_batch --localisation        # fused vs encoders vs perfect
+python -m sim.experiments.run_batch --ablation            # one sensor off at a time
 ```
-main.py                 entry point (Pygame app)
-sim/config.py           environment configurations (the only thing that changes per environment)
-sim/core.py             Pose, angles, terrain table
-sim/world.py            true world + generators (cave / mars / underwater)
-sim/robot/              motor, encoder, control, differential drive, robot body + battery
-sim/sensors/            sensor base (classification, ADC, faults), range sensors, internal sensors, camera, suite
-sim/estimation.py       dead reckoning, heading fusion
-sim/mapping.py          occupancy grid + mapper
-sim/planning.py         cost map, A*, frontiers, Frontier/DFS explorers
-sim/behaviors.py        subsumption layers + arbiter
-sim/mission.py          one run: wires everything, metrics
-sim/ai/                 terrain classifier, fault detector, utility explorer, brain
-sim/ui/                 menu, About, live simulator
-sim/experiments/        batch runner, plots, PID demo
-tests/                  pytest suite
-docs/                   proposal (Task 1) and design notes
-```
+
+## Documents
+
+- [Proposal (Task 1)](docs/Task1_v2.md) · [Design notes & sensor placement](docs/DESIGN.md) · [Results](docs/RESULTS.md)
+- [Drive reports bridge](docs/DRIVE_REPORTS.md) · [Setup with Claude](docs/SETUP_WITH_CLAUDE.md)
+
+## Team
+
+Robotics — team project, Faculty of Engineering, Computer and Systems Department.
+Supervisor: **Dr. Elshaimaa Nabil Nada**.
+
+Ahmed Hamed Mohamed · Aml Hesham Hosny · Tassneem Amin Gamil · Kholoud Waleed Attia ·
+Donia Essam Fathy · Mazen Mohamed Hussien · Mohamed Osama Salah · Mohamed Elsayed Mohamed ·
+Mahmoud Ahmed Abdelghani
