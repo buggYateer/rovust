@@ -73,9 +73,9 @@ section.slide > *:not([style*="position:absolute"]):not([style*="position: absol
 VIEWER_CSS = """
 body{font-family:'IBM Plex Sans',Segoe UI,Arial,sans-serif;color:#e6edf3;height:100vh;overflow:hidden;display:flex;flex-direction:column}
 #stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#frame{position:relative;width:1920px;height:1080px;transform-origin:center center;box-shadow:0 20px 80px rgba(0,0,0,.6)}
-#frame section.slide{position:absolute;left:0;top:0;display:none}
-#frame section.slide.current{display:flex}
+#frame{position:relative;flex:none;width:1920px;height:1080px;transform-origin:center center;box-shadow:0 20px 80px rgba(0,0,0,.6)}
+#frame section.slide{position:absolute;left:0;top:0}
+#frame section.slide:not(.current){display:none!important}
 #bar{height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#11161b;border-top:1px solid #2f3b46;font-size:14px;color:#92a1af;flex-shrink:0}
 #bar b{color:#e6edf3;font-weight:600}
 #bar button{background:#1b232a;color:#e6edf3;border:1px solid #2f3b46;border-radius:6px;padding:4px 10px;font:inherit;cursor:pointer}
@@ -102,8 +102,9 @@ VIEWER_JS = """
   if(bare) document.documentElement.classList.add('bare');
   let i=0; const want=q.get('slide');
   if(want){const k=slides.findIndex(s=>s.id===want); if(k>=0) i=k;}
-  let lang=localStorage.getItem('pyrov-notes-lang')||'en';
-  let notesOn=localStorage.getItem('pyrov-notes')==='1';
+  const store={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
+  let lang=store.get('pyrov-notes-lang')||'en';
+  let notesOn=store.get('pyrov-notes')==='1';
   const frame=document.getElementById('frame'), stage=document.getElementById('stage');
   const notes=document.getElementById('notes'), counter=document.getElementById('counter'), title=document.getElementById('title');
   function fit(){ if(bare) return; const r=stage.getBoundingClientRect(); const s=Math.min(r.width/1920,r.height/1080)*0.98; frame.style.transform='scale('+s+')'; }
@@ -119,17 +120,17 @@ VIEWER_JS = """
     i=Math.max(0,Math.min(slides.length-1,k));
     slides.forEach((s,j)=>s.classList.toggle('current',j===i));
     if(bare){ slides.forEach((s,j)=>{ if(j!==i) s.remove(); }); slides[i].style.display='flex'; }
-    (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>fitSlide(slides[i]));
+    try{ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{ try{ fitSlide(slides[i]); }catch(e){} }); }catch(e){}
     counter.textContent=(i+1)+' / '+slides.length;
     const h=slides[i].querySelector('h1,h2'); title.textContent=h?h.textContent.trim():slides[i].id;
     const n=(lang==='ar'?notesAr:notesEn)[slides[i].id]||'';
     notes.className=(notesOn?'on ':'')+(lang==='ar'?'ar':'');
     notes.innerHTML='<div class="lbl">'+(lang==='ar'?'ملاحظات المتحدث · مصري':'Speaker notes · English')+'</div>'+n.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-    if(!bare){ const u=new URL(location); u.searchParams.set('slide',slides[i].id); history.replaceState(null,'',u); }
     fit();
+    if(!bare){ try{ const u=new URL(location); u.searchParams.set('slide',slides[i].id); history.replaceState(null,'',u); }catch(e){} }
   }
-  function toggleNotes(){ notesOn=!notesOn; localStorage.setItem('pyrov-notes',notesOn?'1':'0'); show(i); }
-  function toggleLang(){ lang=lang==='ar'?'en':'ar'; localStorage.setItem('pyrov-notes-lang',lang); show(i); }
+  function toggleNotes(){ notesOn=!notesOn; store.set('pyrov-notes',notesOn?'1':'0'); show(i); }
+  function toggleLang(){ lang=lang==='ar'?'en':'ar'; store.set('pyrov-notes-lang',lang); show(i); }
   document.getElementById('prev').onclick=()=>show(i-1);
   document.getElementById('next').onclick=()=>show(i+1);
   document.getElementById('bnotes').onclick=toggleNotes;
@@ -174,6 +175,7 @@ def write_viewer(idx, slides, notes_en, notes_ar) -> str:
 <style>{BASE_CSS}{VIEWER_CSS}</style>
 </head><body>
 <div id="stage"><div id="frame">
+<noscript><p style="color:#e6edf3;font-size:40px;padding:120px">This viewer needs JavaScript. Use PyRov_presentation.pdf instead.</p></noscript>
 {body}
 </div></div>
 <div id="notes"></div>
