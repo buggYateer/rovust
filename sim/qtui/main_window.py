@@ -137,7 +137,10 @@ class MainWindow(QMainWindow):
 
         m_mission = mb.addMenu("&Mission")
         self.act_pause = QAction("&Pause", self, shortcut=QKeySequence("Space"), checkable=True, triggered=self._toggle_pause)
+        self.act_stop = QAction("&Stop mission", self, shortcut=QKeySequence("Ctrl+."), triggered=self.stop_mission)
+        self.act_stop.setToolTip("End the mission here and keep everything on screen (you can still send a report)")
         m_mission.addAction(self.act_pause)
+        m_mission.addAction(self.act_stop)
         speed_menu = m_mission.addMenu("&Speed")
         self.speed_group = QActionGroup(self)
         self.speed_actions = {}
@@ -185,6 +188,7 @@ class MainWindow(QMainWindow):
         tb.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
         tb.addAction(self.act_new)
         tb.addAction(self.act_pause)
+        tb.addAction(self.act_stop)
         tb.addAction(self.act_restart)
         tb.addSeparator()
         tb.addWidget(QLabel("  Speed: "))
@@ -243,6 +247,12 @@ class MainWindow(QMainWindow):
     def _toggle_pause(self, checked):
         self.paused = checked
         self.act_pause.setText("Resume" if checked else "Pause")
+
+    def stop_mission(self):
+        if self.mission is not None and not self.mission.done:
+            self.mission.stop()
+            self.paused = False
+            self.act_pause.setChecked(False)
 
     def set_speed(self, s):
         self.speed = s

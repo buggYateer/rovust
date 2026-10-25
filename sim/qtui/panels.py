@@ -6,9 +6,28 @@ from collections import deque
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen, QPixmap
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
                                QFrame, QGroupBox, QHBoxLayout, QHeaderView, QLabel, QProgressBar, QPushButton,
                                QSizePolicy, QSpinBox, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+
+
+class NoWheel(QObject):
+    """Swallow mouse-wheel events on combo boxes and spin boxes, so scrolling
+    the panel never changes a setting by accident."""
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.Wheel:
+            event.ignore()
+            return True
+        return False
+
+
+def no_wheel(widget):
+    f = NoWheel(widget)
+    widget.installEventFilter(f)
+    widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+    return widget
 
 from ..sensors.base import FAULT_MODES
 from ..ui import theme as T
@@ -28,7 +47,7 @@ class SetupPanel(QWidget):
 
         g = QGroupBox("Environment")
         f = QVBoxLayout(g)
-        self.env = QComboBox()
+        self.env = no_wheel(QComboBox())
         for e in ENV_ORDER:
             self.env.addItem(T.ENV_TITLES[e], e)
         self.env_desc = QLabel()
@@ -41,7 +60,7 @@ class SetupPanel(QWidget):
 
         g = QGroupBox("Exploration strategy")
         f = QVBoxLayout(g)
-        self.strategy = QComboBox()
+        self.strategy = no_wheel(QComboBox())
         for k, label in T.STRATEGIES:
             self.strategy.addItem(label, k)
         f.addWidget(self.strategy)
@@ -49,22 +68,34 @@ class SetupPanel(QWidget):
 
         g = QGroupBox("Localisation used by the robot")
         f = QVBoxLayout(g)
-        self.loc = QComboBox()
+        self.loc = no_wheel(QComboBox())
         for k, label in T.LOCALISATION:
             self.loc.addItem(label, k)
         f.addWidget(self.loc)
         lay.addWidget(g)
 
         g = QGroupBox("Options")
-        f = QFormLayout(g)
-        self.ai = QCheckBox("Terrain classifier + fault detector")
+        f = QVBoxLayout(g)
+        f.setSpacing(8)
+        self.ai = QCheckBox("AI: terrain classifier + fault detector")
         self.ai.setChecked(True)
-        self.seed = QSpinBox()
+        f.addWidget(self.ai)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        seed_label = QLabel("Seed")
+        self.seed = no_wheel(QSpinBox())
         self.seed.setRange(0, 999)
         self.seed.setValue(1)
+        self.seed.setFixedWidth(84)
+        self.seed.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.seed.setToolTip("Changes the generated map and the sensor noise")
-        f.addRow("AI", self.ai)
-        f.addRow("Seed", self.seed)
+        seed_hint = QLabel("same seed = same world")
+        seed_hint.setObjectName("hint")
+        row.addWidget(seed_label)
+        row.addWidget(self.seed)
+        row.addWidget(seed_hint)
+        row.addStretch(1)
+        f.addLayout(row)
         lay.addWidget(g)
 
         self.start_btn = QPushButton("Start mission")
@@ -78,13 +109,13 @@ class SetupPanel(QWidget):
 
         g = QGroupBox("Remote control")
         f = QVBoxLayout(g)
-        self.mode = QComboBox()
+        self.mode = no_wheel(QComboBox())
         for k, label in [("autonomous", "Autonomous - the rover drives itself"),
                          ("assisted", "Assisted - you steer, safety layers stay on"),
                          ("manual", "Manual - you drive, nothing stops you")]:
             self.mode.addItem(label, k)
         f.addWidget(self.mode)
-        self.loss = QComboBox()
+        self.loss = no_wheel(QComboBox())
         for k, label in [("home", "Link lost: return home"), ("explore", "Link lost: explore alone"),
                          ("hold", "Link lost: wait for the link")]:
             self.loss.addItem(label, k)
@@ -140,12 +171,13 @@ class SensorsTab(QWidget):
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         hdr = self.table.horizontalHeader()
-        hdr.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        hdr.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        hdr.setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
         self.table.setColumnWidth(0, 90)
-        self.table.setColumnWidth(1, 215)
-        self.table.setColumnWidth(3, 90)
-        self.table.setColumnWidth(4, 250)
-        self.table.setColumnWidth(5, 70)
+        self.table.setColumnWidth(2, 120)
+        self.table.setColumnWidth(3, 110)
+        self.table.setColumnWidth(4, 290)
+        self.table.setColumnWidth(5, 80)
         lay.addWidget(self.table, 1)
         side = QVBoxLayout()
         self.cam_label = QLabel("camera")
@@ -173,22 +205,30 @@ class SensorsTab(QWidget):
         sensors = mission.robot.sensors.sensors
         self.table.setRowCount(len(sensors))
         self.bars = []
+        def centred(text):
+            it = QTableWidgetItem(text)
+            it.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            return it
         for i, s in enumerate(sensors):
-            self.table.setItem(i, 0, QTableWidgetItem(s.name))
-            self.table.setItem(i, 1, QTableWidgetItem(str(s.cls).replace("/", " / ")))
-            self.table.setItem(i, 2, QTableWidgetItem(""))
+            self.table.setItem(i, 0, centred(s.name))
+            self.table.setItem(i, 1, centred(str(s.cls).replace("/", " / ")))
+            self.table.setItem(i, 2, centred(""))
             bar = QProgressBar()
             bar.setRange(0, 100)
             bar.setTextVisible(False)
-            bar.setFixedHeight(12)
+            bar.setFixedHeight(10)
+            holder = QWidget()
+            hl = QHBoxLayout(holder)
+            hl.setContentsMargins(8, 0, 8, 0)
+            hl.addWidget(bar)
             mx = getattr(s, "max_range", None)
             if mx is None or s.cls.signal == "binary":
                 bar.setVisible(False)
-            self.table.setCellWidget(i, 3, bar)
+            self.table.setCellWidget(i, 3, holder)
             self.bars.append(bar)
             self.table.setCellWidget(i, 4, self._fault_buttons(s))
-            self.table.setItem(i, 5, QTableWidgetItem("ok"))
-            self.table.setRowHeight(i, 26)
+            self.table.setItem(i, 5, centred("ok"))
+            self.table.setRowHeight(i, 28)
         self.alarm.setText("")
 
     def _fault_buttons(self, sensor):
@@ -196,8 +236,8 @@ class SensorsTab(QWidget):
         from PySide6.QtWidgets import QButtonGroup
         w = QWidget()
         lay = QHBoxLayout(w)
-        lay.setContentsMargins(2, 1, 2, 1)
-        lay.setSpacing(2)
+        lay.setContentsMargins(6, 2, 6, 2)
+        lay.setSpacing(8)
         group = QButtonGroup(w)
         group.setExclusive(True)
         for mode in FAULT_MODES:

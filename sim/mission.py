@@ -50,6 +50,7 @@ class Mission:
         self.time = 0.0
         self.returning = False
         self.finished = False
+        self.stopped = False                # ended by the operator: data kept for the report
         self.stats = {"bumps": 0, "cliff_events": 0, "return_reason": ""}
         self.cmd = (0.0, 0.0)
         # ---- teleoperation
@@ -73,11 +74,18 @@ class Mission:
             return "battery_dead"
         if self.finished:
             return "returned"
+        if self.stopped:
+            return "stopped"
         return "returning" if self.returning else "exploring"
 
     @property
     def done(self) -> bool:
-        return self.status in ("fell", "battery_dead", "returned")
+        return self.status in ("fell", "battery_dead", "returned", "stopped")
+
+    def stop(self):
+        """End the mission here. Everything stays as it is for the report."""
+        self.stopped = True
+        self.robot.drive.stop()
 
     def end_reason(self) -> str:
         """One sentence for the interface when the mission is over."""
@@ -87,6 +95,8 @@ class Mission:
             return f"The rover fell into a pit{how}."
         if st == "battery_dead":
             return "The battery is empty."
+        if st == "stopped":
+            return "Stopped by the operator."
         if st == "returned":
             why = {"explored": "the map is complete", "battery": "the battery was only just enough to get back",
                    "link lost": "the radio link was lost", "operator": "you asked it to"}.get(self.stats["return_reason"], "")
