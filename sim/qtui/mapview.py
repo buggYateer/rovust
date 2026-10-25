@@ -36,6 +36,7 @@ class MapWidget(QWidget):
         self.kind = "world"          # "world" | "belief"
         self._img = None
         self._arr = None
+        self.banner_enabled = True      # the report grabs the maps without the mission-over banner
         self.setMinimumSize(360, 260)
         self.setAutoFillBackground(True)
 
@@ -101,7 +102,7 @@ class MapWidget(QWidget):
             self._paint_world(p)
         else:
             self._paint_belief(p)
-        if m.done:
+        if m.done and self.banner_enabled:
             self._paint_end_banner(p, m)
 
     def _paint_end_banner(self, p, m):
