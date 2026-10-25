@@ -496,17 +496,26 @@ This is shared control, the way real rovers are driven.</li>
 <li><b>Manual</b> &ndash; you drive and nothing stops you, not even a cliff. Useful to show what the safety
 layers were doing.</li>
 </ul>
-<p>Press <b>Open console for phone / tablet</b>: the simulator starts a small web server and shows an address
-such as <i>http://192.168.1.4:8080</i>. Open it in the browser of any phone or tablet on the same Wi-Fi.
-The console shows a joystick inside a ring of the rover's sonar readings (the ring turns amber and red where
-something is close), the camera, the rover's map, link and battery, and buttons for the driving mode,
-headlights, return home and stop.</p>
-<p>Every command travels over a <b>simulated radio link</b> to a base station at the start point. The signal
-weakens with distance and with every wall between the rover and the base (cave: rock, underwater: an acoustic
-modem with a 0.4 s delay, Mars: a relay with a 2 s delay). When the link is weak, commands are dropped; when it
-is lost for 3 s the rover acts on the <b>Link lost</b> setting: wait, explore alone, or return home. A watchdog
-stops the rover one second after the last command, so letting go of the stick (or losing the link) never
-leaves it driving blind.</p>
+<p><b>Keyboard:</b> start a mission, choose Assisted or Manual, then <i>hold</i> an arrow key or W A S D (a tap
+only moves the rover for an instant: it stops one second after the last command). The status bar reminds you
+while a driving mode is active.</p>
+<p><b>Phone or tablet:</b> press <b>Open console for phone / tablet</b>. The simulator starts a small web server
+and shows an address such as <i>http://192.168.1.4:8080</i>; open it in the browser of any device on the same
+Wi-Fi (add it to the home screen and it behaves like an app). The console has a joystick inside a ring of the
+rover's sonar readings &ndash; the ring turns amber and red where something is close &ndash; the camera, the
+rover's map, link and battery, and the driving mode, headlights, return-home and stop buttons. On a phone it
+opens in a compact layout (joystick, the three numbers that matter, the buttons); <b>More</b> shows the map and
+statistics. The joystick answers like a car: small movements give fine control, full authority only at the
+edge, and turning is eased while driving fast.</p>
+<p><b>The radio link.</b> Driving commands, headlights, stop and return-home travel over a <b>simulated radio
+link</b> to a base station at the start point (the hollow circle on the map; a coloured line joins it to the
+rover). The signal weakens with distance and with every wall between the rover and the base (cave: rock,
+underwater: an acoustic modem with a 0.4 s delay, Mars: a relay with a 2 s delay). Weak link: half the
+commands are dropped and the console warns you. Lost link: nothing arrives; after 3 s the rover acts on the
+<b>Link lost</b> setting &ndash; return home (default: it drives back into range by itself), explore alone, or
+wait. Console <i>settings</i> (who drives, link-lost action, top speed) apply at once; only physical commands
+go over the radio. The <b>Radio link</b> tab shows all of this live: RSSI, walls on the line of sight,
+latency, packets delivered and dropped, and a log of every packet with the sender's address.</p>
 
 <h3>5. Controls</h3>
 <p><b>Space</b> pause / resume &nbsp;&middot;&nbsp; <b>1 2 3 4</b> speed &times;1 &times;4 &times;8 &times;16

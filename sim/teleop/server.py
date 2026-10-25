@@ -27,6 +27,7 @@ import numpy as np
 from ..ui.render import belief_rgb
 
 PAGE = os.path.join(os.path.dirname(__file__), "console.html")
+ICON = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "icon.png")
 
 
 def png_bytes(rgb: np.ndarray) -> bytes:
@@ -89,6 +90,9 @@ class ConsoleServer:
                         self._send(200, server.map_png(), "image/png")
                     elif self.path.startswith("/api/camera.png"):
                         self._send(200, server.camera_png(), "image/png")
+                    elif self.path.startswith(("/favicon", "/icon.png", "/apple-touch-icon")):
+                        with open(ICON, "rb") as f:
+                            self._send(200, f.read(), "image/png")
                     else:
                         self._send(404, b"not found", "text/plain")
                 except Exception as e:          # never kill the thread on a race with a restarting mission
@@ -98,6 +102,7 @@ class ConsoleServer:
                 n = int(self.headers.get("Content-Length", 0))
                 try:
                     cmd = json.loads(self.rfile.read(n) or b"{}")
+                    cmd["from"] = self.client_address[0]
                     ok = server.command(cmd)
                     self._send(200, json.dumps({"ok": ok}).encode(), "application/json")
                 except Exception as e:
@@ -127,7 +132,7 @@ class ConsoleServer:
         if t == "drive":
             # stick right (+x) must turn the rover right: a clockwise turn is a
             # negative angular velocity in the robot's frame
-            ok = m.operator_drive(float(cmd.get("y", 0.0)), -float(cmd.get("x", 0.0)))
+            ok = m.operator_drive(float(cmd.get("y", 0.0)), -float(cmd.get("x", 0.0)), source=cmd.get("from", "console"))
         elif t == "speed":
             m.operator_speed = max(0.05, min(0.6, float(cmd.get("value", 0.35))))
             ok = True
