@@ -1,4 +1,22 @@
-# PyRov - Multi-Environment Autonomous Exploration Rover
+<p align="center">
+  <img src="assets/icon.png" alt="PyRov" width="128">
+</p>
+
+<h1 align="center">PyRov</h1>
+<p align="center"><b>Multi-Environment Autonomous Exploration Rover</b><br>
+one robot, three unknown worlds — cave, Mars, underwater — simulated from the motors up</p>
+
+<p align="center">
+  <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white">
+  <img alt="PySide6" src="https://img.shields.io/badge/UI-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
+  <img alt="tests" src="https://img.shields.io/badge/tests-49%20passing-2dd4bf">
+  <img alt="sensors" src="https://img.shields.io/badge/sensors-20%2B%20modelled-f5a524">
+  <img alt="remote control" src="https://img.shields.io/badge/remote%20control-phone%20%2F%20tablet-8b5cf6">
+</p>
+
+<p align="center">
+  <img src="docs/media/demo.gif" alt="PyRov exploring a cave: true world on the left, the map the rover builds on the right" width="860">
+</p>
 
 A Python simulation of an autonomous exploration rover, built **from the actuator
 and sensor level up** — DC motors, PWM, encoders, PID, a full on-board sensor

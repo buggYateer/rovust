@@ -90,6 +90,7 @@ class MainWindow(QMainWindow):
         self._build_toolbar()
         self._build_statusbar()
 
+        QApplication.instance().installEventFilter(self)
         self.timer = QTimer(self)
         self.timer.setInterval(16)
         self.timer.timeout.connect(self._on_tick)
@@ -258,17 +259,25 @@ class MainWindow(QMainWindow):
         self.settings.setValue("dark", dark)
         self.update()
 
-    def keyPressEvent(self, event):
-        if event.isAutoRepeat():
-            return
-        self._keys.add(event.key())
-        self._key_drive()
+    DRIVE_KEYS = {Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Left, Qt.Key.Key_Right,
+                  Qt.Key.Key_W, Qt.Key.Key_A, Qt.Key.Key_S, Qt.Key.Key_D}
 
-    def keyReleaseEvent(self, event):
-        if event.isAutoRepeat():
-            return
-        self._keys.discard(event.key())
-        self._key_drive()
+    def eventFilter(self, obj, event):
+        """Driving keys work wherever the focus is (a combo box, the table...),
+        as long as a mission is in assisted or manual mode."""
+        from PySide6.QtCore import QEvent
+        from PySide6.QtWidgets import QAbstractSpinBox, QLineEdit
+        if event.type() in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease) and event.key() in self.DRIVE_KEYS:
+            m = self.mission
+            if m is not None and m.mode != "autonomous" and not isinstance(QApplication.focusWidget(), (QLineEdit, QAbstractSpinBox)):
+                if not event.isAutoRepeat():
+                    if event.type() == QEvent.Type.KeyPress:
+                        self._keys.add(event.key())
+                    else:
+                        self._keys.discard(event.key())
+                    self._key_drive()
+                return True
+        return super().eventFilter(obj, event)
 
     def _key_drive(self):
         m = self.mission
