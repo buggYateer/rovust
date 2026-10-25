@@ -84,7 +84,7 @@ class SetupPanel(QWidget):
             self.mode.addItem(label, k)
         f.addWidget(self.mode)
         self.loss = QComboBox()
-        for k, label in [("explore", "Link lost: explore alone"), ("home", "Link lost: return home"),
+        for k, label in [("home", "Link lost: return home"), ("explore", "Link lost: explore alone"),
                          ("hold", "Link lost: wait for the link")]:
             self.loss.addItem(label, k)
         f.addWidget(self.loss)

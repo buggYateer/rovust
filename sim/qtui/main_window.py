@@ -332,7 +332,8 @@ class MainWindow(QMainWindow):
                 self.st_link.setText("")
             else:
                 extra = "  (rover on its own)" if m.link_fallback else ""
-                self.st_link.setText(f"link: {lk.state} {lk.strength:.0%}{extra}   ")
+                keys = "   drive: hold arrow keys / W A S D" if m.mode != "autonomous" else ""
+                self.st_link.setText(f"link: {lk.state} {lk.strength:.0%}{extra}{keys}   ")
             self.st_cov.setText(f"coverage {m.coverage():.1%}   ")
             self.st_time.setText(f"t = {m.time:.1f} s   x{self.speed}")
 

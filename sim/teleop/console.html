@@ -18,13 +18,13 @@
     --stick: #e2e8ee; --stick-knob: #141a1f;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; margin: 0; overscroll-behavior: none; }
+  html, body { height: 100%; margin: 0; overscroll-behavior: none; overflow-x: hidden; max-width: 100vw; }
   body {
     background: var(--bg); color: var(--text);
     font: 15px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
     font-variant-numeric: tabular-nums;
     touch-action: pan-y; user-select: none;
-    display: grid; grid-template-rows: auto 1fr; height: 100dvh;
+    display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); height: 100dvh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
@@ -33,9 +33,9 @@
     display: flex; align-items: center; gap: 18px; padding: 10px 16px;
     border-bottom: 1px solid var(--line); background: var(--surface);
   }
-  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: .01em; white-space: nowrap; }
+  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: .01em; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   header h1 small { color: var(--muted); font-weight: 400; margin-left: 8px; }
-  .meter { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+  .meter { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; flex: none; }
   .meter b { color: var(--text); font-weight: 600; font-size: 15px; }
   .bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
   .bars i { display: block; width: 4px; background: var(--line); border-radius: 1px; }
@@ -53,7 +53,8 @@
   .iconbtn { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; width: 34px; height: 34px; font-size: 16px; cursor: pointer; }
 
   /* ------------------------------------------------------------ layout */
-  main { display: grid; grid-template-columns: minmax(300px, 46%) 1fr; gap: 14px; padding: 14px; min-height: 0; }
+  main { display: grid; grid-template-columns: minmax(280px, 46%) 1fr; gap: 14px; padding: 14px; min-height: 0; min-width: 0; }
+  main > *, .side > * { min-width: 0; }
   .stickpane { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 0; }
   .side { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 0; overflow-y: auto; }
@@ -85,6 +86,7 @@
   .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border-radius: 10px; padding: 3px; }
   .seg button { border: 0; background: transparent; color: var(--muted); padding: 10px 6px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
   .seg button.on { background: var(--amber); color: #141a1f; }
+  .seg button:active, .btn:active { transform: scale(.97); }
   .seg.loss button.on { background: var(--teal); }
   .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .btn { border: 1px solid var(--line); background: var(--surface-2); color: var(--text); padding: 12px 8px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
@@ -92,17 +94,24 @@
   .btn.danger { color: var(--red); border-color: var(--red); }
   .hint { color: var(--muted); font-size: 12px; }
   .label { color: var(--muted); font-size: 12px; margin: 2px 2px -4px; }
+  #banner { display: none; padding: 10px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 600; font-size: 14px; }
+  #banner.weak { background: var(--amber); color: #141a1f; }
+  #banner.show { display: block; grid-column: 1 / -1; }
+  #toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--red); color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; }
 
   /* ------------------------------------------------------------ portrait / phone */
   @media (orientation: portrait), (max-width: 760px) {
     main { display: flex; flex-direction: column; overflow-y: auto; touch-action: pan-y; }
     main > *, .side > * { flex: none; }
     .side { display: contents; }
+    #banner { order: 0; }
     .views { order: 1; }
     .tele { order: 2; grid-template-columns: repeat(2, 1fr); overflow: visible; }
     .stickpane { order: 3; display: block; }
     #stickwrap { display: block; }
-    #stick { display: block; width: min(100%, 52vh); margin: 0 auto; }
+    #stick { display: block; width: min(100%, 34vh, 260px); margin: 0 auto; }
+    #stickwrap { padding: 6px; }
     .controls { order: 4; }
     header h1 small { display: none; }
   }
@@ -128,7 +137,15 @@
     .iconbtn.more { display: inline-block; }
     body.compact .views, body.compact .tele .extra, body.compact #loss, body.compact #losslabel, body.compact #modehint { display: none; }
     body.compact .tele { grid-template-columns: repeat(3, 1fr); }
-    body.compact header .status { display: none; }
+    header { flex-wrap: wrap; gap: 8px 10px; padding: 8px 12px; }
+    header h1 { font-size: 16px; }
+    body.compact header h1 .word { display: none; }
+    body.compact .meter { gap: 6px; font-size: 12px; }
+    body.compact .meter b { font-size: 14px; }
+    body.compact header .status, body.compact header #latency { display: none; }
+    body.compact header h1 small { display: none; }
+    body.compact .seg button { font-size: 14px; padding: 10px 2px; }
+    body.compact .btn { padding: 10px 4px; font-size: 14px; }
     body.compact .side { grid-template-rows: auto 1fr; }
     body.compact .tele { overflow: visible; }
   }
@@ -138,7 +155,7 @@
 </head>
 <body>
 <header>
-  <h1 id="title">PyRov console <small id="env">connecting…</small></h1>
+  <h1 id="title">PyRov <span class="word">console</span> <small id="env">connecting…</small></h1>
   <div class="meter" title="radio link to the rover"><span class="bars l4" id="linkbars"><i></i><i></i><i></i><i></i></span><b id="link">—</b><span id="latency"></span></div>
   <div class="meter" title="battery"><span class="batt" id="battwrap"><i id="batt" style="width:100%"></i></span><b id="battpct">—</b></div>
   <div class="spacer"></div>
@@ -147,7 +164,9 @@
   <button class="iconbtn" id="themebtn" title="Switch light / dark">◐</button>
 </header>
 
+<div id="toast" role="alert"></div>
 <main>
+  <div id="banner" role="status"></div>
   <section class="stickpane">
     <div class="panel" id="stickwrap"><canvas id="stick" width="420" height="420" aria-label="joystick with sonar ring"></canvas></div>
     <div class="stickfoot">
@@ -230,7 +249,11 @@
   applyCompact();
 
   // ------------------------------------------------------------- helpers
-  const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(() => {});
+  let toastTimer = 0;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+  const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true })
+    .then(r => r.json()).then(r => { if (!r.ok && body.type !== 'drive') toast('No radio link - the rover did not receive that'); return r.ok; })
+    .catch(() => { toast('Cannot reach the simulator'); return false; });
 
   // ------------------------------------------------------------- joystick
   const cv = $('stick'), ctx = cv.getContext('2d');
@@ -243,7 +266,7 @@
   }
 
   function draw() {
-    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.36, knob = W * 0.12;
+    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.36, knob = W * 0.13;
     ctx.clearRect(0, 0, W, H);
     const sonar = state ? state.sonar : [];
     const n = sonar.length || 8, step = 2 * Math.PI / n;
@@ -280,7 +303,7 @@
   function pointer(e) {
     const b = cv.getBoundingClientRect(), s = cv.width / b.width;
     const x = (e.clientX - b.left) * s - cv.width / 2, y = (e.clientY - b.top) * s - cv.height / 2;
-    const r = cv.width * 0.36 - cv.width * 0.12;
+    const r = cv.width * 0.36 - cv.width * 0.13;
     let nx = x / r, ny = -y / r; const m = Math.hypot(nx, ny);
     if (m > 1) { nx /= m; ny /= m; }
     if (Math.abs(nx) < 0.12) nx = 0;          // dead zone: straight ahead is easy to hold
@@ -356,6 +379,15 @@
       else if (s.bumper.some(Boolean)) note = 'Bumper pressed.';
       else if (s.cliff.some(Boolean)) note = 'Cliff detected under the rover.';
       $('notice').textContent = note;
+      const bn = $('banner');
+      if (lk.state === 'lost' && s.mode !== 'autonomous') {
+        const act = { hold: 'is waiting for the link', explore: 'is exploring on its own', home: 'is coming back towards the base' }[s.on_link_loss];
+        bn.textContent = s.fallback ? `Out of radio range - the rover ${act}. It will listen again once the link is back.` : `Out of radio range - the rover cannot hear you. In ${Math.max(0, 3 - lk.lost_for).toFixed(0)} s it will act on its own.`;
+        bn.className = 'show';
+      } else if (lk.state === 'weak' && s.mode !== 'autonomous') {
+        bn.textContent = 'Weak radio link - some commands are lost. Stay closer to the base or the open.';
+        bn.className = 'show weak';
+      } else { bn.className = ''; }
       requestDraw();
     } catch (e) {
       $('env').textContent = 'cannot reach the simulator';

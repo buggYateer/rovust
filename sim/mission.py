@@ -54,7 +54,7 @@ class Mission:
         self.cmd = (0.0, 0.0)
         # ---- teleoperation
         self.mode = "autonomous"            # "autonomous" | "assisted" | "manual" (what the operator chose)
-        self.on_link_loss = "explore"       # "hold" | "explore" | "home": what the robot does when the link drops
+        self.on_link_loss = "home"          # "hold" | "explore" | "home": what the robot does when the link drops
         self.link = RadioLink(self.world, self.cfg.link, self.rng)
         self.operator_cmd = (0.0, 0.0)
         self.operator_cmd_time = -10.0
