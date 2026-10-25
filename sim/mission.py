@@ -105,7 +105,7 @@ class Mission:
             return "autonomous"
         return self.mode
 
-    def operator_drive(self, forward: float, turn: float) -> bool:
+    def operator_drive(self, forward: float, turn: float, source: str = "keyboard") -> bool:
         """Stick input in [-1, 1] each, sent over the radio link. Returns
         False when the packet was dropped."""
         forward = max(-1.0, min(1.0, forward))
@@ -114,7 +114,7 @@ class Mission:
         # at the edge; turning is capped at 1 rad/s and eased while driving fast
         v = self.operator_speed * forward * abs(forward)
         w = self.MAX_TURN * turn * abs(turn) * (1.0 - 0.35 * abs(forward))
-        return self.link.send({"type": "drive", "v": v, "w": w}, self.time)
+        return self.link.send({"type": "drive", "v": v, "w": w, "from": source}, self.time)
 
     def operator_command(self, command: dict) -> bool:
         """Any other operator command (mode, lights, stop, home), over the link."""

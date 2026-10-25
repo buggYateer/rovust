@@ -139,7 +139,23 @@ class MapWidget(QWidget):
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(220, 0, 0) if c.value > 0.5 else QColor(60, 180, 90))
             p.drawEllipse(self.to_px(x, y), 2.5, 2.5)
+        self._link_line(p, r.pose)
         self._robot(p, r.pose, r.radius, C_ROBOT, QColor(40, 40, 40))
+
+    def _link_line(self, p, pose):
+        """Radio line of sight from the base station, drawn whenever the operator is in the loop."""
+        m = self.mission
+        if m.mode == "autonomous" and not m.link.log:
+            return
+        col = {"ok": QColor(45, 212, 191), "weak": QColor(245, 165, 36)}.get(m.link.state, QColor(239, 68, 68))
+        pen = QPen(col, 2)
+        pen.setStyle({"ok": Qt.PenStyle.SolidLine, "weak": Qt.PenStyle.DashLine}.get(m.link.state, Qt.PenStyle.DotLine))
+        p.setPen(pen)
+        base = self.to_px(*m.link.base)
+        p.drawLine(base, self.to_px(pose.x, pose.y))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        for rad in (5, 9, 13):
+            p.drawArc(QRectF(base.x() - rad, base.y() - rad, 2 * rad, 2 * rad), 30 * 16, 120 * 16)
 
     def _paint_belief(self, p):
         m = self.mission
@@ -163,5 +179,6 @@ class MapWidget(QWidget):
         p.setPen(QPen(QColor(40, 40, 40), 1.5))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawEllipse(hx, 6, 6)
+        self._link_line(p, m.estimator.pose)
         self._robot(p, m.estimator.odom, m.robot.radius * 0.6, QColor(255, 150, 150), C_ODOM)
         self._robot(p, m.estimator.pose, m.robot.radius, QColor(120, 220, 150), C_FUSED)

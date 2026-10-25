@@ -95,11 +95,16 @@ Using Claude Code instead? Paste the prompt in [docs/SETUP_WITH_CLAUDE.md](docs/
      the browser. The console works in landscape (joystick left, telemetry
      right) and portrait, has a light / dark switch, and shows the rover's
      sonar ring around the joystick, its camera, map, link and battery.
-   - Commands travel over a simulated radio link: it weakens with distance
-     and walls (cave), carries a 2 s delay (Mars) or 0.4 s (underwater
-     acoustic modem), drops packets when weak, and when lost for 3 s the rover
-     waits, explores alone or returns home — your choice in *Link lost*.
-   - Arrow keys / W A S D drive from the computer's keyboard as well.
+   - Driving commands travel over a simulated radio link: it weakens with
+     distance and walls (cave), carries a 2 s delay (Mars) or 0.4 s
+     (underwater acoustic modem), drops packets when weak, and when lost for
+     3 s the rover returns home by default (or explores alone / waits — your
+     choice in *Link lost*). The **Radio link** tab shows the signal, the walls
+     in the way, latency, packet counters and a live log of what arrives from
+     the phone. Console settings (who drives, top speed) apply at once; only
+     physical commands go over the radio.
+   - Arrow keys / W A S D drive from the computer's keyboard as well: start a
+     mission, choose Assisted or Manual, then *hold* a key.
    - If Windows asks, allow Python through the firewall on private networks.
 
 `python main.py --pygame` starts the older single-window Pygame interface.
@@ -114,8 +119,8 @@ Using Claude Code instead? Paste the prompt in [docs/SETUP_WITH_CLAUDE.md](docs/
 | Cave – Sensors tab | Mars – Motor control tab |
 |---|---|
 | ![cave](docs/screenshots/qt_cave.png) | ![mars](docs/screenshots/qt_mars.png) |
-| **Underwater – Statistics tab** | **User guide (Help → F1)** |
-| ![underwater](docs/screenshots/qt_underwater.png) | ![guide](docs/screenshots/qt_guide.png) |
+| **Underwater – Statistics tab** | **Radio link tab while driving from a phone (dark mode)** |
+| ![underwater](docs/screenshots/qt_underwater.png) | ![radio](docs/screenshots/qt_radio.png) |
 
 Left map: the true world the robot never sees (sonar cones, IR beams, cliff
 switches, true path). Right map: the robot's own map (occupancy + terrain +
@@ -135,7 +140,8 @@ PWM → motor → encoder → PID loop, and the mission statistics.
 | **Sensors** (`sim/sensors/`) | Sonar ring (cone, specular loss, cross-talk, time-of-flight), Sharp-style IR PSDs (non-linear, lookup-table calibration, minimum-range fold-back), IR cliff switches (front, side, rear), bumpers, compass with local disturbance, sun sensor, gyro with bias, accelerometer/inclinometer, camera, optical flow / DVL, battery, light, gas, pressure. Analog sensors pass a modelled 10-bit **A/D converter**. Every sensor can be faulted at run time. | Sensors 1 & 2 |
 | **Localisation** (`estimation.py`) | Dead reckoning from the encoders (drifts); fused estimate: gyro integrated and corrected by compass/sun (complementary filter, bias learned while stationary) + ground speed from optical flow / DVL | Sensors 2 |
 | **Mapping** (`mapping.py`) | Log-odds occupancy grid (one echo never makes a cell occupied), terrain-cost layer from the AI, hazard layer from the cliff sensors | Navigation |
-| **Behaviour** (`behaviors.py`) | Subsumption: `STOP > ESCAPE (bumper) > CLIFF > SLOPE > SCAN > AVOID (with hysteresis) > HOME (battery) > EXPLORE > WANDER` | Robot Behaviour |
+| **Behaviour** (`behaviors.py`) | Subsumption: `STOP > ESCAPE (bumper) > CLIFF > SLOPE > SCAN > AVOID (with hysteresis) > TELEOP (operator) > HOME (battery) > EXPLORE > WANDER` | Robot Behaviour |
+| **Communication** (`comms.py`, `teleop/`) | Radio link to a base station at the start point: signal vs distance and walls, packet loss, latency, watchdog, fallback to autonomy; phone/tablet console served over Wi-Fi; Radio link tab | Robot Behaviour (communication) |
 | **Planning** (`planning.py`) | A* on an inflated cost map (configuration space + proximity penalty + terrain cost); nearest-frontier vs DFS-with-backtracking exploration; return to start when the battery only just suffices | Navigation / decision |
 | **AI** (`sim/ai/`) | Random-Forest terrain classifier on 16×16 camera patches → planner cost map; sensor fault detector (stuck / dead / noisy) that drops a bad sensor; utility-based frontier selection (information gain / cost − hazard − battery) | — |
 | **Environments** (`config.py`, `world.py`) | Cave: maze corridors, chambers, mud, pits against the walls, gas pockets, darkness. Mars: rock fields, craters with rims and slopes, sand (25 % slip), bedrock, ridges. Underwater: cellular-automata reef, mud flats, a constant current with noise. | — |
