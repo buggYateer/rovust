@@ -6,4 +6,5 @@ __pycache__/
 results/
 *.png
 !docs/**/*.png
+!assets/*
 sim/ai/terrain_rf.pkl

@@ -318,6 +318,25 @@ class Explore(Behavior):
         return v, w
 
 
+class Teleop(Behavior):
+    """The operator drives (manual / assisted mode). The last command received
+    over the radio link is applied; a watchdog stops the robot when no
+    command has arrived for a second (the link dropped, or the operator let
+    go). In *assisted* mode the safety layers above this one keep working; in
+    *manual* mode the arbiter switches them off and only STOP remains."""
+    name = "TELEOP"
+    WATCHDOG_S = 1.0
+
+    def active(self, ctx):
+        return ctx.m.effective_mode != "autonomous"
+
+    def act(self, ctx):
+        m = ctx.m
+        if m.time - m.operator_cmd_time > self.WATCHDOG_S:
+            return 0.0, 0.0
+        return m.operator_cmd
+
+
 class Wander(Behavior):
     name = "WANDER"
 
@@ -341,8 +360,17 @@ class Arbiter:
         self.layers = layers          # highest priority first
         self.active_name = ""
 
+    # layers the operator overrides in *manual* mode (never STOP)
+    SAFETY = {"ESCAPE", "CLIFF", "SLOPE", "AVOID", "SCAN"}
+    AUTONOMY = {"SCAN", "HOME", "EXPLORE", "WANDER"}
+
     def decide(self, ctx: Context) -> tuple[float, float]:
+        mode = ctx.m.effective_mode
         for b in self.layers:
+            if mode == "manual" and b.name in self.SAFETY:
+                continue
+            if mode == "assisted" and b.name == "SCAN":
+                continue
             if b.active(ctx):
                 self.active_name = b.name
                 return b.act(ctx)

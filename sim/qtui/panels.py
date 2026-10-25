@@ -33,7 +33,7 @@ class SetupPanel(QWidget):
             self.env.addItem(T.ENV_TITLES[e], e)
         self.env_desc = QLabel()
         self.env_desc.setWordWrap(True)
-        self.env_desc.setStyleSheet("color: #555;")
+        self.env_desc.setStyleSheet("color: #777;")
         self.env.currentIndexChanged.connect(self._env_changed)
         f.addWidget(self.env)
         f.addWidget(self.env_desc)
@@ -74,6 +74,33 @@ class SetupPanel(QWidget):
         self.start_btn.setFont(font)
         self.start_btn.clicked.connect(self.start_requested.emit)
         lay.addWidget(self.start_btn)
+
+        g = QGroupBox("Remote control")
+        f = QVBoxLayout(g)
+        self.mode = QComboBox()
+        for k, label in [("autonomous", "Autonomous - the rover drives itself"),
+                         ("assisted", "Assisted - you steer, safety layers stay on"),
+                         ("manual", "Manual - you drive, nothing stops you")]:
+            self.mode.addItem(label, k)
+        f.addWidget(self.mode)
+        self.loss = QComboBox()
+        for k, label in [("explore", "Link lost: explore alone"), ("home", "Link lost: return home"),
+                         ("hold", "Link lost: wait for the link")]:
+            self.loss.addItem(label, k)
+        f.addWidget(self.loss)
+        self.server_btn = QPushButton("Open console for phone / tablet")
+        self.server_btn.setCheckable(True)
+        f.addWidget(self.server_btn)
+        self.server_url = QLabel("")
+        self.server_url.setWordWrap(True)
+        self.server_url.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.server_url.setStyleSheet("color: #2a9d8f; font-weight: 600;")
+        f.addWidget(self.server_url)
+        hint = QLabel("Keyboard: arrow keys or W A S D drive the rover in assisted / manual mode.")
+        hint.setWordWrap(True)
+        hint.setStyleSheet("color: #777;")
+        f.addWidget(hint)
+        lay.addWidget(g)
 
         g = QGroupBox("Map layers")
         f = QVBoxLayout(g)
@@ -127,7 +154,7 @@ class SensorsTab(QWidget):
         self.cam_pred = QLabel("")
         self.cam_pred.setWordWrap(True)
         self.alarm = QLabel("")
-        self.alarm.setStyleSheet("color: #b00000;")
+        self.alarm.setStyleSheet("color: #e05252;")
         self.alarm.setWordWrap(True)
         side.addWidget(self.cam_label)
         side.addWidget(self.cam)
@@ -230,8 +257,9 @@ class PlotWidget(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = self.rect().adjusted(1, 1, -1, -1)
-        p.fillRect(r, QColor(255, 255, 255))
-        p.setPen(QPen(QColor(180, 180, 180), 1))
+        pal = self.palette()
+        p.fillRect(r, pal.base())
+        p.setPen(QPen(pal.mid().color(), 1))
         p.drawRect(r)
         mid = r.center().y()
         p.drawLine(r.left(), mid, r.right(), mid)
@@ -372,7 +400,7 @@ class AboutDialog(QDialog):
         self.setWindowTitle("About")
         self.setMinimumWidth(560)
         lay = QVBoxLayout(self)
-        title = QLabel(T.PROJECT_TITLE)
+        title = QLabel(f"{T.ROVER_NAME} - {T.PROJECT_TITLE}")
         f = QFont(title.font())
         f.setPointSize(13)
         f.setBold(True)
@@ -458,14 +486,40 @@ cliff events, localisation error of the estimate in use versus encoders-only, ba
 of the terrain classifier.</li>
 </ul>
 
-<h3>4. Controls</h3>
+<h3>4. Driving the rover yourself (remote control)</h3>
+<p>The <b>Remote control</b> group in the left panel switches who drives:</p>
+<ul>
+<li><b>Autonomous</b> &ndash; the rover explores and returns by itself (default).</li>
+<li><b>Assisted</b> &ndash; you steer with the arrow keys / W A S D, or from a phone or tablet; the safety
+layers (bumper escape, cliff stop, slope, obstacle avoidance) keep working and override you when needed.
+This is shared control, the way real rovers are driven.</li>
+<li><b>Manual</b> &ndash; you drive and nothing stops you, not even a cliff. Useful to show what the safety
+layers were doing.</li>
+</ul>
+<p>Press <b>Open console for phone / tablet</b>: the simulator starts a small web server and shows an address
+such as <i>http://192.168.1.4:8080</i>. Open it in the browser of any phone or tablet on the same Wi-Fi.
+The console shows a joystick inside a ring of the rover's sonar readings (the ring turns amber and red where
+something is close), the camera, the rover's map, link and battery, and buttons for the driving mode,
+headlights, return home and stop.</p>
+<p>Every command travels over a <b>simulated radio link</b> to a base station at the start point. The signal
+weakens with distance and with every wall between the rover and the base (cave: rock, underwater: an acoustic
+modem with a 0.4 s delay, Mars: a relay with a 2 s delay). When the link is weak, commands are dropped; when it
+is lost for 3 s the rover acts on the <b>Link lost</b> setting: wait, explore alone, or return home. A watchdog
+stops the rover one second after the last command, so letting go of the stick (or losing the link) never
+leaves it driving blind.</p>
+
+<h3>5. Controls</h3>
 <p><b>Space</b> pause / resume &nbsp;&middot;&nbsp; <b>1 2 3 4</b> speed &times;1 &times;4 &times;8 &times;16
 &nbsp;&middot;&nbsp; <b>R</b> restart &nbsp;&middot;&nbsp; <b>H</b> headlights. Map layers can be switched
 in the left panel or the View menu. The panels are dockable: drag them to rearrange, or hide them from the
 View menu.</p>
 
-<h3>5. What to look for in a demonstration</h3>
+<h3>6. What to look for in a demonstration</h3>
 <ul>
+<li>Switch to <i>Assisted</i>, open the console on a tablet, and drive into a wall: the rover refuses.
+Switch to <i>Manual</i> and do it again.</li>
+<li>Drive deep into the cave in <i>Manual</i> with <i>Link lost: return home</i>: watch the link bars drop,
+the commands stop arriving, and the rover come back by itself.</li>
 <li>Switch localisation to <i>Encoders only</i> in the cave and watch the red estimate drift and the map
 duplicate walls &ndash; then run the same seed with <i>Fused</i>.</li>
 <li>On Mars, set the <i>optflow</i> sensor to <i>dead</i>: the fused estimate now relies on the encoders and

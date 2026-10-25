@@ -1,4 +1,4 @@
-# Multi-Environment Autonomous Exploration Rover
+# PyRov - Multi-Environment Autonomous Exploration Rover
 
 A Python simulation of an autonomous exploration rover, built **from the actuator
 and sensor level up** — DC motors, PWM, encoders, PID, a full on-board sensor
@@ -14,6 +14,26 @@ placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
 [docs/RESULTS.md](docs/RESULTS.md).
 
 ## How to run
+
+### One-click (Windows)
+
+1. Download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
+   (right-click → *Save link as…*) and double-click it.
+2. It asks where to put the project (Enter = `C:\Users\<you>\PyRov`), finds or
+   installs Python, downloads the project, installs everything, puts a **PyRov**
+   shortcut on the desktop and starts the program. Run it again later to update.
+3. Next time: double-click the **PyRov** desktop shortcut, or `run.bat` in the
+   project folder.
+
+Or, in PowerShell, one line:
+
+```powershell
+irm https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.ps1 | iex
+```
+
+Using Claude Code instead? Paste the prompt in [docs/SETUP_WITH_CLAUDE.md](docs/SETUP_WITH_CLAUDE.md).
+
+### By hand
 
 **Requirements:** Python 3.12 or newer (we use 3.15), Git, Windows / Linux / macOS.
 
@@ -48,6 +68,21 @@ placement: [docs/DESIGN.md](docs/DESIGN.md). Experimental results:
    python -m sim.experiments.pid_demo
    python -m sim.experiments.run_batch --seeds 10
    ```
+
+5. (optional) Drive the rover yourself from a phone or tablet
+   - In **Remote control** choose *Assisted* (you steer, the safety layers stay
+     on) or *Manual* (nothing stops you), then press **Open console for phone /
+     tablet**. The panel shows an address such as `http://192.168.1.4:8080`.
+   - On a phone or tablet connected to the **same Wi-Fi**, open that address in
+     the browser. The console works in landscape (joystick left, telemetry
+     right) and portrait, has a light / dark switch, and shows the rover's
+     sonar ring around the joystick, its camera, map, link and battery.
+   - Commands travel over a simulated radio link: it weakens with distance
+     and walls (cave), carries a 2 s delay (Mars) or 0.4 s (underwater
+     acoustic modem), drops packets when weak, and when lost for 3 s the rover
+     waits, explores alone or returns home — your choice in *Link lost*.
+   - Arrow keys / W A S D drive from the computer's keyboard as well.
+   - If Windows asks, allow Python through the firewall on private networks.
 
 `python main.py --pygame` starts the older single-window Pygame interface.
 

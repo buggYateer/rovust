@@ -61,12 +61,13 @@ class MapWidget(QWidget):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        p.fillRect(self.rect(), QColor(250, 250, 250))
-        p.setPen(QColor(90, 90, 90))
+        pal = self.palette()
+        p.fillRect(self.rect(), pal.base())
+        p.setPen(pal.placeholderText().color())
         p.setFont(QFont(self.font().family(), 9, QFont.Weight.Bold))
         p.drawText(8, 16, self.title)
         if self.mission is None:
-            p.setPen(QColor(150, 150, 150))
+            p.setPen(pal.placeholderText().color())
             p.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "No mission running")
             return
         m = self.mission
@@ -84,7 +85,7 @@ class MapWidget(QWidget):
         img = QImage(self._arr.data, w, h, 3 * w, QImage.Format.Format_RGB888)
         p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
         p.drawImage(QRectF(ox, oy, pw, ph), img)
-        p.setPen(QPen(QColor(120, 120, 120), 1))
+        p.setPen(QPen(pal.mid().color(), 1))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawRect(QRectF(ox, oy, pw, ph))
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
