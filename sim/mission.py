@@ -19,6 +19,8 @@ STRATEGIES = {"frontier": FrontierExplorer, "dfs": DFSExplorer}
 
 
 class Mission:
+    MAX_TURN = 1.0      # rad/s at full stick, turning in place
+
     def __init__(self, env: str | EnvConfig, strategy: str = "frontier", seed: int = 0,
                  localisation: str = "fused", dt: float = 0.05, ai=None):
         self.cfg = get_env(env, seed) if isinstance(env, str) else env
@@ -108,7 +110,11 @@ class Mission:
         False when the packet was dropped."""
         forward = max(-1.0, min(1.0, forward))
         turn = max(-1.0, min(1.0, turn))
-        return self.link.send({"type": "drive", "v": forward * self.operator_speed, "w": turn * 1.5}, self.time)
+        # quadratic response: fine control near the centre, full authority only
+        # at the edge; turning is capped at 1 rad/s and eased while driving fast
+        v = self.operator_speed * forward * abs(forward)
+        w = self.MAX_TURN * turn * abs(turn) * (1.0 - 0.35 * abs(forward))
+        return self.link.send({"type": "drive", "v": v, "w": w}, self.time)
 
     def operator_command(self, command: dict) -> bool:
         """Any other operator command (mode, lights, stop, home), over the link."""
