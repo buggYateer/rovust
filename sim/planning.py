@@ -105,10 +105,11 @@ def astar(cm: CostMap, start: tuple[int, int], goal: tuple[int, int], max_expans
 def nearest_free_cell(cm: CostMap, cell: tuple[int, int], max_r: int = 6):
     """If the robot's own cell is inside the inflated band (it happens after
     a bump), find the nearest traversable cell to plan from."""
-    x0, y0 = cell
-    if not np.isinf(cm.cost[y0, x0]):
-        return cell
     h, w = cm.cost.shape
+    # a badly drifted estimate can place the robot outside its own map
+    x0, y0 = min(max(cell[0], 0), w - 1), min(max(cell[1], 0), h - 1)
+    if not np.isinf(cm.cost[y0, x0]):
+        return (x0, y0)
     for r in range(1, max_r + 1):
         for dy in range(-r, r + 1):
             for dx in range(-r, r + 1):
