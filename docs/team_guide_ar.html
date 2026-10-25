@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyRov — دليل الفريق</title>
+<link rel="icon" href="../assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f5f8; --surface:#fff; --surface2:#f6f8fa; --line:#d9e0e7; --text:#17202a; --muted:#5f6f7e;
+    --teal:#0f9d8a; --amber:#d97706; --red:#dc2626; --blue:#2563eb; --code:#eef2f6; --shadow:0 1px 2px rgba(20,30,40,.06);
+  }
+  :root[data-theme="dark"]{
+    --bg:#11161b; --surface:#1b232a; --surface2:#222c35; --line:#33404c; --text:#e6edf3; --muted:#92a1af;
+    --teal:#2dd4bf; --amber:#f5a524; --red:#f87171; --blue:#60a5fa; --code:#0f151a; --shadow:none;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.9 "Cairo","Segoe UI",Tahoma,sans-serif}
+  a{color:var(--teal);text-decoration:none} a:hover{text-decoration:underline}
+  code,pre,.ltr{direction:ltr;unicode-bidi:isolate;font-family:Consolas,"Cascadia Mono",monospace;font-size:.9em}
+  code{background:var(--code);padding:1px 6px;border-radius:5px}
+  pre{background:var(--code);padding:12px 14px;border-radius:10px;overflow:auto;text-align:left;line-height:1.5}
+  h1,h2,h3,h4{line-height:1.35;margin:0 0 .4em}
+  h2{font-size:1.6rem;font-weight:800;padding-top:.4em;border-top:1px solid var(--line);margin-top:2.2em}
+  h2:first-of-type{border-top:0;margin-top:0}
+  h3{font-size:1.2rem;font-weight:700;margin-top:1.6em;color:var(--teal)}
+  p{margin:.4em 0 .9em}
+  /* layout */
+  .wrap{display:grid;grid-template-columns:260px 1fr;gap:28px;max-width:1340px;margin:0 auto;padding:0 20px 80px}
+  nav.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 0 40px;border-left:1px solid var(--line)}
+  nav.side .brand{display:flex;align-items:center;gap:10px;padding:0 14px 14px;margin-bottom:8px;border-bottom:1px solid var(--line)}
+  nav.side .brand img{width:40px;height:40px;border-radius:9px}
+  nav.side .brand b{font-size:1.1rem;font-weight:800}
+  nav.side a{display:block;padding:6px 14px;color:var(--muted);border-right:3px solid transparent;font-size:.95rem}
+  nav.side a.on{color:var(--text);border-color:var(--teal);background:var(--surface)}
+  nav.side .grp{color:var(--muted);font-size:.75rem;letter-spacing:.02em;padding:14px 14px 2px}
+  main{min-width:0;padding-top:28px}
+  .hero{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px 28px;box-shadow:var(--shadow)}
+  .hero h1{font-size:2.1rem;font-weight:800}
+  .hero .sub{color:var(--muted);font-size:1.05rem}
+  .hero img{width:96px;height:96px;border-radius:22px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .pill{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.85rem;color:var(--muted)}
+  .pill b{color:var(--text)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:14px 0;box-shadow:var(--shadow)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  figure{margin:14px 0}
+  figure img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+  figcaption{color:var(--muted);font-size:.9rem;margin-top:6px}
+  .note{border-right:4px solid var(--amber);background:var(--surface2);padding:10px 14px;border-radius:8px;margin:12px 0}
+  .ok{border-right-color:var(--teal)} .bad{border-right-color:var(--red)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.95rem}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:right}
+  th{color:var(--muted);font-weight:700;background:var(--surface2)}
+  tr:hover td{background:var(--surface2)}
+  .tag{display:inline-block;padding:1px 8px;border-radius:6px;font-size:.8rem;background:var(--surface2);border:1px solid var(--line);color:var(--muted);margin:1px}
+  .tag.t{color:var(--teal)} .tag.a{color:var(--amber)} .tag.r{color:var(--red)} .tag.b{color:var(--blue)}
+  /* interactive bits */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+  .tabs button{font:inherit;font-weight:700;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 16px;cursor:pointer;color:var(--muted)}
+  .tabs button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{display:none} .panel.on{display:block}
+  .filters button{font:inherit;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--muted);font-size:.9rem;margin:2px}
+  .filters button.on{background:var(--amber);color:#111;border-color:var(--amber)}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin:8px 0}
+  details summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+  details summary::before{content:"◀";font-size:.7em;color:var(--muted);transition:transform .15s}
+  details[open] summary::before{transform:rotate(-90deg)}
+  .tree{font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:.9rem}
+  .tree .f{display:grid;grid-template-columns:260px 1fr;gap:12px;padding:5px 0;border-bottom:1px dashed var(--line)}
+  .tree .f span:last-child{font-family:"Cairo","Segoe UI",sans-serif;direction:rtl;text-align:right;color:var(--muted)}
+  .tree .d{font-weight:700;color:var(--teal);margin-top:10px}
+  .stack{display:grid;gap:6px;margin:12px 0}
+  .layer{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+  .layer b{color:var(--teal)} .layer .lec{color:var(--muted);font-size:.85rem;white-space:nowrap}
+  .timeline{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}
+  .step{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .step b{display:block;color:var(--teal);font-size:1.05rem} .step small{color:var(--muted)}
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+  .kpi div{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .kpi b{font-size:1.5rem;color:var(--teal);display:block}
+  .kpi span{color:var(--muted);font-size:.9rem}
+  .topbar{position:fixed;top:14px;left:14px;display:flex;gap:8px;z-index:9}
+  .topbar button{font:inherit;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;color:var(--text)}
+  .qa dt{font-weight:700;margin-top:10px} .qa dd{margin:2px 0 0;color:var(--muted)}
+  .check label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+  .check input{margin-top:8px;accent-color:var(--teal)}
+  @media (max-width:1000px){.wrap{grid-template-columns:1fr}nav.side{position:static;height:auto;border:0;display:flex;flex-wrap:wrap;gap:4px}nav.side .grp,nav.side .brand{display:none}.grid2,.grid3,.kpi{grid-template-columns:1fr}.timeline{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.tree .f{grid-template-columns:1fr}.layer{grid-template-columns:1fr}}
+  @media print{nav.side,.topbar{display:none}.wrap{display:block}}
+</style>
+</head>
+<body>
+<div class="topbar"><button id="theme">◐ فاتح / داكن</button><button onclick="window.print()">🖨 طباعة</button></div>
+<div class="wrap">
+<nav class="side" id="nav">
+  <div class="brand"><img src="../assets/icon.png" alt=""><div><b>PyRov</b><br><small style="color:var(--muted)">دليل الفريق</small></div></div>
+  <div class="grp">البداية</div>
+  <a href="#idea">الفكرة في دقيقة</a><a href="#journey">رحلة المهمة</a><a href="#layers">طبقات الروبوت</a>
+  <div class="grp">جوه الروبوت</div>
+  <a href="#motors">الموتورات والتحكم</a><a href="#sensors">السنسورز</a><a href="#localisation">فين أنا؟</a><a href="#mapping">الخريطة</a><a href="#behaviour">السلوك</a><a href="#planning">الاستكشاف والتخطيط</a><a href="#ai">الذكاء الاصطناعي</a><a href="#envs">البيئات الثلاث</a>
+  <div class="grp">التشغيل</div>
+  <a href="#ui">البرنامج</a><a href="#remote">التحكم من الموبايل</a><a href="#reports">التقارير والدرايف</a><a href="#results">النتائج</a>
+  <div class="grp">للفريق</div>
+  <a href="#files">ملفات المشروع</a><a href="#run">التشغيل والاختبار</a><a href="#demo">سيناريو العرض</a><a href="#qa">أسئلة متوقعة</a><a href="#lessons">دروس اتعلمناها</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div>
+    <h1>PyRov — دليل الفريق الكامل</h1>
+    <div class="sub">روبوت استكشاف واحد بيشتغل في كهف وعلى المريخ وتحت المية — محاكى من الموتور لحد الخريطة. الدليل ده بيشرح كل حتة اتعملت، ليه اتعملت كده، وبتربط بإيه في المنهج.</div>
+    <div class="pills"><span class="pill"><b>3</b> بيئات</span><span class="pill"><b>20+</b> سنسور</span><span class="pill"><b>9</b> طبقات سلوك</span><span class="pill"><b>3</b> استراتيجيات استكشاف</span><span class="pill"><b>49</b> اختبار</span><span class="pill"><b>264</b> تجربة مقاسة</span><span class="pill">تحكم من الموبايل</span><span class="pill">تقارير على Drive</span></div>
+  </div>
+  <img src="../assets/icon.png" alt="PyRov">
+</div>
+
+<h2 id="idea">1. الفكرة في دقيقة</h2>
+<div class="card">
+<p>بننزّل روبوت في مكان ما يعرفوش — من غير خريطة ومن غير GPS — ولازم: يتحرك بأمان، يتفادى الجدران والحفر، يبني خريطة، يقرر هو يروح فين، ويرجع البيت قبل ما البطارية تخلص. ده بالظبط وضع روفر على المريخ أو روبوت في منجم منهار.</p>
+<p>اللي يفرّق المشروع إن الروبوت <b>مبني من تحت لفوق زي الحقيقي</b>: موتورات DC بـ PWM، encoders، PID، سنسورز بفيزياء حقيقية وعيوبها، وبعدها الخريطة والقرار. ونفس الكود بيشتغل في 3 بيئات مختلفة تمامًا — اللي بيتغير هو ملف الإعدادات بس (<code>sim/config.py</code>).</p>
+<figure><img src="media/demo.gif" alt="المحاكاة"><figcaption>يمين: الخريطة اللي الروبوت بيبنيها بنفسه. شمال: العالم الحقيقي اللي الروبوت عمره ما بيشوفه (المسار الأصفر = مساره الحقيقي).</figcaption></figure>
+<div class="note ok"><b>الجملة اللي تقولها للدكتورة:</b> "عملنا محرك استكشاف واحد، وكل بيئة عبارة عن إعدادات — خريطة، تربة، سنسورز، ضوضاء، انزلاق — والروبوت نفسه ما بيتغيرش."</div>
+</div>
+
+<h2 id="journey">2. رحلة المهمة من أول ما تدوس Start</h2>
+<div class="card">
+<div class="timeline">
+  <div class="step"><b>1.5 ث واقف</b><small>بيتعلم انحراف الـ gyro (bias) وهو ثابت</small></div>
+  <div class="step"><b>لفة كاملة</b><small>حلقة الـ sonar تملا أول خريطة (SCAN)</small></div>
+  <div class="step"><b>استكشاف</b><small>يختار هدف → A* → يمشي → يحدّث الخريطة</small></div>
+  <div class="step"><b>ردود فعل</b><small>جدار قريب / حفرة / لمس → طبقة أمان تاخد التحكم</small></div>
+  <div class="step"><b>الرجوع</b><small>الخريطة كملت أو البطارية بالكاد كفاية → HOME</small></div>
+  <div class="step"><b>تقرير</b><small>HTML + صور + أرقام → فولدر Drive</small></div>
+</div>
+<p>المهمة بتنتهي بواحدة من 4: <span class="tag t">returned</span> رجع البيت، <span class="tag r">fell</span> وقع في حفرة (ممكن بس في Manual)، <span class="tag r">battery_dead</span> البطارية خلصت، <span class="tag">stopped</span> انت وقفتها. في كل الحالات بتظهر لافتة بالسبب وبتقدر تبعت تقرير.</p>
+</div>
+
+<h2 id="layers">3. طبقات الروبوت (من تحت لفوق)</h2>
+<div class="card">
+<p>كل طبقة بتعتمد على اللي تحتها، وكل طبقة مربوطة بمحاضرة:</p>
+<div class="stack">
+  <div class="layer"><b>الموتورات</b><span>2 DC motor + H-bridge + PWM، منحنى duty→سرعة غير خطي، حمل حسب التربة</span><span class="lec">Actuators 1 & 2</span></div>
+  <div class="layer"><b>الـ Encoders</b><span>16 tick × gearbox 30 = 480 tick للفة العجلة، اتجاه من الـ phase</span><span class="lec">Sensors 1</span></div>
+  <div class="layer"><b>التحكم</b><span>PID منفصل لكل عجلة + controller للمشي المستقيم</span><span class="lec">Control</span></div>
+  <div class="layer"><b>السنسورز</b><span>sonar, IR, cliff, bumper, compass/sun, gyro, accel, camera, flow/DVL, بطارية، غاز، ضوء، ضغط — كلها على ADC</span><span class="lec">Sensors 1 & 2</span></div>
+  <div class="layer"><b>فين أنا</b><span>dead reckoning + دمج gyro/compass/flow</span><span class="lec">Sensors 2</span></div>
+  <div class="layer"><b>الخريطة</b><span>occupancy grid باحتمالات + طبقة تربة + طبقة مخاطر</span><span class="lec">Navigation</span></div>
+  <div class="layer"><b>السلوك</b><span>subsumption: 9 طبقات بأولوية</span><span class="lec">Robot Behaviour</span></div>
+  <div class="layer"><b>التخطيط</b><span>A* + frontier / DFS / utility</span><span class="lec">Navigation</span></div>
+  <div class="layer"><b>الذكاء الاصطناعي</b><span>تصنيف تربة، كشف أعطال، utility</span><span class="lec">إضافة</span></div>
+  <div class="layer"><b>الاتصال</b><span>وصلة راديو محاكاة + console على الموبايل</span><span class="lec">Robot Behaviour (communication)</span></div>
+  <div class="layer"><b>الواجهة</b><span>برنامج Qt + صفحة ويب للموبايل + تقارير</span><span class="lec">—</span></div>
+</div>
+</div>
+
+<h2 id="motors">4. الموتورات والتحكم <small style="color:var(--muted);font-size:.8em">(محاضرات Actuators وControl)</small></h2>
+<div class="card">
+<h3>الموتور (<code>sim/robot/motor.py</code>)</h3>
+<p>المتحكم مش بيشوف غير <b>duty cycle</b> من −1 لـ +1. الإشارة بتختار اتجاه الـ H-bridge (SW1+SW2 لقدام، SW3+SW4 لورا)، والقيمة بتتحول لجهد فعّال <b>غير خطي</b>: فيه منطقة ميتة تحت 6% (الاحتكاك الساكن)، ومنحنى أسّي، وسرعة الاستقرار بتقل مع الحمل (رمل، طين). عشان كده لازم <b>calibration table</b> زي ما المحاضرة قالت — <code>calibration_table()</code> بتطلعها.</p>
+<h3>الـ Encoder (<code>encoder.py</code>)</h3>
+<p>على عمود الموتور قبل الـ gearbox (16 tick × 30 = 480 tick للفة العجلة). سرعة العجلة المقاسة = فرق الـ ticks في الخطوة — قيمة <b>مقطّعة (quantised)</b>، ودي الحاجة الوحيدة اللي الـ PID بيشوفها.</p>
+<h3>التحكم (<code>control.py</code>, <code>drive.py</code>)</h3>
+<p>اتنفذت كل الصيغ اللي في المحاضرة: on-off، on-off بـ hysteresis، وPID بالصيغة التزايدية المنفصلة:</p>
+<pre class="ltr">R_n = R_{n-1} + Kp(e_n − e_{n−1}) + Ki(e_n + e_{n−1})/2 + Kd(e_n − 2e_{n−1} + e_{n−2})</pre>
+<p>وفوقهم الـ <b>driving straight</b> بتاع المحاضرة (شكل 5.16): I-controller بيجمع فرق <i>المسافة</i> بين الـ encoders ويرجّعه للعجلتين. الانزلاق بيتطبق بعد الموتور فالـ encoders ما بتشوفوش — ده السبب الفيزيائي إن الـ dead reckoning بيتوه.</p>
+<figure><img src="figures/pid_step_response.png" alt="PID"><figcaption>يسار: استجابة الخطوة — on-off بيتذبذب، P سايب خطأ ثابت، PI/PID بيصفّروا الخطأ ويستحملوا حمل مفاجئ عند 3 ث. يمين: منحنى المعايرة duty→سرعة مش خطي وبيقل مع الحمل.</figcaption></figure>
+<div class="note">شوف الحتة دي حيّة في البرنامج: تبويب <b>Motor control</b> بيرسم المطلوب والمقاس والـ duty للعجلة الشمال لحظيًا.</div>
+</div>
+
+<h2 id="sensors">5. السنسورز — كل واحد مكانه وسببه <small style="color:var(--muted);font-size:.8em">(محاضرات Sensors 1 & 2)</small></h2>
+<div class="card">
+<p>كل سنسور شايل <b>تصنيفه</b> زي المحاضرة (local/global · internal/external · active/passive · binary/analog/digital)، والتناظري منهم بيعدي على <b>ADC</b> 10-bit، وأي واحد ممكن <b>تبوّظه وقت الشغل</b> (stuck / dead / noisy) من جدول Sensors. اضغط على فلتر:</p>
+<div class="filters" id="sf"><button class="on" data-f="all">الكل</button><button data-f="active">Active</button><button data-f="passive">Passive</button><button data-f="internal">Internal</button><button data-f="external">External</button><button data-f="binary">Binary</button><button data-f="cave">الكهف</button><button data-f="mars">المريخ</button><button data-f="water">تحت المية</button></div>
+<table id="stab">
+<thead><tr><th>السنسور</th><th>التصنيف</th><th>مكانه</th><th>ليه هنا بالذات</th><th>البيئة</th></tr></thead>
+<tbody>
+<tr data-k="active external digital cave mars water"><td><b>Sonar ring</b> 8× (12× تحت المية)</td><td><span class="tag t">active</span><span class="tag">external</span><span class="tag">digital</span></td><td>حوالين الجسم على ارتفاع الـ bumper، S0 لقدام</td><td>سنسور الخريطة الأساسي. مخروط 15°، <b>فقد الصدى</b> لما الزاوية تبقى مائلة (الجدار يبان أبعد — زي المحاضرة)، <b>تداخل</b> بين الجيران، وضوضاء بتزيد مع المسافة.</td><td>كلها</td></tr>
+<tr data-k="active external analog cave mars"><td><b>IR PSD</b> 3× لقدام</td><td><span class="tag t">active</span><span class="tag">external</span><span class="tag">analog</span></td><td>قدام، موزعين على عرض الجسم، مغمورين 6 سم</td><td>أي حاجة الجسم هيخبط فيها بتقع في شعاع. الخرج <code class="ltr">V=24/(d+4)</code> غير خطي → <b>lookup table</b> بالمعايرة؛ تحت 6 سم المنحنى بيرجع لورا فالسنسور مغمور عشان مفيش حاجة تقرب أكتر (نص المحاضرة).</td><td>كهف، مريخ</td></tr>
+<tr data-k="active external binary cave mars"><td><b>Cliff switches</b> 6×</td><td><span class="tag t">active</span><span class="tag">external</span><span class="tag b">binary</span></td><td>زوج قدام، زوج على الجنبين، زوج ورا — بيبصوا لتحت</td><td>السنسور الأفقي ما بيشوفش حفرة. الزوج الخلفي موجود لأن <b>كل مناورات الهروب بترجع لورا</b>، والجانبي لأن الجسم بيحتك بالحفرة وهو بيلف. نقص زوج منهم كلّفنا روبوت في الاختبار.</td><td>كهف، مريخ</td></tr>
+<tr data-k="passive external binary cave mars water"><td><b>Bumpers</b> 2×</td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag b">binary</span></td><td>شريط قدام، نص يمين ونص شمال</td><td>خط الدفاع الأخير. الزوج بيقول نلف ناحية إيه (المحاضرة). اللمس من الجنب (تيار بيزق الروبوت على جدار) ما بيضغطش bumper <i>أمامي</i>.</td><td>كلها</td></tr>
+<tr data-k="passive internal digital cave mars water"><td><b>Encoders</b> 2×</td><td><span class="tag">passive</span><span class="tag a">internal</span><span class="tag">digital</span></td><td>على عمود الموتور</td><td>feedback للسرعة + dead reckoning.</td><td>كلها</td></tr>
+<tr data-k="passive internal digital cave water"><td><b>Compass</b></td><td><span class="tag">passive</span><span class="tag a">internal</span><span class="tag">digital</span> 1°</td><td>فوق في النص بعيد عن الموتورات</td><td>اتجاه مطلق بيحد انحراف الـ gyro. في الكهف فيه اضطراب مغناطيسي محلي (حديد في الصخر). <b>مش مركّب على المريخ</b> — مفيش مجال مغناطيسي نافع.</td><td>كهف، تحت المية</td></tr>
+<tr data-k="passive external digital mars"><td><b>Sun sensor</b></td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag">digital</span></td><td>فوق</td><td>اللي روفرات المريخ الحقيقية بتستخدمه للاتجاه المطلق — بديل الـ compass.</td><td>المريخ</td></tr>
+<tr data-k="passive internal digital cave mars water"><td><b>Gyro</b> (yaw)</td><td><span class="tag">passive</span><span class="tag a">internal</span><span class="tag">digital</span></td><td>مركز الكتلة</td><td>فيه bias ثابت: 0.006 rad/s لوحدها = 20° في الدقيقة. عشان كده بيتعلم الـ bias وهو واقف أول 1.5 ث والـ compass بيصحّحه.</td><td>كلها</td></tr>
+<tr data-k="passive internal digital cave mars water"><td><b>Accelerometer</b></td><td><span class="tag">passive</span><span class="tag a">internal</span><span class="tag">digital</span></td><td>مركز الكتلة</td><td>ميل الأرض من متجه الجاذبية، مع فلتر لأن العجلة بتتلخبط مع الميل في عينة واحدة (المحاضرة: الـ inclinometer بيتأخر). سلوك SLOPE بيرفض ميل أكتر من 11°.</td><td>كلها</td></tr>
+<tr data-k="passive external digital cave mars water"><td><b>Camera</b></td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag">digital</span></td><td>قدام، مايلة 15° لتحت</td><td>بتشوف 16×16 بكسل من الأرض اللي قدام الروبوت → مدخل مصنّف التربة. الضلمة بتزود الضوضاء والكشافات بتسحب 4 W.</td><td>كلها</td></tr>
+<tr data-k="active external digital cave mars water"><td><b>Optical flow</b> (كهف/مريخ) / <b>DVL</b> (تحت المية)</td><td><span class="tag t">active</span><span class="tag">external</span><span class="tag">digital</span></td><td>تحت الجسم بيبص على الأرض</td><td>بيقيس حركة الأرض الحقيقية تحت الروبوت — ما بيشوفش انزلاق العجل (رمل المريخ 25%)، وتحت المية هو مصدر الـ odometry الوحيد (الـ thrusters ما بتلمسش الأرض).</td><td>كلها</td></tr>
+<tr data-k="passive internal analog cave mars water"><td><b>Battery monitor</b></td><td><span class="tag">passive</span><span class="tag a">internal</span><span class="tag">analog</span></td><td>داخلي عبر مقسم جهد</td><td>بيدخل في قرار الرجوع للبيت.</td><td>كلها</td></tr>
+<tr data-k="passive external analog cave"><td><b>Light sensor</b> + كشافات</td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag">analog</span></td><td>قدام</td><td>ضلمة → كشافات → طاقة أكتر → مهمة أقصر.</td><td>الكهف</td></tr>
+<tr data-k="passive external analog cave"><td><b>Gas sensor</b></td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag">analog</span> بتأخر</td><td>فوق</td><td>جيوب الغاز بتبقى مناطق تكلفتها عالية في الـ planner (مش جدران).</td><td>الكهف</td></tr>
+<tr data-k="passive external analog water"><td><b>Pressure</b></td><td><span class="tag">passive</span><span class="tag">external</span><span class="tag">analog</span></td><td>الجسم</td><td>العمق.</td><td>تحت المية</td></tr>
+</tbody></table>
+<div class="note"><b>النقطة اللي تتكلم فيها:</b> مفيش GPS خالص — مش موجود تحت الأرض ولا على المريخ ولا تحت المية. عشان كده "فين أنا" مشكلة حقيقية (القسم اللي بعده).</div>
+</div>
+
+<h2 id="localisation">6. فين أنا؟ — تحديد الموقع (<code>sim/estimation.py</code>)</h2>
+<div class="card">
+<p>بنحتفظ بـ 3 تقديرات جنب بعض وبنرسمهم على الخريطة:</p>
+<ul>
+<li><b>Encoders only (أحمر)</b> — dead reckoning زي المحاضرة بالظبط: بيجمع حركة العجل. بيتوه مع الوقت (انزلاق + انحراف اتجاه).</li>
+<li><b>Fused (أخضر)</b> — المسافة من الـ optical flow/DVL، والاتجاه من الـ gyro المصحّح بالـ compass/sun (complementary filter). بيفضل في حدود سنتيمترات.</li>
+<li><b>Perfect (للمقارنة بس)</b> — المكان الحقيقي.</li>
+</ul>
+<div class="kpi"><div><b>2.4–5.5 م</b><span>خطأ الـ encoders بعد 5 دقايق</span></div><div><b>4–17 سم</b><span>خطأ الـ fused</span></div><div><b>47% ← 87%</b><span>تغطية الكهف بـ encoders بس vs fused</span></div><div><b>20°/دقيقة</b><span>انحراف الـ gyro لو من غير compass</span></div></div>
+<p>جرّب في البرنامج: اختار <b>Localisation → Encoders only</b> في الكهف وشوف الخريطة بتتشقق والجدران بتتكرر، وبعدين نفس الـ seed بـ Fused.</p>
+</div>
+
+<h2 id="mapping">7. الخريطة (<code>sim/mapping.py</code>)</h2>
+<div class="card">
+<p><b>Occupancy grid</b> بخلايا 20 سم، كل خلية فيها <code class="ltr">log(p/(1−p))</code> إنها مسدودة. صدى الـ sonar بيفضّي الخلايا على طول الشعاع ويزوّد الخلية اللي <i>ورا</i> نقطة الصدى (الصدى من السطح، الجدار وراه). الخلية محتاجة صدايين عشان تبقى "مسدودة" فأي spike واحد ما بيعملش جدار. و"مفيش صدى" ما بيعلّمش حاجة — غالبًا انعكاس ضايع مش فراغ. فوقها طبقتين: تربة (من الـ AI) ومخاطر (حفر).</p>
+<figure><img src="screenshots/map_popup.png" alt="الخريطة الكبيرة"><figcaption>اضغط على أي خريطة في البرنامج تفتح كبيرة وحيّة. أبيض حر، أسود مسدود، أزرق رمادي مجهول، أحمر خطر، ملوّن = نوع تربة توقعه الـ AI. نقط برتقالي = frontiers، المحوّطة = الهدف الحالي.</figcaption></figure>
+</div>
+
+<h2 id="behaviour">8. السلوك — Subsumption (<code>sim/behaviors.py</code>)</h2>
+<div class="card">
+<p>زي محاضرة Robot Behaviour: طبقات بأولوية، الطبقة الأعلى بتاخد التحكم من اللي تحتها ("subsume"). كل خطوة تحكم (20 مرة/ثانية) كل طبقة بتقول هي عايزة تمسك ولا لأ:</p>
+<table>
+<tr><th>#</th><th>الطبقة</th><th>إمتى</th><th>بتعمل إيه</th></tr>
+<tr><td>9</td><td><b>STOP</b></td><td>وقع في حفرة / بطارية فاضية / انت وقفتها</td><td>مفيش حركة، المهمة انتهت</td></tr>
+<tr><td>8</td><td><b>ESCAPE</b></td><td>bumper اتلمس</td><td>يرجع لورا 0.7 ث (أو يلف لو فيه حفرة ورا)، يلف بعيد عن الجنب اللي خبط، ويشطب الهدف</td></tr>
+<tr><td>7</td><td><b>CLIFF</b></td><td>cliff switch شاف حافة</td><td>يبعد عن الحافة ويعلّم الخطر على الخريطة</td></tr>
+<tr><td>6</td><td><b>SLOPE</b></td><td>ميل أكتر من 11°</td><td>يرجع لورا</td></tr>
+<tr><td>5</td><td><b>SCAN</b></td><td>بداية المهمة</td><td>1.5 ث واقف ثم لفة كاملة</td></tr>
+<tr><td>4</td><td><b>AVOID</b></td><td>sonar/IR قريب (32 سم قدام، 14 سم قطري)</td><td>يلف للجنب الأفضى — <b>on-off بـ hysteresis</b> (يفصل بس لما الطريق يفضى بوضوح) ولو اتزنق 3 ثواني يرجع لورا</td></tr>
+<tr><td>3</td><td><b>TELEOP</b></td><td>انت بتسوق (assisted/manual)</td><td>آخر أمر وصل بالراديو؛ watchdog يوقّفه بعد ثانية من غير أوامر</td></tr>
+<tr><td>2</td><td><b>HOME</b></td><td>الطاقة بالكاد كفاية للرجوع (×1.6 أمان) أو الخريطة كملت</td><td>A* لنقطة البداية</td></tr>
+<tr><td>1</td><td><b>EXPLORE</b></td><td>فيه هدف</td><td>يتبع مسار الـ A* (pure pursuit)</td></tr>
+<tr><td>0</td><td><b>WANDER</b></td><td>مفيش حاجة تانية</td><td>مشية عشوائية (Monte Carlo walk بتاع المحاضرة)</td></tr>
+</table>
+<p>في وضع <b>Manual</b> الطبقات 4–8 متعطّلة عمدًا — عشان تبيّن للدكتورة هي كانت بتعمل إيه (وعشان كده ممكن تقع في حفرة فيه).</p>
+</div>
+
+<h2 id="planning">9. الاستكشاف والتخطيط (<code>sim/planning.py</code>)</h2>
+<div class="card">
+<p><b>Cost map:</b> الخلايا المسدودة والمخاطر بتتضخّم بنصف قطر الروبوت (configuration space)، +1.5 جنب الجدران عشان المسار يفضل في النص، المجهول بـ 8× (مسموح بس بتجنّبه)، × تكلفة التربة من الـ AI. <b>A*</b> 8-connected من غير قطع زوايا.</p>
+<div class="grid3">
+<div class="card"><h4>Nearest frontier</h4><p>الـ frontier = خلية حرة ملاصقة لمجهول. بيروح لأقرب مجموعة وبيلتزم بيها (غير كده بيتردد بين اتنين قريبين).</p></div>
+<div class="card"><h4>DFS + backtracking</h4><p>نقاط كل متر؛ يجرب قدام، شمال، يمين، ورا؛ طريق مسدود = يرجع للنقطة اللي قبلها (ده الـ backtracking event اللي بنعدّه).</p></div>
+<div class="card"><h4>Utility (AI)</h4><p>لكل frontier: <span class="ltr">gain / (cost + 1) − hazard − battery</span>. المعلومات المتوقعة ÷ المسافة الموزونة بالتربة. <b>كسب في كل البيئات.</b></p></div>
+</div>
+</div>
+
+<h2 id="ai">10. الذكاء الاصطناعي (<code>sim/ai/</code>) — بصراحة</h2>
+<div class="card">
+<p>مفيش موديل خارجي ولا LLM. ثلاث حاجات كلها بتتعلم/تتحسب على الجهاز:</p>
+<ol>
+<li><b>مصنّف التربة — Random Forest (scikit-learn):</b> ده الـ machine learning الحقيقي. من صورة الكاميرا 16×16 بنستخرج 26 رقم (متوسط، تباين، حواف، تموّجات بالـ FFT، ارتباط البكسلات، شقوق غامقة، histogram) وندرّب 120 شجرة قرار على 3500 صورة اصطناعية علشان يقول: ground / sand / rock / mud / bedrock / water / pit. <b>بيتدرّب على جهازك أول تشغيل</b> (ثواني) ويتحفظ في <code>sim/ai/terrain_rf.pkl</code>. دقته ~86%، وناتجه بيدخل في cost map الـ A* فعلًا — الروبوت بيتجنب الرمل والطين.</li>
+<li><b>كاشف الأعطال:</b> إحصائي (مش موديل): نافذة 60 قراءة لكل سنسور — ثابتة وهو بيتحرك (stuck)، على أقصى المدى والجيران شايفين حاجة (dead)، تذبذب أكبر بكتير من المقرر (noisy) → السنسور يتشال من الحسابات ويظهر FAULTY.</li>
+<li><b>Utility explorer:</b> دالة تقييم (القسم اللي فات).</li>
+</ol>
+<div class="note">لو الدكتورة سألت "ليه مش CNN؟": المدخل 256 بكسل و7 فئات — الـ Random Forest كافي وسريع، والترقية لـ CNN صغيرة بـ PyTorch نفس المدخل والمخرج.</div>
+</div>
+
+<h2 id="envs">11. البيئات الثلاث (<code>sim/config.py</code>, <code>sim/world.py</code>)</h2>
+<div class="card">
+<div class="tabs" id="envtabs"><button class="on" data-t="cave">الكهف</button><button data-t="mars">المريخ</button><button data-t="water">تحت المية</button></div>
+<div class="panel on" data-p="cave"><p><b>التوليد:</b> متاهة DFS على شبكة، ممرات عرضها 6 خلايا (1.2 م)، غرف، جدران مخرّمة، طين، حفر ملاصقة للجدران، 3 جيوب غاز بعيدة عن البداية. <b>الخاص بيه:</b> ضلمة (الكشافات شغالة)، sonar مداه 2.5 م بس، compass مضطرب، راديو بيموت بعد الثلث الأخير. <b>مناسب لـ:</b> DFS + backtracking (ممرات وطرق مسدودة).</p></div>
+<div class="panel" data-p="mars"><p><b>التوليد:</b> أرض مفتوحة، حقول صخور، فوهات بحوافها (pit + rim + ميل 0.25 rad)، رمل (انزلاق 25%)، bedrock، حواجز. <b>الخاص بيه:</b> مفيش compass → sun sensor، optical flow لأن الـ encoders بتكدب في الرمل، راديو قوي بس بتأخير ثانيتين (relay). <b>مناسب لـ:</b> frontier/utility في المناطق المفتوحة.</p></div>
+<div class="panel" data-p="water"><p><b>التوليد:</b> شعاب بـ cellular automata، طين، تيار ثابت (0.04, −0.02) م/ث + ضوضاء. <b>الخاص بيه:</b> thrusters بدل عجل، 12 sonar مداهم 6 م (مفيش IR — الضوء ضعيف)، DVL للسرعة، pressure للعمق، مودم صوتي قصير المدى بتأخير 0.4 ث. <b>بيبيّن:</b> السنسورز بتتبدل حسب البيئة والكود واحد.</p></div>
+</div>
+
+<h2 id="ui">12. البرنامج (<code>sim/qtui/</code>)</h2>
+<div class="card">
+<p>برنامج ديسكتوب (PySide6/Qt) بوضع فاتح وداكن (View → Dark mode أو Ctrl+D)، بيفتح maximized، وفيه دليل مستخدم كامل (Help → User guide, F1).</p>
+<div class="grid2">
+<figure><img src="screenshots/main_light.png" alt=""><figcaption><b>الوضع الفاتح.</b> شمال: Mission setup (البيئة، الاستراتيجية، الـ localisation، AI، seed، Remote control، طبقات الخريطة). النص: العالم الحقيقي | خريطة الروبوت. تحت: تبويبات Sensors / Motor control / Statistics / Radio link.</figcaption></figure>
+<figure><img src="screenshots/main_dark_radio.png" alt=""><figcaption><b>الوضع الداكن</b> وتبويب <b>Radio link</b>: المحطة الأرضية، الجدران في الطريق، RSSI، الحزم اللي وصلت/وقعت، وسجل بكل حزمة جاية من الموبايل بعنوانه.</figcaption></figure>
+<figure><img src="screenshots/tab_motor.png" alt=""><figcaption><b>Motor control:</b> السلوك النشط، أمر (v, ω)، duty/encoder/سرعة كل موتور وحالة الـ H-bridge، الانزلاق، والرسم الحي.</figcaption></figure>
+<figure><img src="screenshots/tab_stats.png" alt=""><figcaption><b>Statistics:</b> التغطية، طول المسار، backtracks، تصادمات، أحداث الحفر، خطأ الموقع (المستخدم vs encoders)، البطارية، دقة الـ AI.</figcaption></figure>
+<figure><img src="screenshots/mission_over.png" alt=""><figcaption><b>نهاية المهمة:</b> لافتة بالسبب وإيه اللي تعمله.</figcaption></figure>
+<figure><img src="screenshots/guide.png" alt=""><figcaption><b>User guide</b> جوه البرنامج (Help → F1) بيشرح كل لوحة وكل زرار.</figcaption></figure>
+</div>
+<h3>الزراير والاختصارات</h3>
+<table>
+<tr><th>فين</th><th>إيه</th><th>بيعمل إيه</th></tr>
+<tr><td>Toolbar</td><td>New / Pause / Stop / Restart</td><td>مهمة جديدة · إيقاف مؤقت (Space) · إنهاء المهمة مع الاحتفاظ بالبيانات · إعادة (R)</td></tr>
+<tr><td>Toolbar</td><td>Speed ×1 ×4 ×8 ×16</td><td>سرعة المحاكاة (مش الروبوت) — مفاتيح 1-4</td></tr>
+<tr><td>Toolbar</td><td>Headlights (H)</td><td>كشافات — بتسحب بطارية وبتحسّن الكاميرا في الكهف</td></tr>
+<tr><td>Toolbar</td><td>Send report (Ctrl+S)</td><td>تقرير المهمة الحالية → reports/ → Drive</td></tr>
+<tr><td>Sensors tab</td><td>ok / stuck / dead / noisy</td><td>تبويظ أي سنسور وقت الشغل بضغطة؛ عمود Health بيبيّن لو الـ AI شاله</td></tr>
+<tr><td>الخريطتين</td><td>ضغطة</td><td>نافذة كبيرة حيّة</td></tr>
+<tr><td>Remote control</td><td>Autonomous / Assisted / Manual</td><td>مين يسوق (القسم اللي بعده)</td></tr>
+</table>
+</div>
+
+<h2 id="remote">13. التحكم من الموبايل والوصلة اللاسلكية (<code>sim/comms.py</code>, <code>sim/teleop/</code>)</h2>
+<div class="card">
+<p>البرنامج بيفتح سيرفر صغير على الـ WiFi (زرار <b>Open console for phone / tablet</b>) ويديك عنوان زي <code class="ltr">http://192.168.1.4:8080</code> تفتحه من متصفح الموبايل على نفس الشبكة. الصفحة فيها <b>joystick جواه حلقة الـ sonar</b> (بتبقى برتقالي وأحمر ناحية الحاجات القريبة فبتسوق بالإحساس)، الكاميرا، الخريطة، الإشارة، البطارية، وأزرار الأوضاع. على الموبايل بتفتح مضغوطة (joystick + 3 أرقام + أزرار) وزرار More يفتح الباقي.</p>
+<div class="grid2">
+<figure><img src="screenshots/console_tablet_dark.jpg" alt=""><figcaption>تابلت بالعرض — داكن.</figcaption></figure>
+<figure><img src="screenshots/console_phone_light.jpg" alt="" style="max-width:360px;margin:0 auto"><figcaption>موبايل بالطول — فاتح، الوضع المضغوط.</figcaption></figure>
+</div>
+<h3>الوصلة اللاسلكية — ليه مهمة</h3>
+<p>كل أمر قيادة بيعدي بـ <b>راديو محاكى</b> من محطة أرضية عند نقطة البداية: الإشارة بتضعف مع المسافة ومع كل خلية جدار في خط النظر (كهف: صخر، تحت المية: مودم صوتي + 0.4 ث تأخير، مريخ: relay + ثانيتين). ضعيفة = نص الأوامر بتضيع. مقطوعة = ولا أمر بيوصل، وبعد 3 ثواني الروبوت بيتصرف حسب اختيارك: <b>يرجع البيت</b> (الافتراضي — بيرجع لمدى الإشارة بنفسه) / يستكشف لوحده / يستنى. ده بالظبط الحجة اللي في الـ proposal: ليه الروبوت لازم يبقى autonomous.</p>
+<p><b>Assisted:</b> انت بتوجّه بس طبقات الأمان شغالة (الروبوت يرفض الجدار والحفرة). <b>Manual:</b> مفيش حاجة توقفك. الاستجابة زي عجلة العربية: تربيعية، سقف دوران 1 rad/s، وبتقل وانت ماشي بسرعة. الكيبورد (الأسهم/WASD) بيشتغل بأي لغة لأنه بيقرأ مكان الزرار الفيزيائي.</p>
+</div>
+
+<h2 id="reports">14. التقارير وفولدر Drive (<code>sim/report.py</code>)</h2>
+<div class="card">
+<p>لما المهمة تخلص (أو تدوس Send report) بيتعمل فولدر <code class="ltr">reports/Mission #n - 2026-10-26 14-05 - cave (اسم الجهاز)/</code> فيه <code>report.html</code> (كل الإحصائيات + صورتي الخريطتين + الفريق)، صور PNG، و<code>metrics.json</code>، وسطر في <code>missions.csv</code>.</p>
+<p>وبيترفع لفولدر Drive الموحد بتاع الفريق عن طريق <b>Google Apps Script</b> صغير في حساب صاحب الفولدر (بوّابة): البرنامج يبعت الملفات → السكريبت يشوف آخر رقم Mission في الفولدر ويدي الجديد n+1 → يرجّع الاسم → النسخة المحلية تتسمّى زيه. <b>لو مفيش نت:</b> التقرير يستنى في <code>reports/pending.json</code> ويترفع لوحده كل 30 ث أو عند التشغيل الجاي. التفاصيل في <a href="DRIVE_REPORTS.md">DRIVE_REPORTS.md</a>.</p>
+<figure><img src="screenshots/report.png" alt="" style="max-width:720px;margin:0 auto"><figcaption>شكل التقرير.</figcaption></figure>
+</div>
+
+<h2 id="results">15. النتائج — بالأرقام (<code>docs/RESULTS.md</code>)</h2>
+<div class="card">
+<p>264 تشغيلة بدون واجهة (<code>sim/experiments/run_batch.py</code>)، كل seed = خريطة وضوضاء مختلفة.</p>
+<h3>الاستراتيجيات (90 تشغيلة)</h3>
+<table><tr><th>البيئة</th><th>Utility (AI)</th><th>DFS</th><th>Nearest frontier</th></tr>
+<tr><td>الكهف</td><td><b>96%</b></td><td>92%</td><td>69%</td></tr><tr><td>المريخ</td><td><b>84%</b></td><td>72%</td><td>47%</td></tr><tr><td>تحت المية</td><td><b>97%</b></td><td>92%</td><td>65%</td></tr></table>
+<p>فرضية الـ proposal اتأكد نصها: DFS فعلًا قوي في الكهف، لكن nearest-frontier البسيط طلع الأضعف حتى في المفتوح (بيطارد frontiers صغيرة جنب الصخور)، والـ utility كسب في كل مكان. <b>وده إجابة بتجربة مش افتراض</b>.</p>
+<figure><img src="figures/strategies_coverage.png" alt=""><figcaption>التغطية مع الوقت (متوسط ± انحراف معياري على 10 seeds).</figcaption></figure>
+<h3>تحديد الموقع (54 تشغيلة)</h3>
+<p>Fused بيساوي تقريبًا "مكان مثالي" (الفرق جوه الانحراف المعياري)؛ encoders بس بتبعد 2.4 م (كهف) / 3.7 م (مريخ) / 5.5 م (تحت المية) في 5 دقايق وبتنصّف تغطية الكهف.</p>
+<figure><img src="figures/localisation_summary.png" alt=""></figure>
+<h3>إطفاء السنسورز واحد واحد (120 تشغيلة)</h3>
+<p>الـ sonar = سنسور الخريطة (من غيره 5–25% تغطية). الـ optical flow/DVL = سنسور الموقع (من غيره 5–16 م خطأ). الـ compass/sun لا غنى عنه (8–10 م خطأ). الـ cliff switches = الحاجز الوحيد قدام الحفر (من غيرها وقع روبوت من 4). الـ IR والـ bumpers طلعوا redundant مع الـ sonar — دورهم "خط الدفاع الأخير". وإطفاء سنسور مش مركّب ما غيّرش حاجة = التجربة سليمة.</p>
+<figure><img src="figures/ablation_summary.png" alt=""></figure>
+</div>
+
+<h2 id="files">16. ملفات المشروع — إيه كل ملف</h2>
+<div class="card">
+<details open><summary>جذر المشروع</summary><div class="tree">
+<div class="f"><span>main.py</span><span>نقطة البداية: <code>python main.py</code> (Qt) أو <code>--pygame</code> للواجهة القديمة</span></div>
+<div class="f"><span>run.bat / setup.bat / setup.ps1</span><span>تشغيل بضغطة · تثبيت بضغطة واحدة (ينزّل، يجهّز، shortcut، يشغّل)</span></div>
+<div class="f"><span>requirements.txt</span><span>numpy, scipy, scikit-learn, matplotlib, pygame-ce, PySide6, pytest</span></div>
+<div class="f"><span>report_config.json</span><span>لينك بوّابة Drive + auto_send</span></div>
+<div class="f"><span>assets/icon.png, icon.ico</span><span>الأيقونة (بتتولّد من <code>paint_icon</code>)</span></div>
+</div></details>
+<details><summary>sim/ — جوهر المحاكاة</summary><div class="tree">
+<div class="d">sim/</div>
+<div class="f"><span>config.py</span><span>كل الفروق بين البيئات: MotorConfig, PIDConfig, DriveConfig, SensorConfig, LinkConfig, EnvConfig + cave()/mars()/underwater()</span></div>
+<div class="f"><span>core.py</span><span>Pose، زوايا، جدول أنواع التربة وخصائصها (تكلفة، انزلاق، لون)</span></div>
+<div class="f"><span>world.py</span><span>العالم الحقيقي: مولّدات الثلاث بيئات، raycast (DDA)، تصادم الدايرة، الاتصال بين المناطق</span></div>
+<div class="f"><span>estimation.py</span><span>dead reckoning + HeadingFilter + PoseEstimator (odom / fused / perfect)</span></div>
+<div class="f"><span>mapping.py</span><span>OccupancyGrid (log-odds، طبقات) + Mapper (بيحوّل قراءات السنسورز لخريطة)</span></div>
+<div class="f"><span>planning.py</span><span>cost map، A*، frontiers، FrontierExplorer، DFSExplorer</span></div>
+<div class="f"><span>behaviors.py</span><span>طبقات الـ subsumption + Arbiter + PathFollower</span></div>
+<div class="f"><span>mission.py</span><span>بيجمّع كل حاجة في مهمة واحدة: step()، المقاييس، أوضاع التحكم، الراديو</span></div>
+<div class="f"><span>comms.py</span><span>RadioLink: قوة الإشارة، فقد الحزم، التأخير، السجل</span></div>
+<div class="f"><span>report.py</span><span>بناء التقرير + ReportUploader (طابور offline)</span></div>
+<div class="d">sim/robot/</div>
+<div class="f"><span>motor.py</span><span>DCMotor, HBridge, calibration_table</span></div>
+<div class="f"><span>encoder.py</span><span>IncrementalEncoder</span></div>
+<div class="f"><span>control.py</span><span>OnOff, Hysteresis, PID, Integral</span></div>
+<div class="f"><span>drive.py</span><span>DifferentialDrive: PID لكل عجلة + المشي المستقيم + الانزلاق + الكينماتيكس</span></div>
+<div class="f"><span>robot.py</span><span>Robot: الجسم، البطارية، التصادم (sliding)، السقوط، السنسورز</span></div>
+<div class="d">sim/sensors/</div>
+<div class="f"><span>base.py</span><span>Sensor الأساسي، SensorClass، ADC، الأعطال</span></div>
+<div class="f"><span>range_sensors.py</span><span>Sonar, IRDistance, CliffSensor, Bumper</span></div>
+<div class="f"><span>internal_sensors.py</span><span>Compass, Gyro, Accelerometer, Battery, Light, Gas, Pressure, DVL/optical flow</span></div>
+<div class="f"><span>camera.py</span><span>Camera + مولّد الـ textures الاصطناعية (نفسه المستخدم للتدريب)</span></div>
+<div class="f"><span>suite.py</span><span>SensorSuite: بيركّب السنسورز حسب البيئة ويحدّد أماكنها</span></div>
+<div class="d">sim/ai/</div>
+<div class="f"><span>terrain.py</span><span>TerrainClassifier (features + Random Forest)</span></div>
+<div class="f"><span>faults.py</span><span>FaultDetector</span></div>
+<div class="f"><span>exploration.py</span><span>UtilityExplorer</span></div>
+<div class="f"><span>brain.py</span><span>AIBrain: بيشغّل التلاتة جوه المهمة</span></div>
+<div class="d">sim/qtui/ (البرنامج)</div>
+<div class="f"><span>main_window.py</span><span>النافذة: قوائم، toolbar، docks، التايمر، الكيبورد، السيرفر، التقارير</span></div>
+<div class="f"><span>panels.py</span><span>SetupPanel، SensorsTab، MotorTab، StatsTab، About، Guide</span></div>
+<div class="f"><span>mapview.py / popup.py</span><span>رسم الخرائط + النافذة الكبيرة</span></div>
+<div class="f"><span>radio.py</span><span>تبويب Radio link</span></div>
+<div class="f"><span>theme_qt.py</span><span>الألوان والـ stylesheet (فاتح/داكن) + رسم الأيقونة</span></div>
+<div class="d">sim/teleop/</div>
+<div class="f"><span>server.py</span><span>HTTP server: الصفحة، /api/state، /api/cmd، الصور</span></div>
+<div class="f"><span>console.html</span><span>صفحة الموبايل/التابلت (HTML/CSS/JS واحد)</span></div>
+<div class="d">sim/ui/ (الواجهة القديمة Pygame — fallback)</div>
+<div class="f"><span>app.py, render.py, theme.py, widgets.py</span><span>render.py لسه مستخدم لتلوين الخرائط في Qt والتقارير</span></div>
+<div class="d">sim/experiments/</div>
+<div class="f"><span>run_batch.py</span><span>التجارب بدون واجهة (strategies / --localisation / --ablation)</span></div>
+<div class="f"><span>plots.py / pid_demo.py</span><span>الرسومات + استجابة الخطوة للـ PID</span></div>
+</div></details>
+<details><summary>tests/ — 49 اختبار</summary><div class="tree">
+<div class="f"><span>test_stage1.py</span><span>موتور، encoder، PID (خطأ ثابت لـ P، صفر لـ PI)، مشي مستقيم، توليد العوالم، تصادم</span></div>
+<div class="f"><span>test_stage2_sensors.py</span><span>ADC، lookup table الـ IR، تركيب السنسورز لكل بيئة، الأعطال، انحراف gyro، cliff، bumper، كاميرا</span></div>
+<div class="f"><span>test_stage3_estimation_mapping.py</span><span>dead reckoning، fused أحسن من odometry، دقة الخريطة</span></div>
+<div class="f"><span>test_stage4_planning_behaviors.py</span><span>A*، frontiers، مهمات في كل بيئة، أولوية الطبقات، الرجوع للبيت</span></div>
+<div class="f"><span>test_stage5_ai.py</span><span>دقة المصنّف، كاشف الأعطال، utility</span></div>
+<div class="f"><span>test_stage6_qt.py</span><span>النافذة تشتغل وتعمل مهمة وتحقن عطل</span></div>
+<div class="f"><span>test_stage7_teleop.py</span><span>assisted/manual، watchdog، تأخير المريخ، فقد الوصلة، السيرفر، اتجاه اليمين</span></div>
+</div></details>
+<details><summary>docs/</summary><div class="tree">
+<div class="f"><span>Task1_v2.md / .docx</span><span>الـ proposal المحدّث</span></div>
+<div class="f"><span>DESIGN.md</span><span>تبرير كل سنسور ومكانه + قرارات التصميم + الدروس</span></div>
+<div class="f"><span>RESULTS.md</span><span>الثلاث تجارب بالجداول والرسومات</span></div>
+<div class="f"><span>DRIVE_REPORTS.md + apps_script/Code.gs</span><span>إعداد بوّابة Drive</span></div>
+<div class="f"><span>SETUP_WITH_CLAUDE.md</span><span>برومبت التثبيت لمن يستخدم Claude</span></div>
+<div class="f"><span>screenshots/ figures/ media/</span><span>الصور والرسومات والـ GIF</span></div>
+<div class="f"><span>team_guide_ar.html</span><span>الملف ده</span></div>
+</div></details>
+</div>
+
+<h2 id="run">17. التشغيل والاختبار</h2>
+<div class="card">
+<pre class="ltr">git clone https://github.com/buggYateer/robotics-project.git
+cd robotics-project
+python -m venv .venv &amp;&amp; .venv\Scripts\activate
+pip install -r requirements.txt
+python main.py                       # البرنامج
+pytest                               # 49 اختبار
+python -m sim.experiments.pid_demo   # رسمة PID
+python -m sim.experiments.run_batch --seeds 10   # تجارب الاستراتيجيات</pre>
+<p>أو بضغطة واحدة على ويندوز: <code>setup.bat</code>. بعدها <code>run.bat</code> أو الـ shortcut. ملحوظة: Windows 11 مع Smart App Control شغال ممكن يمنع الحزم المترجمة — اقفله أو استخدم Python 3.12.</p>
+</div>
+
+<h2 id="demo">18. سيناريو عرض 10 دقايق قدام الدكتورة</h2>
+<div class="card check">
+<label><input type="checkbox"> <span><b>الفكرة (1 دقيقة):</b> روبوت واحد، 3 بيئات، مبني من الموتور. افتح البرنامج على الكهف.</span></label>
+<label><input type="checkbox"> <span><b>الطبقة السفلية (2 دقيقة):</b> ابدأ مهمة، افتح <b>Motor control</b>: ورّي PWM/encoder/PID وهو بيشتغل، واذكر الصيغة التزايدية. اعرض رسمة <code>pid_step_response.png</code>.</span></label>
+<label><input type="checkbox"> <span><b>السنسورز (2 دقيقة):</b> تبويب Sensors: التصنيفات، الأماكن (كبّر الخريطة بالضغط عليها). اضرب <b>sonar0 → noisy</b> واستنى كاشف الأعطال يعلّمه FAULTY. اضرب <b>optflow → dead</b> على المريخ وشوف التقدير الأخضر يبعد.</span></label>
+<label><input type="checkbox"> <span><b>فين أنا (1 دقيقة):</b> نفس الـ seed مرتين: Encoders only ثم Fused. الأحمر بيتوه، الأخضر ثابت.</span></label>
+<label><input type="checkbox"> <span><b>السلوك (1 دقيقة):</b> Assisted من الموبايل: سوق في جدار → الروبوت يرفض. حوّل Manual وكرر → يخبط (أو يقع لو حفرة) → لافتة Mission over.</span></label>
+<label><input type="checkbox"> <span><b>الاتصال (1 دقيقة):</b> سوق في الكهف لحد ما الإشارة تضعف وتقطع → الروبوت يرجع البيت لوحده. ورّي تبويب Radio link.</span></label>
+<label><input type="checkbox"> <span><b>النتائج (1 دقيقة):</b> جدول الاستراتيجيات + التقرير اللي اترفع على Drive.</span></label>
+<label><input type="checkbox"> <span><b>الخاتمة:</b> "كل حاجة اتقاست بتجربة، والكود واحد في الثلاث بيئات."</span></label>
+</div>
+
+<h2 id="qa">19. أسئلة متوقعة وإجاباتها</h2>
+<div class="card qa"><dl>
+<dt>ليه الـ nearest-frontier طلع أضعف من المتوقع في المفتوح؟</dt><dd>لأنه greedy على المسافة بس: بيطارد frontiers صغيرة جنب الصخور ويرجع لنفس المنطقة. الـ utility بيحسب المعلومات المتوقعة ÷ التكلفة فبيروح للمناطق الكبيرة المجهولة. والفرضية اتختبرت مش اتفرضت.</dd>
+<dt>إزاي الـ sonar بيتعامل مع الانعكاس المائل؟</dt><dd>لو زاوية السقوط أكبر من 65–78° (حسب خشونة السطح) الصدى بيضيع والقراءة بترجع "أقصى مدى" — زي المحاضرة. وفي الخريطة "مفيش صدى" ما بيعلّمش فراغ عشان ما نمسحش جدران حقيقية.</dd>
+<dt>ليه 6 cliff sensors مش 2؟</dt><dd>لأن مناورات الهروب بترجع لورا، والجسم بيحتك بالحفر وهو بيلف. في تجربة الإطفاء، من غيرهم وقع روبوت من كل 4.</dd>
+<dt>الـ AI ده إيه بالظبط؟</dt><dd>Random Forest من scikit-learn بيتدرّب محليًا على 3500 صورة اصطناعية، 26 feature، 7 فئات، ~86%، وناتجه بيدخل في تكلفة الـ A*. + كاشف أعطال إحصائي + دالة utility.</dd>
+<dt>ليه الروبوت لازم يبقى autonomous لو فيه تحكم عن بعد؟</dt><dd>لأن الراديو مش مضمون: الصخر بياكله، المريخ فيه تأخير ثانيتين، تحت المية مودم صوتي. لما الوصلة تقطع الروبوت بيرجع لوحده — وده مبيّن في البرنامج.</dd>
+<dt>إيه اللي بيحصل لو سنسور باظ؟</dt><dd>كاشف الأعطال بيشيله من الخريطة والتفادي (graceful degradation)، والـ bumpers والـ IR خط دفاع أخير. وفي جدول الإطفاء شوفنا تأثير كل سنسور بالأرقام.</dd>
+<dt>ليه الـ fused أحسن من "perfect" أحيانًا؟</dt><dd>مش أحسن — الفرق جوه الانحراف المعياري بين الـ seeds؛ بيقول إن الخطأ الباقي (سنتيمترات) ما بيأثرش على المهمة.</dd>
+</dl></div>
+
+<h2 id="lessons">20. دروس اتعلمناها بالعافية (كلها ممكن تتكرر بأزرار الأعطال)</h2>
+<div class="card">
+<ul>
+<li>من غير cliff sensors ورا وعلى الجنب الروبوت بيرجع أو يحتك في الفوهات.</li>
+<li>فلتر زمني على الـ sonar بيتأخر وهو بيلف ويرسم الجدران في مكان غلط — الأحسن نرفض الـ spikes في الخريطة (صدايين للخلية) مش في الزمن.</li>
+<li>قراءات الـ IR قريب أقصى المدى = ضوضاء مش عوائق (المنحنى مسطح هناك).</li>
+<li>الـ bumper الأمامي ما ينفعش يفصل على لمس جانبي، وإلا التيار اللي بيزق الروبوت على جدار بيعمل حلقة لا نهائية "ارجع لورا في الجدار".</li>
+<li>bias الـ gyro 0.006 rad/s = 20° في الدقيقة: لازم معايرة وهو واقف + مرجع اتجاه مطلق.</li>
+<li>لما القيادة من الموبايل "ما بتردش" في الغالب الإشارة مقطوعة أو المهمة انتهت — عشان كده اللافتات.</li>
+</ul>
+</div>
+<p style="color:var(--muted);text-align:center;margin-top:40px">PyRov · Robotics team project · Dr. Elshaimaa Nabil Nada · Faculty of Engineering – Computer and Systems Department</p>
+</main>
+</div>
+<script>
+  // theme
+  const root=document.documentElement; const saved=localStorage.getItem('guide-theme'); if(saved) root.dataset.theme=saved;
+  document.getElementById('theme').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'':'dark'; localStorage.setItem('guide-theme',root.dataset.theme);};
+  // tabs
+  document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; const card=t.parentElement; t.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); card.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.p===b.dataset.t));}));
+  // sensor filter
+  document.getElementById('sf').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; document.querySelectorAll('#sf button').forEach(x=>x.classList.toggle('on',x===b)); const f=b.dataset.f; document.querySelectorAll('#stab tbody tr').forEach(r=>{r.style.display=(f==='all'||(r.dataset.k||'').split(' ').includes(f))?'':'none';});});
+  // scrollspy
+  const links=[...document.querySelectorAll('#nav a')]; const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+en.target.id));}})},{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+  // checklist memory
+  document.querySelectorAll('.check input').forEach((c,i)=>{c.checked=localStorage.getItem('demo'+i)==='1'; c.onchange=()=>localStorage.setItem('demo'+i,c.checked?'1':'0');});
+</script>
+</body>
+</html>
