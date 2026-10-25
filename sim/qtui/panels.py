@@ -128,7 +128,7 @@ class SetupPanel(QWidget):
 
 
 class SensorsTab(QWidget):
-    COLS = ["Sensor", "Class (local/scope/mode/signal)", "Reading", "", "Fault", "Health"]
+    COLS = ["Sensor", "Class", "Reading", "", "Fault (click to inject)", "Health"]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -140,11 +140,11 @@ class SensorsTab(QWidget):
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         hdr = self.table.horizontalHeader()
-        hdr.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        hdr.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         self.table.setColumnWidth(0, 90)
-        self.table.setColumnWidth(2, 110)
+        self.table.setColumnWidth(1, 215)
         self.table.setColumnWidth(3, 90)
-        self.table.setColumnWidth(4, 90)
+        self.table.setColumnWidth(4, 250)
         self.table.setColumnWidth(5, 70)
         lay.addWidget(self.table, 1)
         side = QVBoxLayout()
@@ -175,7 +175,7 @@ class SensorsTab(QWidget):
         self.bars = []
         for i, s in enumerate(sensors):
             self.table.setItem(i, 0, QTableWidgetItem(s.name))
-            self.table.setItem(i, 1, QTableWidgetItem(str(s.cls)))
+            self.table.setItem(i, 1, QTableWidgetItem(str(s.cls).replace("/", " / ")))
             self.table.setItem(i, 2, QTableWidgetItem(""))
             bar = QProgressBar()
             bar.setRange(0, 100)
@@ -186,13 +186,32 @@ class SensorsTab(QWidget):
                 bar.setVisible(False)
             self.table.setCellWidget(i, 3, bar)
             self.bars.append(bar)
-            combo = QComboBox()
-            combo.addItems(FAULT_MODES)
-            combo.currentTextChanged.connect(lambda mode, sensor=s: self._set_fault(sensor, mode))
-            self.table.setCellWidget(i, 4, combo)
+            self.table.setCellWidget(i, 4, self._fault_buttons(s))
             self.table.setItem(i, 5, QTableWidgetItem("ok"))
-            self.table.setRowHeight(i, 24)
+            self.table.setRowHeight(i, 26)
         self.alarm.setText("")
+
+    def _fault_buttons(self, sensor):
+        """Four small exclusive buttons in the cell: one tap injects the fault."""
+        from PySide6.QtWidgets import QButtonGroup
+        w = QWidget()
+        lay = QHBoxLayout(w)
+        lay.setContentsMargins(2, 1, 2, 1)
+        lay.setSpacing(2)
+        group = QButtonGroup(w)
+        group.setExclusive(True)
+        for mode in FAULT_MODES:
+            b = QPushButton(mode)
+            b.setCheckable(True)
+            b.setChecked(mode == sensor.fault)
+            b.setObjectName("faultbtn")
+            b.setFixedHeight(20)
+            b.setToolTip({"ok": "sensor works", "stuck": "keeps reporting its last value", "dead": "reports nothing",
+                          "noisy": "very noisy readings"}[mode])
+            b.clicked.connect(lambda checked, sensor=sensor, mode=mode: self._set_fault(sensor, mode))
+            group.addButton(b)
+            lay.addWidget(b)
+        return w
 
     def _set_fault(self, sensor, mode):
         sensor.set_fault(mode)
