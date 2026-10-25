@@ -305,6 +305,9 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ loop
     def _on_tick(self):
+        if self.server is not None and self.server.restart_requested:
+            self.server.restart_requested = False
+            self.restart_mission()
         m = self.mission
         if m is None:
             return
