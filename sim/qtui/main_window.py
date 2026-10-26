@@ -391,6 +391,21 @@ class MainWindow(QMainWindow):
         pop.show()
 
     # ----------------------------------------------------------- teleop
+    def _mirror_mission_controls(self, m):
+        """Commands from the phone console (mode, link-loss policy, headlights)
+        change the mission directly; show that state on the desktop controls
+        too, without re-sending it."""
+        for combo, value in ((self.setup.mode, m.mode), (self.setup.loss, m.on_link_loss)):
+            i = combo.findData(value)
+            if i >= 0 and i != combo.currentIndex():
+                combo.blockSignals(True)
+                combo.setCurrentIndex(i)
+                combo.blockSignals(False)
+        if self.act_lights.isChecked() != m.robot.headlights:
+            self.act_lights.blockSignals(True)
+            self.act_lights.setChecked(m.robot.headlights)
+            self.act_lights.blockSignals(False)
+
     def _mode_changed(self, _):
         if self.mission is not None:
             # the operator's own console is wired to the rover, not radio
@@ -503,6 +518,7 @@ class MainWindow(QMainWindow):
         for pop in self.popups.values():
             pop.refresh()
         if self._tick % 3 == 0:
+            self._mirror_mission_controls(m)
             idx = self.tabs.currentIndex()
             if idx == 0:
                 self.sensors_tab.refresh()
