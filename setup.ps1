@@ -2,13 +2,14 @@
 #
 #   Double-click setup.bat (next to this file), or run in PowerShell:
 #       powershell -ExecutionPolicy Bypass -File setup.ps1
-#   or straight from GitHub, without downloading anything first:
-#       irm https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.ps1 | iex
 #
-# What it does: finds (or installs) Python, downloads the project into a folder
-# you choose, creates a virtual environment, installs the dependencies, puts a
-# PyRov shortcut on the desktop and starts the program. Running it again on an
-# existing folder updates the project and the dependencies.
+# What it does: finds (or installs) Python, creates a virtual environment,
+# installs the dependencies, puts a PyRov shortcut on the desktop and starts the
+# program. Run from inside an extracted copy of the project (Code > Download ZIP
+# on GitHub) it sets that folder up in place; run from elsewhere it clones the
+# repository into a folder you choose (the repository is private, so git may ask
+# you to sign in). Running it again updates the dependencies and, with git, the
+# project.
 
 param([string]$Dest = "")
 
@@ -27,6 +28,10 @@ Write-Host "  Robotics team project setup" -ForegroundColor Yellow
 Write-Host ""
 
 # ------------------------------------------------------------------ destination
+if (-not $Dest -and $PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "main.py"))) {
+    # started from setup.bat inside an extracted or cloned copy: set up this folder
+    $Dest = $PSScriptRoot
+}
 if (-not $Dest) {
     $default = Join-Path $env:USERPROFILE "PyRov"
     $answer = Read-Host "Where should the project live? [Enter = $default]"
@@ -76,9 +81,9 @@ if (Test-Path (Join-Path $Dest "main.py")) {
 } elseif ($git) {
     Say "Cloning the repository with git"
     & cmd /c "git clone --quiet `"$Repo`" `"$Dest`" 2>&1"
-    if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $Dest "main.py"))) { Fail "git clone failed. Check your internet connection and run the setup again." }
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $Dest "main.py"))) { Fail "git clone failed. The repository is private: accept the GitHub invitation and sign in when git asks, check the internet connection, then run the setup again. Or download the ZIP from GitHub, extract it and run setup.bat from that folder." }
 } else {
-    Say "git is not installed - downloading the project as a zip instead"
+    Say "git is not installed - downloading the project as a zip instead (a private repository needs a sign-in; if this fails, download the ZIP from the GitHub page and run setup.bat from the extracted folder)"
     $tmp = Join-Path $env:TEMP "pyrov_download"
     if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
     New-Item -ItemType Directory -Path $tmp | Out-Null
