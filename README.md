@@ -74,10 +74,15 @@ and the same code runs unchanged in a cave, on Mars and under water.
 
 ## Quick start
 
-**Windows:** download [`setup.bat`](https://raw.githubusercontent.com/buggYateer/robotics-project/main/setup.bat)
-(right-click, *Save link as*) and run it. It installs Python if needed, downloads
-the project, installs the dependencies, creates a desktop shortcut and starts
-the program. Run it again to update.
+**Windows, no tools needed:** on the repository page click **Code**, then
+**Download ZIP**. Extract the folder anywhere short (for example `C:\PyRov`)
+and double-click `setup.bat` inside it. It installs Python if needed, creates
+the virtual environment, installs the dependencies, puts a PyRov shortcut on the
+desktop and starts the program. Run it again later to update the dependencies
+(a copy cloned with git is also pulled to the latest version).
+
+The repository is private: accept the collaborator invitation first, and sign
+in to GitHub if git asks when cloning.
 
 **Any platform:**
 
