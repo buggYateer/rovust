@@ -2,7 +2,7 @@
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">RESULTS · EXPLORATION STRATEGIES · 90 RUNS</p>
 <h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">The hypothesis was half right — and the AI explorer won everywhere</h2>
 <div style="display:flex;gap:32px;align-items:start">
-<div style="width:760px;display:flex;flex-direction:column;gap:14px">
+<div style="width:760px;flex:none;display:flex;flex-direction:column;gap:14px">
 <table style="font-size:27px;color:#e6edf3">
 <tr style="background:#1b232a"><th style="width:31%;color:#92a1af">Coverage at 400 s</th><th style="width:23%;color:#92a1af">Cave</th><th style="width:23%;color:#92a1af">Mars</th><th style="width:23%;color:#92a1af">Underwater</th></tr>
 <tr><td style="color:#f5a524"><b>Utility (AI)</b></td><td><b>96 %</b></td><td><b>84 %</b></td><td><b>97 %</b></td></tr>
@@ -11,13 +11,15 @@
 <tr style="background:#161d23"><td style="color:#92a1af">Backtracking events (DFS)</td><td style="color:#92a1af">135</td><td style="color:#92a1af">26</td><td style="color:#92a1af">42</td></tr>
 <tr><td style="color:#92a1af">Rovers lost to pits</td><td style="color:#92a1af">0 / 30</td><td style="color:#92a1af">0 / 30</td><td style="color:#92a1af">0 / 30</td></tr>
 </table>
-<ul style="font-size:25px;line-height:1.5;color:#bfd0d8;padding:0 24px 0 0">
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px">
+<img src="../figures/strategies_coverage.png" alt="Coverage over time for the three strategies in the three environments, mean and standard deviation over ten seeds" style="width:872px;height:218px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
+<ul style="font-size:25px;line-height:1.5;color:#bfd0d8;padding:0 0 0 28px">
 <li><b>Confirmed:</b> DFS with backtracking is strong in the cave — corridors funnel the search.</li>
 <li><b>Refuted:</b> plain nearest-frontier is the weakest strategy even in open terrain: it chases tiny frontiers near rocks and revisits the same region.</li>
 <li><b>Found:</b> the utility explorer — information gain over terrain-weighted cost — leads in all three worlds, with no backtracking.</li>
 </ul>
 </div>
-<img src="../figures/strategies_coverage.png" alt="Coverage over time for the three strategies in the three environments, mean and standard deviation over ten seeds" style="width:872px;height:218px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
 </div>
 <p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Results · 3 environments × 3 strategies × 10 seeds, 400 s each — mean values</p>
 <aside>Here is the hypothesis test. The proposal predicted DFS in corridors and nearest-frontier in the open. DFS did win the cave among the two classical methods. But nearest-frontier was the weakest everywhere — greedy on distance, it chases crumbs. The utility explorer, which weighs how much it expects to learn against how much the path costs, came first in all three worlds. And no rover fell into a pit in ninety runs — the cliff layer works.</aside>
