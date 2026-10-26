@@ -5,11 +5,12 @@ from collections import deque
 
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QFont, QIcon, QImage, QPainter, QPen, QPixmap
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
                                QFrame, QGroupBox, QHBoxLayout, QHeaderView, QLabel, QProgressBar, QPushButton,
-                               QSizePolicy, QSpinBox, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+                               QApplication, QSizePolicy, QSpinBox, QTableWidget, QTableWidgetItem, QToolButton,
+                               QToolTip, QVBoxLayout, QWidget)
 
 
 class NoWheel(QObject):
@@ -33,6 +34,25 @@ from ..sensors.base import FAULT_MODES
 from .. import meta as T
 
 ENV_ORDER = ["cave", "mars", "underwater"]
+
+
+
+def copy_icon(color: str = "#92a1af", size: int = 16) -> QIcon:
+    """Two overlapping rounded squares: the usual "copy" glyph, drawn so it
+    matches both themes without an image file."""
+    pm = QPixmap(size * 2, size * 2)
+    pm.setDevicePixelRatio(2)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    pen = QPen(QColor(color))
+    pen.setWidthF(1.4)
+    p.setPen(pen)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawRoundedRect(QRectF(5.5, 5.5, 8.5, 8.5), 1.5, 1.5)
+    p.drawRoundedRect(QRectF(2.0, 2.0, 8.5, 8.5), 1.5, 1.5)
+    p.end()
+    return QIcon(pm)
 
 
 class SetupPanel(QWidget):
@@ -125,11 +145,29 @@ class SetupPanel(QWidget):
         self.server_btn.setObjectName("secondary")
         self.server_btn.setMinimumHeight(36)
         f.addWidget(self.server_btn)
-        self.server_url = QLabel("")
-        self.server_url.setWordWrap(True)
-        self.server_url.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.server_url.setStyleSheet("color: #2a9d8f; font-weight: 600;")
-        f.addWidget(self.server_url)
+        self.server_msg = QLabel("")
+        self.server_msg.setWordWrap(True)
+        self.server_msg.setObjectName("hint")
+        self.server_msg.setVisible(False)
+        f.addWidget(self.server_msg)
+        url_row = QHBoxLayout()
+        url_row.setContentsMargins(0, 0, 0, 0)
+        url_row.setSpacing(6)
+        self.server_link = QLabel("")
+        self.server_link.setOpenExternalLinks(True)          # click: opens the console in this computer's browser
+        self.server_link.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        self.server_link.setToolTip("Click to open the console here; type it on the phone or tablet")
+        url_row.addWidget(self.server_link, 1)
+        self.copy_btn = QToolButton()
+        self.copy_btn.setIcon(copy_icon())
+        self.copy_btn.setAutoRaise(True)
+        self.copy_btn.setToolTip("Copy the address")
+        self.copy_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.copy_btn.clicked.connect(self._copy_url)
+        url_row.addWidget(self.copy_btn, 0)
+        f.addLayout(url_row)
+        self._console_url = ""
+        self.show_console_url(None)
         hint = QLabel("Keyboard: arrow keys or W A S D drive the rover in assisted / manual mode.")
         hint.setWordWrap(True)
         hint.setObjectName("hint")
@@ -158,6 +196,29 @@ class SetupPanel(QWidget):
     def config(self):
         return dict(env=self.env.currentData(), strategy=self.strategy.currentData(),
                     localisation=self.loc.currentData(), ai=self.ai.isChecked(), seed=self.seed.value())
+
+
+    def show_console_url(self, url: str | None, error: str | None = None):
+        """Show the console address as a clickable link with a copy button,
+        an error message, or nothing."""
+        self._console_url = url or ""
+        if url:
+            self.server_msg.setText("On the phone or tablet (same Wi-Fi) open:")
+            self.server_link.setText(f'<a href="{url}" style="color:#2a9d8f;font-weight:600;text-decoration:none">{url}</a>')
+        elif error:
+            self.server_msg.setText(error)
+            self.server_link.setText("")
+        else:
+            self.server_msg.setText("")
+            self.server_link.setText("")
+        self.server_msg.setVisible(bool(url or error))
+        self.server_link.setVisible(bool(url))
+        self.copy_btn.setVisible(bool(url))
+
+    def _copy_url(self):
+        if self._console_url:
+            QApplication.clipboard().setText(self._console_url)
+            QToolTip.showText(self.copy_btn.mapToGlobal(self.copy_btn.rect().bottomLeft()), "Copied", self.copy_btn, self.copy_btn.rect(), 1500)
 
 
 class SensorsTab(QWidget):

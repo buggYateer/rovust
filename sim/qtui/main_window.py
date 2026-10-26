@@ -409,17 +409,17 @@ class MainWindow(QMainWindow):
             try:
                 self.server = ConsoleServer(lambda: self.mission, port=8080)
                 self.server.start()
-                self.setup.server_url.setText(f"On the phone or tablet (same Wi-Fi) open:\n{self.server.url}")
+                self.setup.show_console_url(self.server.url)
                 self.setup.server_btn.setText("Close console")
                 self.tabs.setCurrentWidget(self.radio_tab)
             except OSError as e:
-                self.setup.server_url.setText(f"Could not start the console: {e}")
+                self.setup.show_console_url(None, f"Could not start the console: {e}")
                 self.setup.server_btn.setChecked(False)
         else:
             if self.server is not None:
                 self.server.stop()
                 self.server = None
-            self.setup.server_url.setText("")
+            self.setup.show_console_url(None)
             self.setup.server_btn.setText("Open console for phone / tablet")
         self.setFocus()
 
