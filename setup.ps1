@@ -126,18 +126,21 @@ try {
     $pythonw = Join-Path $Dest ".venv\Scripts\pythonw.exe"
     $icon = Join-Path $Dest "assets\icon.ico"
     $shell = New-Object -ComObject WScript.Shell
-    $lnk = $shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath("Desktop")) "PyRov.lnk"))
-    $lnk.TargetPath = $pythonw
-    $lnk.Arguments = "main.py"
-    $lnk.WorkingDirectory = $Dest
-    if (Test-Path $icon) { $lnk.IconLocation = $icon }
-    $lnk.Description = "PyRov - exploration rover simulator"
-    $lnk.Save()
-    Say "Shortcut 'PyRov' placed on the desktop"
-} catch { Write-Host "(could not create the desktop shortcut: $_)" }
+    # one on the desktop and one inside the project folder (instead of run.bat)
+    foreach ($where in @([Environment]::GetFolderPath("Desktop"), $Dest)) {
+        $lnk = $shell.CreateShortcut((Join-Path $where "PyRov.lnk"))
+        $lnk.TargetPath = $pythonw
+        $lnk.Arguments = "main.py"
+        $lnk.WorkingDirectory = $Dest
+        if (Test-Path $icon) { $lnk.IconLocation = $icon }
+        $lnk.Description = "PyRov - exploration rover simulator"
+        $lnk.Save()
+    }
+    Say "Shortcut 'PyRov' placed on the desktop and in the project folder"
+} catch { Write-Host "(could not create the shortcuts: $_)" }
 
 # ------------------------------------------------------------------ run
 Say "Starting PyRov"
-Write-Host "  Next time: double-click the PyRov shortcut on the desktop, or run.bat in $Dest"
+Write-Host "  Next time: double-click the PyRov shortcut on the desktop or in $Dest"
 Write-Host ""
 Start-Process -FilePath $venvPy -ArgumentList "main.py" -WorkingDirectory $Dest
