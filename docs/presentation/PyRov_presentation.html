@@ -169,11 +169,11 @@ kbd{background:#1b232a;border:1px solid #2f3b46;border-radius:4px;padding:1px 6p
 <g fill="#22c55e"><circle cx="244" cy="130" r="9"/><circle cx="396" cy="130" r="9"/><circle cx="210" cy="270" r="9"/><circle cx="430" cy="270" r="9"/><circle cx="244" cy="410" r="9"/><circle cx="396" cy="410" r="9"/></g>
 <path d="M300 20 L320 2 L340 20 Z" fill="#92a1af"/>
 </svg>
-<div style="flex:1;display:flex;flex-direction:column;gap:14px">
-<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#2dd4bf;font-weight:600;white-space:nowrap">Sonar ring</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">at bumper height, 45° apart, so no part of the body shadows a cone.</p></div>
-<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#ef4444;font-weight:600;white-space:nowrap">IR beams</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">three, all forward, spread across the body: anything the body will hit is in a beam. Recessed 6 cm — below that the IR curve folds back.</p></div>
-<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#22c55e;font-weight:600;white-space:nowrap">Cliff switches</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">front pair ahead of the wheels; rear pair because every escape manoeuvre reverses; side pair because the body brushes pits while turning. Each missing pair cost us a rover in testing.</p></div>
-<div style="display:flex;gap:16px;align-items:start"><p style="font-size:26px;color:#f5a524;font-weight:600;white-space:nowrap">Centre</p><p style="font-size:26px;line-height:1.4;color:#bfd0d8">gyro and accelerometer at the centre of mass; compass on top away from the motors; camera at the front tilted 15° down; optical flow underneath.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;gap:16px;align-items:start"><p style="width:200px;flex:none;font-size:26px;line-height:1.4;color:#2dd4bf;font-weight:600">Sonar ring</p><p style="flex:1;font-size:26px;line-height:1.4;color:#bfd0d8">at bumper height, 45° apart, so no part of the body shadows a cone.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="width:200px;flex:none;font-size:26px;line-height:1.4;color:#ef4444;font-weight:600">IR beams</p><p style="flex:1;font-size:26px;line-height:1.4;color:#bfd0d8">three, all forward, spread across the body: anything the body will hit is in a beam. Recessed 6 cm — below that the IR curve folds back.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="width:200px;flex:none;font-size:26px;line-height:1.4;color:#22c55e;font-weight:600">Cliff switches</p><p style="flex:1;font-size:26px;line-height:1.4;color:#bfd0d8">front pair ahead of the wheels; rear pair because every escape manoeuvre reverses; side pair because the body brushes pits while turning. Each missing pair cost us a rover in testing.</p></div>
+<div style="display:flex;gap:16px;align-items:start"><p style="width:200px;flex:none;font-size:26px;line-height:1.4;color:#f5a524;font-weight:600">Centre</p><p style="flex:1;font-size:26px;line-height:1.4;color:#bfd0d8">gyro and accelerometer at the centre of mass; compass on top away from the motors; camera at the front tilted 15° down; optical flow underneath.</p></div>
 </div>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Analysis · Sensor placement</p>
@@ -499,7 +499,7 @@ kbd{background:#1b232a;border:1px solid #2f3b46;border-radius:4px;padding:1px 6p
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">RESULTS · EXPLORATION STRATEGIES · 90 RUNS</p>
 <h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">The hypothesis was half right — and the AI explorer won everywhere</h2>
 <div style="display:flex;gap:32px;align-items:start">
-<div style="width:760px;display:flex;flex-direction:column;gap:14px">
+<div style="width:760px;flex:none;display:flex;flex-direction:column;gap:14px">
 <table style="font-size:27px;color:#e6edf3">
 <tr style="background:#1b232a"><th style="width:31%;color:#92a1af">Coverage at 400 s</th><th style="width:23%;color:#92a1af">Cave</th><th style="width:23%;color:#92a1af">Mars</th><th style="width:23%;color:#92a1af">Underwater</th></tr>
 <tr><td style="color:#f5a524"><b>Utility (AI)</b></td><td><b>96 %</b></td><td><b>84 %</b></td><td><b>97 %</b></td></tr>
@@ -508,13 +508,15 @@ kbd{background:#1b232a;border:1px solid #2f3b46;border-radius:4px;padding:1px 6p
 <tr style="background:#161d23"><td style="color:#92a1af">Backtracking events (DFS)</td><td style="color:#92a1af">135</td><td style="color:#92a1af">26</td><td style="color:#92a1af">42</td></tr>
 <tr><td style="color:#92a1af">Rovers lost to pits</td><td style="color:#92a1af">0 / 30</td><td style="color:#92a1af">0 / 30</td><td style="color:#92a1af">0 / 30</td></tr>
 </table>
-<ul style="font-size:25px;line-height:1.5;color:#bfd0d8;padding:0 24px 0 0">
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px">
+<img src="../figures/strategies_coverage.png" alt="Coverage over time for the three strategies in the three environments, mean and standard deviation over ten seeds" style="width:872px;height:218px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
+<ul style="font-size:25px;line-height:1.5;color:#bfd0d8;padding:0 0 0 28px">
 <li><b>Confirmed:</b> DFS with backtracking is strong in the cave — corridors funnel the search.</li>
 <li><b>Refuted:</b> plain nearest-frontier is the weakest strategy even in open terrain: it chases tiny frontiers near rocks and revisits the same region.</li>
 <li><b>Found:</b> the utility explorer — information gain over terrain-weighted cost — leads in all three worlds, with no backtracking.</li>
 </ul>
 </div>
-<img src="../figures/strategies_coverage.png" alt="Coverage over time for the three strategies in the three environments, mean and standard deviation over ten seeds" style="width:872px;height:218px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
 </div>
 <p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Results · 3 environments × 3 strategies × 10 seeds, 400 s each — mean values</p>
 <aside>Here is the hypothesis test. The proposal predicted DFS in corridors and nearest-frontier in the open. DFS did win the cave among the two classical methods. But nearest-frontier was the weakest everywhere — greedy on distance, it chases crumbs. The utility explorer, which weighs how much it expects to learn against how much the path costs, came first in all three worlds. And no rover fell into a pit in ninety runs — the cliff layer works.</aside>
@@ -524,7 +526,7 @@ kbd{background:#1b232a;border:1px solid #2f3b46;border-radius:4px;padding:1px 6p
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">RESULTS · LOCALISATION · 54 RUNS</p>
 <h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Fused localisation is as good as knowing the truth</h2>
 <div style="display:flex;gap:32px;align-items:start">
-<div style="width:700px;display:flex;flex-direction:column;gap:14px">
+<div style="width:700px;flex:none;display:flex;flex-direction:column;gap:14px">
 <table style="font-size:27px;color:#e6edf3">
 <tr style="background:#11161b"><th style="width:34%;color:#92a1af">Estimate used</th><th style="width:22%;color:#92a1af">Cave</th><th style="width:22%;color:#92a1af">Mars</th><th style="width:22%;color:#92a1af">Underwater</th></tr>
 <tr><td>Encoders only — error</td><td style="color:#f87171">2.4 m</td><td style="color:#f87171">3.7 m</td><td style="color:#f87171">5.5 m</td></tr>
@@ -533,10 +535,10 @@ kbd{background:#1b232a;border:1px solid #2f3b46;border-radius:4px;padding:1px 6p
 <tr style="background:#161d23"><td>Coverage, fused</td><td>87 %</td><td>71 %</td><td>87 %</td></tr>
 <tr><td>Coverage, perfect pose</td><td>82 %</td><td>62 %</td><td>87 %</td></tr>
 </table>
-<p style="font-size:25px;line-height:1.5;color:#bfd0d8">Dead reckoning alone drifts by metres in five minutes — the lecture’s warning, measured. The fused estimate stays within centimetres, and the robot using it explores as well as one that knows its true position: the differences are inside one standard deviation. In the cave the cost of drift is brutal: walls duplicate, the planner finds no way through, coverage halves.</p>
 </div>
-<img src="../figures/localisation_summary.png" alt="Bar charts comparing fused, encoders-only and perfect localisation on coverage, path, backtracking, bumps, error and energy" style="width:932px;height:524px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
+<img src="../figures/localisation_summary.png" alt="Bar charts comparing fused, encoders-only and perfect localisation on coverage, path, backtracking, bumps, error and energy" style="width:782px;height:440px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#fbfbf8">
 </div>
+<p style="font-size:25px;line-height:1.5;color:#bfd0d8">Dead reckoning alone drifts by metres within five minutes: the lecture’s warning, measured. The fused estimate stays within centimetres, and the robot using it explores as well as one that knows its true position (the differences are inside one standard deviation). In the cave the cost of drift is brutal: walls duplicate, the planner finds no way through, coverage halves.</p>
 <p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Results · DFS strategy, 6 seeds per case, 300 s — mean position error over the run</p>
 <aside>Localisation in numbers. Encoders alone: two to five metres of error in five minutes — slip in mud and sand, thrusters that never touch the ground. The fused estimate: four to seventeen centimetres. And the important finding: the rover with the fused estimate explores as well as a rover that knows its true position, so the remaining error no longer limits the mission.</aside>
 </section>
