@@ -1,6 +1,6 @@
 """Project constants shared by the desktop interface, the console and the reports."""
 
-ROVER_NAME = "PyRov"           # the rover's name, shown in window titles and the console
+ROVER_NAME = "Rovust"           # the rover's name, shown in window titles and the console
 PROJECT_TITLE = "Multi-Environment Autonomous Exploration Rover"
 PROJECT_SUB = "A Python-based simulation - from motor control to mapping"
 COURSE = "Robotics - Team Project"

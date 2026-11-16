@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/icon.png" alt="PyRov" width="110">
+  <img src="assets/icon.png" alt="Rovust" width="110">
 </p>
 
-<h1 align="center">PyRov</h1>
+<h1 align="center">Rovust</h1>
 <p align="center"><b>Multi-Environment Autonomous Exploration Rover</b><br>
 A Python simulation of an exploration rover, from motor control to mapping and decision making.</p>
 
@@ -14,10 +14,10 @@ A Python simulation of an exploration rover, from motor control to mapping and d
 </p>
 
 <p align="center">
-  <img src="docs/media/demo.gif" alt="PyRov exploring a cave: the true world on the left, the map the rover builds on the right" width="860">
+  <img src="docs/media/demo.gif" alt="Rovust exploring a cave: the true world on the left, the map the rover builds on the right" width="860">
 </p>
 
-PyRov is dropped into a place it has never seen, with no map and no GPS, and has
+Rovust is dropped into a place it has never seen, with no map and no GPS, and has
 to explore it on its own: drive, sense, avoid walls and pits, build a map, decide
 where to go next and return before the battery runs out. The robot is simulated
 from the actuator level up (DC motors, PWM, encoders, PID, a full sensor suite),
@@ -75,9 +75,9 @@ and the same code runs unchanged in a cave, on Mars and under water.
 ## Quick start
 
 **Windows, no tools needed:** on the repository page click **Code**, then
-**Download ZIP**. Extract the folder anywhere short (for example `C:\PyRov`)
+**Download ZIP**. Extract the folder anywhere short (for example `C:\Rovust`)
 and double-click `setup.bat` inside it. It installs Python if needed, creates
-the virtual environment, installs the dependencies, puts a PyRov shortcut on the
+the virtual environment, installs the dependencies, puts a Rovust shortcut on the
 desktop and in the project folder, and starts the program. Run it again later to update the dependencies
 (a copy cloned with git is also pulled to the latest version).
 
@@ -109,7 +109,7 @@ uploaded to the team's Drive folder when the bridge is configured
 
 ## Course mapping
 
-| Course topic | In PyRov |
+| Course topic | In Rovust |
 |---|---|
 | Actuators, PWM, H-bridge | `sim/robot/motor.py`: non-linear duty to speed, load, calibration table |
 | Encoders, A/D conversion | `sim/robot/encoder.py`, `sim/sensors/base.py`: 2-phase encoder, 10-bit ADC |
@@ -148,7 +148,7 @@ python -m sim.experiments.run_batch --ablation      # one sensor off at a time
 
 | | |
 |---|---|
-| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/PyRov_presentation.pptx) · [PDF](docs/presentation/PyRov_presentation.pdf) · [web viewer](docs/presentation/PyRov_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) |
+| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) |
 | Proposal | [docs/Task1_v2.md](docs/Task1_v2.md) |
 | Design notes | [docs/DESIGN.md](docs/DESIGN.md): architecture, sensor placement and its justification, lessons learned |
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |

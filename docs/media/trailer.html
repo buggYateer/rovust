@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PyRov — trailer</title>
+<title>Rovust — trailer</title>
 <link rel="icon" href="../../assets/icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -135,8 +135,8 @@ h2{font-size:72px}
 </section>
 
 <section class="scene" id="s2">
-  <img class="r" src="../../assets/icon.png" alt="PyRov icon">
-  <h1 class="r d1">PyRov</h1>
+  <img class="r" src="../../assets/icon.png" alt="Rovust icon">
+  <h1 class="r d1">Rovust</h1>
   <p class="lead r d2" style="text-align:center">An exploration rover, built in Python<br>from the motors up.</p>
   <div class="chain r d3"><span class="b">PWM</span><span class="a">→</span><span class="b">DC motor</span><span class="a">→</span><span class="b">encoder</span><span class="a">→</span><span class="b">PID</span><span class="a">→</span><span class="b">sensors</span><span class="a">→</span><span class="b">map</span><span class="a">→</span><span class="b">decision</span></div>
 </section>
@@ -206,7 +206,7 @@ h2{font-size:72px}
 </section>
 
 <section class="scene" id="s8">
-  <div class="logo r"><img src="../../assets/icon.png" alt=""><h1 style="font-size:120px">PyRov</h1></div>
+  <div class="logo r"><img src="../../assets/icon.png" alt=""><h1 style="font-size:120px">Rovust</h1></div>
   <p class="lead r d1" style="text-align:center">Multi-Environment Autonomous Exploration Rover</p>
   <div class="team r d2">
     <span>Ahmed Hamed Mohamed</span><span>Aml Hesham Hosny</span><span>Tassneem Amin Gamil</span>
@@ -220,7 +220,7 @@ h2{font-size:72px}
 <div id="ctrl"><button id="bcap">Captions</button><button id="breplay">Replay</button><button id="bfull">Fullscreen</button></div>
 
 <div id="overlay">
-  <h1>PyRov</h1>
+  <h1>Rovust</h1>
   <p>A 75-second trailer with an English voice-over spoken by your browser. Sound starts when you press play.</p>
   <button class="play" id="play">&#9654; Play trailer</button>
   <div class="opts"><label>Voice <select id="voice"></select></label><label><input type="checkbox" id="mute"> captions only</label></div>
@@ -231,14 +231,14 @@ h2{font-size:72px}
 <script>
 const SCRIPT = [
   {id:'s1', text:"Somewhere no human can drive. No map. No GPS. No signal. A rover has to find its own way.", min:7},
-  {id:'s2', text:"Meet PyRov: an exploration rover built in Python, from the motors up. PWM, DC motors, encoders, PID control. Then the sensors. Then the map. Then the decision.", min:10},
+  {id:'s2', text:"Meet Rovust: an exploration rover built in Python, from the motors up. PWM, DC motors, encoders, PID control. Then the sensors. Then the map. Then the decision.", min:10},
   {id:'s3', text:"Twenty sensors, and each one is placed for a reason. Eight sonars around the body. Infrared beams facing forward. Six cliff switches, so it never backs into a crater. A gyro, a compass, and a camera that learns the terrain.", min:12},
   {id:'s4', text:"Three worlds, one brain. A dark cave. The surface of Mars. A flooded site under water. The same robot, only the configuration changes.", min:10},
   {id:'s5', text:"It builds its own map as it goes, and decides where to look next. On the left, the true cave it never sees. On the right, what it believes.", min:10},
-  {id:'s6', text:"Drive it from your phone over a simulated radio link. Go deep into the cave, and the signal fades. The link is lost. Three seconds later, PyRov takes over, and finds its own way home.", min:13,
+  {id:'s6', text:"Drive it from your phone over a simulated radio link. Go deep into the cave, and the signal fades. The link is lost. Three seconds later, Rovust takes over, and finds its own way home.", min:13,
    cues:[[0.45,'lost',"Link lost. The console tells you. The rover waits three seconds…"],[0.75,'home',"…then drives itself back into range."]]},
   {id:'s7', text:"Measured, not assumed. Two hundred and sixty-four runs. Ninety-seven percent of the reachable area mapped. Localisation to a few centimetres, where encoders alone drift by metres.", min:11},
-  {id:'s8', text:"PyRov. A team project for the Robotics course, Faculty of Engineering, Computer and Systems Department.", min:8},
+  {id:'s8', text:"Rovust. A team project for the Robotics course, Faculty of Engineering, Computer and Systems Department.", min:8},
 ];
 const scenes = Object.fromEntries([...document.querySelectorAll('.scene')].map(s=>[s.id,s]));
 const screen = document.getElementById('screen'), overlay=document.getElementById('overlay');

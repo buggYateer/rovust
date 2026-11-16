@@ -1,10 +1,10 @@
-# PyRov one-click setup for Windows.
+# Rovust one-click setup for Windows.
 #
 #   Double-click setup.bat (next to this file), or run in PowerShell:
 #       powershell -ExecutionPolicy Bypass -File setup.ps1
 #
 # What it does: finds (or installs) Python, creates a virtual environment,
-# installs the dependencies, puts a PyRov shortcut on the desktop and starts the
+# installs the dependencies, puts a Rovust shortcut on the desktop and starts the
 # program. Run from inside an extracted copy of the project (Code > Download ZIP
 # on GitHub) it sets that folder up in place; run from elsewhere it clones the
 # repository into a folder you choose (the repository is private, so git may ask
@@ -23,7 +23,7 @@ function Say($msg) { Write-Host ""; Write-Host "==> $msg" -ForegroundColor Cyan 
 function Fail($msg) { Write-Host ""; Write-Host "!! $msg" -ForegroundColor Red; Read-Host "Press Enter to close"; exit 1 }
 
 Write-Host ""
-Write-Host "  PyRov - Multi-Environment Exploration Rover" -ForegroundColor Yellow
+Write-Host "  Rovust - Multi-Environment Exploration Rover" -ForegroundColor Yellow
 Write-Host "  Robotics team project setup" -ForegroundColor Yellow
 Write-Host ""
 
@@ -33,14 +33,14 @@ if (-not $Dest -and $PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "main
     $Dest = $PSScriptRoot
 }
 if (-not $Dest) {
-    $default = Join-Path $env:USERPROFILE "PyRov"
+    $default = Join-Path $env:USERPROFILE "Rovust"
     $answer = Read-Host "Where should the project live? [Enter = $default]"
     $Dest = if ($answer) { $answer } else { $default }
 }
 $Dest = [System.IO.Path]::GetFullPath($Dest)
 if ($Dest.Length -gt 70) {
     # Windows limits paths to 260 characters and the Qt package has very deep folders
-    Fail "That folder path is too long ($($Dest.Length) characters). Please choose a short one such as C:\Users\$env:USERNAME\PyRov and run the setup again."
+    Fail "That folder path is too long ($($Dest.Length) characters). Please choose a short one such as C:\Users\$env:USERNAME\Rovust and run the setup again."
 }
 Say "Project folder: $Dest"
 
@@ -84,7 +84,7 @@ if (Test-Path (Join-Path $Dest "main.py")) {
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $Dest "main.py"))) { Fail "git clone failed. The repository is private: accept the GitHub invitation and sign in when git asks, check the internet connection, then run the setup again. Or download the ZIP from GitHub, extract it and run setup.bat from that folder." }
 } else {
     Say "git is not installed - downloading the project as a zip instead (a private repository needs a sign-in; if this fails, download the ZIP from the GitHub page and run setup.bat from the extracted folder)"
-    $tmp = Join-Path $env:TEMP "pyrov_download"
+    $tmp = Join-Path $env:TEMP "rovust_download"
     if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
     New-Item -ItemType Directory -Path $tmp | Out-Null
     $zipPath = Join-Path $tmp "main.zip"
@@ -128,19 +128,19 @@ try {
     $shell = New-Object -ComObject WScript.Shell
     # one on the desktop and one inside the project folder (instead of run.bat)
     foreach ($where in @([Environment]::GetFolderPath("Desktop"), $Dest)) {
-        $lnk = $shell.CreateShortcut((Join-Path $where "PyRov.lnk"))
+        $lnk = $shell.CreateShortcut((Join-Path $where "Rovust.lnk"))
         $lnk.TargetPath = $pythonw
         $lnk.Arguments = "main.py"
         $lnk.WorkingDirectory = $Dest
         if (Test-Path $icon) { $lnk.IconLocation = $icon }
-        $lnk.Description = "PyRov - exploration rover simulator"
+        $lnk.Description = "Rovust - exploration rover simulator"
         $lnk.Save()
     }
-    Say "Shortcut 'PyRov' placed on the desktop and in the project folder"
+    Say "Shortcut 'Rovust' placed on the desktop and in the project folder"
 } catch { Write-Host "(could not create the shortcuts: $_)" }
 
 # ------------------------------------------------------------------ run
-Say "Starting PyRov"
-Write-Host "  Next time: double-click the PyRov shortcut on the desktop or in $Dest"
+Say "Starting Rovust"
+Write-Host "  Next time: double-click the Rovust shortcut on the desktop or in $Dest"
 Write-Host ""
 Start-Process -FilePath $venvPy -ArgumentList "main.py" -WorkingDirectory $Dest

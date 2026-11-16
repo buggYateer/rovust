@@ -20,6 +20,6 @@
 <div style="background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:30px;color:#f5a524">Manual mode</h3><p style="font-size:25px;line-height:1.45;color:#bfd0d8">Layers 4–8 are switched off on purpose, to show what they were doing. Yes, you can drive into a crater.</p></div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Design · behaviors.py</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Design · behaviors.py</p>
 <aside>Behaviour is organised as a subsumption architecture, straight from the Robot Behaviour lecture. Ten layers; the highest one that wants control wins. The reflexes are on top — stop, escape, cliff, slope — then avoidance, then the operator, then return-home, then exploration. The avoidance layer is itself an on-off controller with a hysteresis band, which is the Control lecture applied to behaviour. And the manual driving mode exists to demonstrate the layers by switching them off.</aside>
 </section>
