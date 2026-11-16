@@ -2,7 +2,7 @@
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">INTRODUCTION</p>
 <h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1.1">Every course topic is a working layer of the rover</h2>
 <table style="font-size:27px;color:#e6edf3">
-<tr style="background:#11161b"><th style="width:28%;color:#92a1af">Course topic</th><th style="width:52%;color:#92a1af">What PyRov does</th><th style="width:20%;color:#92a1af">Module</th></tr>
+<tr style="background:#11161b"><th style="width:28%;color:#92a1af">Course topic</th><th style="width:52%;color:#92a1af">What Rovust does</th><th style="width:20%;color:#92a1af">Module</th></tr>
 <tr><td>Actuators · PWM · H-bridge</td><td>Two DC motors, non-linear duty → speed, load, calibration table</td><td style="font-family:'JetBrains Mono', monospace">robot/motor.py</td></tr>
 <tr style="background:#161d23"><td>Encoders · A/D</td><td>480-tick incremental encoders, 10-bit ADC on every analog sensor</td><td style="font-family:'JetBrains Mono', monospace">encoder.py · sensors/base.py</td></tr>
 <tr><td>Control</td><td>Discrete PID per wheel, driving-straight controller, on-off and hysteresis</td><td style="font-family:'JetBrains Mono', monospace">robot/control.py</td></tr>
@@ -11,6 +11,6 @@
 <tr style="background:#161d23"><td>Navigation</td><td>Dead reckoning + fusion, log-odds occupancy grid, A*, frontier / DFS exploration</td><td style="font-family:'JetBrains Mono', monospace">estimation · mapping · planning</td></tr>
 <tr><td>Communication</td><td>Radio link model with range, walls, latency and loss; phone console</td><td style="font-family:'JetBrains Mono', monospace">comms.py · teleop/</td></tr>
 </table>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Introduction</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Introduction</p>
 <aside>This table is our map of the course. Each row is a lecture — actuators, encoders, control, sensors, behaviour, navigation, communication — and each is implemented as a module that the others depend on. We will go through them in that order: first the analysis of the hardware we simulate, then the design of the software on top, then the measurements.</aside>
 </section>

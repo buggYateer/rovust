@@ -1,5 +1,5 @@
 @echo off
-rem Starts PyRov. Creates the environment on first use.
+rem Starts Rovust. Creates the environment on first use.
 setlocal
 cd /d "%~dp0"
 if not exist ".venv\Scripts\python.exe" (

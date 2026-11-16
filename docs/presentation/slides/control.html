@@ -12,6 +12,6 @@
 <p style="font-size:24px;color:#92a1af;line-height:1.4">On-off chatters, hysteresis widens the swing, P settles 2 rad/s short of the 6 rad/s target, PI and PID remove the error and recover from a 50 % load step at t = 3 s in under a second.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Analysis · Control — sim/robot/control.py, drive.py, experiments/pid_demo.py</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Analysis · Control — sim/robot/control.py, drive.py, experiments/pid_demo.py</p>
 <aside>This is the Control lecture running. We implemented on-off, on-off with hysteresis, and the incremental PID exactly as derived in class, and the plot shows the textbook behaviour: the P controller keeps a steady-state error because its output goes to zero when the error does, and the integral term removes it. The straight-driving controller is the structure from figure 5.16: integrate the position difference of the two wheels and feed it back. In the application you can watch this loop live in the Motor control tab.</aside>
 </section>

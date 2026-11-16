@@ -1,24 +1,24 @@
-# PyRov — Multi-Environment Autonomous Exploration Rover — speaker notes
+# Rovust — Multi-Environment Autonomous Exploration Rover — speaker notes
 
 English notes first, then the same note in Egyptian Arabic. One entry per slide, in deck order.
 
-## 1. PyRov
+## 1. Rovust
 
-Good morning. We are the PyRov team. PyRov is an exploration rover that we built as a Python simulation — not from the map downwards, but from the motors upwards: DC motors, encoders, PID, a full sensor suite, and only then mapping and decision making. The same robot explores a cave, the surface of Mars and an underwater site. In the next twenty minutes we will show what we built, why every sensor sits where it sits, and what we measured.
+Good morning. We are the Rovust team. Rovust is an exploration rover that we built as a Python simulation — not from the map downwards, but from the motors upwards: DC motors, encoders, PID, a full sensor suite, and only then mapping and decision making. The same robot explores a cave, the surface of Mars and an underwater site. In the next twenty minutes we will show what we built, why every sensor sits where it sits, and what we measured.
 
 <div dir="rtl" align="right">
 
-صباح الخير. إحنا فريق PyRov. ‏PyRov روفر استكشاف بنيناه كمحاكاة بالبايثون، بس مش من الخريطة ونازلين، لأ، من المواتير وطالعين: مواتير DC، إنكودرز، PID، طقم حساسات كامل، وبعد كده بس ييجي رسم الخريطة واتخاذ القرار. نفس الروبوت بيستكشف كهف، وسطح المريخ، وموقع تحت الميّه. في العشرين دقيقة الجايين هنوريكم بنينا إيه، وليه كل حساس متركّب في مكانه بالذات، وقيسنا إيه.
+صباح الخير. إحنا فريق Rovust. ‏Rovust روفر استكشاف بنيناه كمحاكاة بالبايثون، بس مش من الخريطة ونازلين، لأ، من المواتير وطالعين: مواتير DC، إنكودرز، PID، طقم حساسات كامل، وبعد كده بس ييجي رسم الخريطة واتخاذ القرار. نفس الروبوت بيستكشف كهف، وسطح المريخ، وموقع تحت الميّه. في العشرين دقيقة الجايين هنوريكم بنينا إيه، وليه كل حساس متركّب في مكانه بالذات، وقيسنا إيه.
 
 </div>
 
 ## 2. A rover that explores a place it has never seen — safely, on its own
 
-In one sentence: PyRov is a software rover that is dropped into an unknown place and has to explore it autonomously. The problem is real — Mars, collapsed mines, flooded caves — and simulation is the only safe and repeatable way to develop and compare the algorithms. The four numbers on the right summarise the project: three environments with one codebase, more than twenty modelled sensors, 264 measured runs, and up to 97 percent of the reachable area mapped.
+In one sentence: Rovust is a software rover that is dropped into an unknown place and has to explore it autonomously. The problem is real — Mars, collapsed mines, flooded caves — and simulation is the only safe and repeatable way to develop and compare the algorithms. The four numbers on the right summarise the project: three environments with one codebase, more than twenty modelled sensors, 264 measured runs, and up to 97 percent of the reachable area mapped.
 
 <div dir="rtl" align="right">
 
-في جملة واحدة: PyRov روفر سوفتوير بيتحط في مكان مجهول ولازم يستكشفه لوحده. المشكلة حقيقية، المريخ، المناجم المنهارة، الكهوف الغرقانة، والمحاكاة هي الطريقة الوحيدة الآمنة واللي تتكرر عشان نطوّر الخوارزميات ونقارن بينها. الأربع أرقام اللي على اليمين بتلخّص المشروع: تلات بيئات بكود واحد، أكتر من عشرين حساس متمودلين، 264 تجربة متقاسة، ولحد 97 في الميّه من المساحة اللي ينفع يوصلها اترسمت.
+في جملة واحدة: Rovust روفر سوفتوير بيتحط في مكان مجهول ولازم يستكشفه لوحده. المشكلة حقيقية، المريخ، المناجم المنهارة، الكهوف الغرقانة، والمحاكاة هي الطريقة الوحيدة الآمنة واللي تتكرر عشان نطوّر الخوارزميات ونقارن بينها. الأربع أرقام اللي على اليمين بتلخّص المشروع: تلات بيئات بكود واحد، أكتر من عشرين حساس متمودلين، 264 تجربة متقاسة، ولحد 97 في الميّه من المساحة اللي ينفع يوصلها اترسمت.
 
 </div>
 
@@ -282,7 +282,7 @@ Five things we take away. First, building from the motors up was not an academic
 
 </div>
 
-## 29. Where PyRov goes next
+## 29. Where Rovust goes next
 
 Four natural next steps. Scan matching would close the loop between the map and the pose. A learned explorer could replace our hand-tuned utility weights, trained in the same harness that produced our results. The radio model is already there for a multi-robot version. And because the controller analysis is essentially a wiring list, the step to real hardware is a matter of interfaces, not of rewriting the robot.
 
