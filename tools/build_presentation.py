@@ -1,10 +1,10 @@
-"""Build the PyRov presentation from docs/presentation/slides/*.html.
+"""Build the Rovust presentation from docs/presentation/slides/*.html.
 
 Outputs (in docs/presentation/):
-    PyRov_presentation.html            standalone viewer: arrow keys, N = notes, L = notes language (EN / مصري), F = fullscreen
-    PyRov_presentation.pdf             the 30 slides as pages
-    PyRov_presentation.pptx            PowerPoint with the slides as pictures + English speaker notes
-    PyRov_presentation_ar_notes.pptx   same, speaker notes in Egyptian Arabic
+    Rovust_presentation.html            standalone viewer: arrow keys, N = notes, L = notes language (EN / مصري), F = fullscreen
+    Rovust_presentation.pdf             the 30 slides as pages
+    Rovust_presentation.pptx            PowerPoint with the slides as pictures + English speaker notes
+    Rovust_presentation_ar_notes.pptx   same, speaker notes in Egyptian Arabic
     SPEAKER_NOTES.md                   both languages, slide by slide
     png/<nn>-<id>.png                  one 1920x1080 picture per slide (rendered with headless Edge / Chrome)
 
@@ -103,8 +103,8 @@ VIEWER_JS = """
   let i=0; const want=q.get('slide');
   if(want){const k=slides.findIndex(s=>s.id===want); if(k>=0) i=k;}
   const store={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
-  let lang=store.get('pyrov-notes-lang')||'en';
-  let notesOn=store.get('pyrov-notes')==='1';
+  let lang=store.get('rovust-notes-lang')||'en';
+  let notesOn=store.get('rovust-notes')==='1';
   const frame=document.getElementById('frame'), stage=document.getElementById('stage');
   const notes=document.getElementById('notes'), counter=document.getElementById('counter'), title=document.getElementById('title');
   function fit(){ if(bare) return; const r=stage.getBoundingClientRect(); const s=Math.min(r.width/1920,r.height/1080)*0.98; frame.style.transform='scale('+s+')'; }
@@ -129,8 +129,8 @@ VIEWER_JS = """
     fit();
     if(!bare){ try{ const u=new URL(location); u.searchParams.set('slide',slides[i].id); history.replaceState(null,'',u); }catch(e){} }
   }
-  function toggleNotes(){ notesOn=!notesOn; store.set('pyrov-notes',notesOn?'1':'0'); show(i); }
-  function toggleLang(){ lang=lang==='ar'?'en':'ar'; store.set('pyrov-notes-lang',lang); show(i); }
+  function toggleNotes(){ notesOn=!notesOn; store.set('rovust-notes',notesOn?'1':'0'); show(i); }
+  function toggleLang(){ lang=lang==='ar'?'en':'ar'; store.set('rovust-notes-lang',lang); show(i); }
   document.getElementById('prev').onclick=()=>show(i-1);
   document.getElementById('next').onclick=()=>show(i+1);
   document.getElementById('bnotes').onclick=toggleNotes;
@@ -175,7 +175,7 @@ def write_viewer(idx, slides, notes_en, notes_ar) -> str:
 <style>{BASE_CSS}{VIEWER_CSS}</style>
 </head><body>
 <div id="stage"><div id="frame">
-<noscript><p style="color:#e6edf3;font-size:40px;padding:120px">This viewer needs JavaScript. Use PyRov_presentation.pdf instead.</p></noscript>
+<noscript><p style="color:#e6edf3;font-size:40px;padding:120px">This viewer needs JavaScript. Use Rovust_presentation.pdf instead.</p></noscript>
 {body}
 </div></div>
 <div id="notes"></div>
@@ -184,7 +184,7 @@ def write_viewer(idx, slides, notes_en, notes_ar) -> str:
 <button id="bnotes">Notes <kbd>N</kbd></button><button id="blang">EN / مصري <kbd>L</kbd></button><button id="bfull">Fullscreen <kbd>F</kbd></button></div>
 <script>const NOTES_EN={json.dumps(notes_en, ensure_ascii=False)};const NOTES_AR={json.dumps(notes_ar, ensure_ascii=False)};{VIEWER_JS}</script>
 </body></html>"""
-    out = os.path.join(PRES, "PyRov_presentation.html")
+    out = os.path.join(PRES, "Rovust_presentation.html")
     open(out, "w", encoding="utf-8", newline="\n").write(page)
     return out
 
@@ -213,7 +213,7 @@ def render_pngs(viewer: str, order: list[str]) -> list[str]:
         return []
     os.makedirs(PNG_DIR, exist_ok=True)
     url = "file:///" + urllib.parse.quote(viewer.replace("\\", "/"))
-    profile = tempfile.mkdtemp(prefix="pyrov-render-")
+    profile = tempfile.mkdtemp(prefix="rovust-render-")
     outs = []
     t0 = time.time()
     for n, sid in enumerate(order, 1):
@@ -236,8 +236,8 @@ def render_pngs(viewer: str, order: list[str]) -> list[str]:
 def write_pdf(pngs: list[str]):
     from PIL import Image
     imgs = [Image.open(p).convert("RGB") for p in pngs]
-    out = os.path.join(PRES, "PyRov_presentation.pdf")
-    imgs[0].save(out, save_all=True, append_images=imgs[1:], resolution=144.0, title="PyRov presentation")
+    out = os.path.join(PRES, "Rovust_presentation.pdf")
+    imgs[0].save(out, save_all=True, append_images=imgs[1:], resolution=144.0, title="Rovust presentation")
     print("pdf:", os.path.relpath(out, ROOT), f"{os.path.getsize(out) / 1e6:.1f} MB")
 
 
@@ -272,8 +272,8 @@ def main():
         print("not every slide rendered; PDF/PPTX skipped", file=sys.stderr)
         return 1
     write_pdf(pngs)
-    write_pptx(pngs, idx["order"], notes_en, "PyRov_presentation.pptx", "en")
-    write_pptx(pngs, idx["order"], notes_ar, "PyRov_presentation_ar_notes.pptx", "ar")
+    write_pptx(pngs, idx["order"], notes_en, "Rovust_presentation.pptx", "en")
+    write_pptx(pngs, idx["order"], notes_ar, "Rovust_presentation_ar_notes.pptx", "ar")
     return 0
 
 

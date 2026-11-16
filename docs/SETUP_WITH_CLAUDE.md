@@ -1,15 +1,15 @@
-# Setting up PyRov with Claude
+# Setting up Rovust with Claude
 
 If you use Claude Code (or any coding assistant that can run commands on your
 computer), paste the prompt below. It installs everything and starts the
 program. If you do not use Claude, use `setup.bat` instead — see the README.
 
 ```
-Set up and run the PyRov project on this computer:
+Set up and run the Rovust project on this computer:
 
 1. Repository: https://github.com/buggYateer/robotics-project
    Clone it (or download the main-branch zip if git is missing) into a folder
-   named PyRov inside my home directory, unless I say otherwise.
+   named Rovust inside my home directory, unless I say otherwise.
 2. Make sure Python 3.12 or newer is available (install it if it is not).
 3. Inside the project folder create a virtual environment in .venv, upgrade pip
    and install requirements.txt.
