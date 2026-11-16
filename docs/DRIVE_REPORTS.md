@@ -58,7 +58,7 @@ function doPost(e) {
   }
 }
 
-function doGet() { return json({ ok: true, service: 'PyRov reports' }); }
+function doGet() { return json({ ok: true, service: 'Rovust reports' }); }
 
 function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
@@ -68,16 +68,16 @@ function json(obj) {
 
 3. The team folder ID is already in `ROOT_FOLDER_ID` (from the folder link
    `drive.google.com/drive/folders/1NJFC1WdeRxKdd7GiRqP2NmEqSGIGlvxe`). Save
-   (Ctrl+S) and name the project *PyRov reports*.
+   (Ctrl+S) and name the project *Rovust reports*.
 4. **Deploy → New deployment** → type **Web app**:
    - *Execute as*: **Me**
    - *Who has access*: **Anyone**
    - Deploy, authorise with your Google account when asked (click
-     *Advanced → Go to PyRov reports (unsafe)* on the warning: it is your own
+     *Advanced → Go to Rovust reports (unsafe)* on the warning: it is your own
      script).
 5. Copy the **Web app URL** (ends in `/exec`).
 
-## 2. Tell PyRov about it
+## 2. Tell Rovust about it
 
 Put the URL in `report_config.json` at the root of the project (commit it, so
 everyone gets it):
@@ -109,4 +109,4 @@ the team.
 
 When `Code.gs` changes in this repository, paste the new code into the Apps
 Script editor, save, then **Deploy → Manage deployments → ✎ (edit) → Version:
-New version → Deploy**. The URL stays the same, so nothing changes in PyRov.
+New version → Deploy**. The URL stays the same, so nothing changes in Rovust.

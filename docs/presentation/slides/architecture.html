@@ -31,6 +31,6 @@
 <div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:22px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:28px;color:#f5a524">One mission object</h3><p style="font-size:24px;line-height:1.45;color:#bfd0d8">mission.py wires world, robot, estimator, grid, explorer and behaviours; the desktop app, the phone console and the headless experiments all drive the same object.</p></div>
 <div style="flex:1;background:#1b232a;border:1px solid #2f3b46;border-radius:16px;padding:22px 28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:28px;color:#f5a524">~4 500 lines of Python</h3><p style="font-size:24px;line-height:1.45;color:#bfd0d8">NumPy, SciPy, scikit-learn, PySide6; 49 tests; no robotics framework underneath.</p></div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Design · Architecture</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Design · Architecture</p>
 <aside>The architecture has one rule: the robot never touches the world directly. The world and the robot's true state are ground truth; only the sensors read them; everything the robot knows lives in its belief — a pose estimate and a map; and decisions are made on the belief alone. The interface shows both side by side, which is how you see the difference between what is true and what the robot thinks. Everything that differs between environments is configuration.</aside>
 </section>
