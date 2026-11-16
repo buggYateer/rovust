@@ -1,5 +1,5 @@
 @echo off
-rem PyRov one-click setup - double-click this file.
+rem Rovust one-click setup - double-click this file.
 rem It runs setup.ps1 next to it (the repository is private, so the scripts
 rem cannot be fetched from GitHub without signing in: download the project ZIP
 rem from the repository page, extract it and run this file from that folder).

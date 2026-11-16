@@ -13,6 +13,6 @@
 <p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#e6edf3;line-height:1.5">(unknown ? 8 : 1)<br>× terrain_cost<br>+ 1.5 if next to the band<br>∞ if blocked</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">PyRov · Design · planning.py, ai/exploration.py</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Design · planning.py, ai/exploration.py</p>
 <aside>Three strategies decide where to go; one planner decides how to get there. The proposal's hypothesis was that nearest-frontier would win in open terrain and DFS in corridors. We implemented both faithfully, and added a third: a utility score that weighs expected information against terrain-weighted cost, hazards and battery. You will see in the results which one actually won.</aside>
 </section>

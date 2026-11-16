@@ -31,7 +31,7 @@ function doPost(e) {
   }
 }
 
-function doGet() { return json({ ok: true, service: 'PyRov reports' }); }
+function doGet() { return json({ ok: true, service: 'Rovust reports' }); }
 
 function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
