@@ -9,7 +9,7 @@ A Python simulation of an exploration rover, from motor control to mapping and d
 <p align="center">
   <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white">
   <img alt="PySide6" src="https://img.shields.io/badge/desktop%20app-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
-  <img alt="tests" src="https://img.shields.io/badge/tests-49%20passing-2dd4bf">
+  <img alt="tests" src="https://img.shields.io/badge/tests-58%20passing-2dd4bf">
   <img alt="sensors" src="https://img.shields.io/badge/sensors-20%2B%20modelled-f5a524">
 </p>
 
@@ -43,18 +43,26 @@ and the same code runs unchanged in a cave, on Mars and under water.
   exploration strategies: nearest frontier, DFS with backtracking, utility.
 - **AI.** A random-forest terrain classifier feeds the planner's cost map; a
   statistical fault detector drops sensors that go bad.
-- **Remote control.** Assisted or manual driving from a phone or tablet over a
-  simulated radio link that weakens with distance and walls; when the link is
-  lost the rover drives itself back into range.
-- **Desktop application** (Qt, light and dark) with live telemetry, a motor
-  control loop view, a radio link tab, a built-in user guide and mission reports
-  uploaded to the team's shared Drive folder.
+- **Remote control.** Assisted or manual driving from a phone or tablet (scan
+  a QR code), the keyboard or a game controller, over a simulated radio link
+  that weakens with distance and walls; when the link is lost the rover drives
+  itself back into range.
+- **Game controller.** Any USB or Bluetooth pad, on the desktop and on the
+  phone, laid out like a driving game: ✕ gas, △ reverse, stick or arrows steer,
+  Start stops; the stick alone points where to go.
+- **Desktop application** (Qt) in English and Egyptian Arabic (right-to-left),
+  light and dark: live numbers, the two maps, sensors with fault injection, the
+  motor control loop, the radio link, one calm alert at a time with an event log,
+  a built-in user guide in both languages, and mission reports uploaded to the
+  team's shared Drive folder.
 
 ## Screenshots
 
-| Mars, utility explorer | Cave, driven from a phone |
+| Cave, utility explorer | Driven from a phone: QR code, radio link |
 |---|---|
 | ![light](docs/screenshots/main_light.png) | ![dark](docs/screenshots/main_dark_radio.png) |
+| Egyptian Arabic, right to left | Before the first mission |
+| ![arabic](docs/screenshots/main_ar.png) | ![start](docs/screenshots/app_start.png) |
 | Motor control: PWM, motor, encoder, PID | Statistics |
 | ![motor](docs/screenshots/tab_motor.png) | ![stats](docs/screenshots/tab_stats.png) |
 
@@ -63,11 +71,13 @@ and the same code runs unchanged in a cave, on Mars and under water.
 | ![tablet](docs/screenshots/console_tablet_dark.jpg) | ![phone](docs/screenshots/console_phone_light.jpg) | ![report](docs/screenshots/report.png) |
 
 <details>
-<summary>More: map pop-up, mission over, user guide, about</summary>
+<summary>More: map pop-up, mission over, controller, events, user guide, about</summary>
 
 | Large map view | Mission over |
 |---|---|
 | ![popup](docs/screenshots/map_popup.png) | ![over](docs/screenshots/mission_over.png) |
+| Game controller card (✕ held, stick pushed) | Events tab |
+| ![controller](docs/screenshots/controller.png) | ![events](docs/screenshots/tab_events.png) |
 | User guide (F1) | About |
 | ![guide](docs/screenshots/guide.png) | ![about](docs/screenshots/about.png) |
 </details>
@@ -94,12 +104,33 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Pick an environment, a strategy and a localisation mode, then **Start mission**.
-`Space` pause, `1–4` speed, `R` restart, `Ctrl+S` send report, `F1` user guide.
+Pick an environment, a strategy and a localisation mode, then **Start mission**
+(or **New mission** in the header). Buttons that cannot act yet are greyed out.
+
+| Key | Does | Key | Does |
+|---|---|---|---|
+| `Ctrl+N` | new mission | `R` | restart, same settings |
+| `Space` | pause / resume | `Ctrl+.` | stop the mission |
+| `1` `2` `3` `4` | speed ×1 ×4 ×8 ×16 | `H` | headlights |
+| `Ctrl+S` | send report | `Ctrl+L` | English / عربي |
+| `Ctrl+D` | dark mode | `F1` | user guide |
+| arrows / `W A S D` | drive (Assisted, Manual) | | |
 
 To drive from a phone, choose *Assisted* or *Manual* under **Remote control**,
-press **Open console for phone / tablet** and open the address shown in the
-phone's browser on the same Wi-Fi. Reports are saved under `reports/` and
+press **Phone console** and scan the QR code that appears in the side panel (or
+open the address in the phone's browser on the same Wi-Fi).
+
+**Game controller** (USB dongle or Bluetooth; needs the optional `pygame-ce`,
+installed by `setup.bat`):
+
+| PlayStation (Xbox) | Does |
+|---|---|
+| ✕ (A) held | gas: forward, the left stick or the arrows steer |
+| △ (Y) held | reverse, the left stick or the arrows steer |
+| left stick or arrows alone | point-to-go: push where the rover should go; circle the stick to spin in place |
+| R2 / L2 + right stick | analog driving |
+| Start | stop |
+| ○ (B) · □ (X) · L1 / R1 | headlights · return home · change mode | Reports are saved under `reports/` and
 uploaded to the team's Drive folder when the bridge is configured
 ([docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md)).
 
@@ -137,11 +168,13 @@ ground-speed sensor the estimate is 5–16 m off; without the cliff switches one
 rover in four is lost to a crater.
 
 ```bash
-pytest                                              # 49 tests
+pytest                                              # 58 tests
 python -m sim.experiments.pid_demo                  # step responses, calibration curve
 python -m sim.experiments.run_batch --seeds 10      # strategies
 python -m sim.experiments.run_batch --localisation  # fused vs encoders vs perfect
 python -m sim.experiments.run_batch --ablation      # one sensor off at a time
+python tools/make_media.py                          # regenerate every screenshot, the GIF and the report picture
+python tools/build_presentation.py                  # rebuild the presentation (HTML, PDF, PowerPoint)
 ```
 
 ## Documents
@@ -154,7 +187,7 @@ python -m sim.experiments.run_batch --ablation      # one sensor off at a time
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |
 | Drive reports | [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md): shared Drive folder, numbering by Drive |
 | Trailer | [docs/media/trailer.html](docs/media/trailer.html): 75 s animated page with browser voice-over |
-| بالعربي | [دليل الفريق](docs/team_guide_ar.html) · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
+| بالعربي | [دليل الفريق](docs/team_guide_ar.html): كل جزء في الروبوت وكل زرار في البرنامج، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
 
 ## Team
 

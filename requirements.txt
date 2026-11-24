@@ -4,3 +4,5 @@ scikit-learn>=1.5
 scipy>=1.14
 PySide6>=6.7
 pytest>=8
+pygame-ce>=2.5      # optional: drive with a game controller (USB or Bluetooth)
+segno>=1.6          # optional: QR code of the phone console address

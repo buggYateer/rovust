@@ -93,7 +93,7 @@ Or in the program: **File → Report settings…**, paste the URL, Save.
 
 ## 3. Use it
 
-- **Send report** (toolbar, or File menu) asks for a name for the report
+- **Send report** (header button, File menu or Ctrl+S) asks for a name for the report
   (or sends it with the automatic name), builds it for the current mission
   and uploads it.
 - With *auto-send* on (default) a report is sent automatically when a mission

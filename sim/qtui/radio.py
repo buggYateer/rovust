@@ -13,6 +13,8 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import QFormLayout, QHBoxLayout, QLabel, QPlainTextEdit, QVBoxLayout, QWidget
 
+from .i18n import LANG, tr
+
 C_OK, C_WEAK, C_LOST = QColor(45, 212, 191), QColor(245, 165, 36), QColor(239, 68, 68)
 
 
@@ -71,15 +73,15 @@ class LinkDiagram(QWidget):
         # labels
         p.setPen(pal.text().color())
         p.setFont(QFont(self.font().family(), 9))
-        p.drawText(QRectF(bx - 50, by + 34, 100, 18), Qt.AlignmentFlag.AlignCenter, "base station")
-        p.drawText(QRectF(rx - 50, ry + 34, 100, 18), Qt.AlignmentFlag.AlignCenter, "rover")
+        p.drawText(QRectF(bx - 50, by + 34, 100, 18), Qt.AlignmentFlag.AlignCenter, tr("r_base"))
+        p.drawText(QRectF(rx - 50, ry + 34, 100, 18), Qt.AlignmentFlag.AlignCenter, tr("r_rover"))
         mid = (bx + rx) / 2
         p.drawText(QRectF(mid - 120, r.top() + 8, 240, 18), Qt.AlignmentFlag.AlignCenter,
-                   f"{lk.distance:.1f} m   -   {lk.walls} wall cells in the way")
+                   tr("r_between", lk.distance, lk.walls))
         p.setPen(col)
         p.setFont(QFont(self.font().family(), 10, QFont.Weight.Bold))
         p.drawText(QRectF(mid - 120, by - 40, 240, 18), Qt.AlignmentFlag.AlignCenter,
-                   f"{lk.state.upper()}   RSSI {lk.strength:.0%}")
+                   f"{tr('link_' + lk.state)}   RSSI {lk.strength:.0%}")
 
 
 class RadioTab(QWidget):
@@ -90,11 +92,9 @@ class RadioTab(QWidget):
         left = QVBoxLayout()
         self.diagram = LinkDiagram()
         left.addWidget(self.diagram, 1)
-        self.hint = QLabel("Commands from the console and the keyboard travel over this link. Signal falls with distance "
-                           "and with every wall between the rover and its base; weak = half the packets lost, "
-                           "lost = nothing arrives and the rover acts on its own after 3 s.")
+        self.hint = QLabel()
         self.hint.setWordWrap(True)
-        self.hint.setStyleSheet("color: #888;")
+        self.hint.setObjectName("hint")
         left.addWidget(self.hint)
         w = QWidget()
         w.setLayout(left)
@@ -103,21 +103,33 @@ class RadioTab(QWidget):
         right = QVBoxLayout()
         form = QFormLayout()
         self.labels = {}
-        for key, title in [("state", "Link"), ("latency", "One-way latency"), ("packets", "Packets delivered / dropped"),
-                           ("mode", "Driving mode"), ("last", "Last command received"), ("clients", "Operator")]:
+        self.titles = {}
+        for key in ("state", "latency", "packets", "mode", "last", "clients"):
             lab = QLabel("-")
             self.labels[key] = lab
-            form.addRow(title + ":", lab)
+            self.titles[key] = QLabel()
+            form.addRow(self.titles[key], lab)
         right.addLayout(form)
         self.log = QPlainTextEdit()
         self.log.setReadOnly(True)
         self.log.setMaximumBlockCount(60)
         self.log.setFont(QFont("Consolas", 9))
+        self.log.setLayoutDirection(Qt.LayoutDirection.LeftToRight)       # the packet log is technical: always left to right
         right.addWidget(self.log, 1)
         w2 = QWidget()
         w2.setLayout(right)
         lay.addWidget(w2, 2)
         self._logged = 0
+        LANG.changed.connect(self.retranslate)
+        self.retranslate()
+
+    def retranslate(self, *_):
+        self.hint.hide()
+        self.diagram.setToolTip(tr("r_hint"))
+        for k, lab in self.titles.items():
+            lab.setText(tr("r_" + k) + ":")
+        self.refresh()
+        self.diagram.update()
 
     def set_mission(self, mission):
         self.mission = mission
@@ -131,18 +143,18 @@ class RadioTab(QWidget):
             return
         lk = m.link
         L = self.labels
-        L["state"].setText(f"{lk.state}   RSSI {lk.strength:.0%}   ({lk.distance:.1f} m, {lk.walls} walls)")
+        L["state"].setText(f"{tr('link_' + lk.state)}   RSSI {lk.strength:.0%}   " + tr("r_walls", lk.distance, lk.walls))
         L["state"].setStyleSheet(f"color: {link_color(lk.state).name()}; font-weight: 600;")
         L["latency"].setText(f"{m.cfg.link.latency_s:.1f} s")
         L["packets"].setText(f"{lk.delivered} / {lk.dropped}")
-        eff = m.effective_mode
-        L["mode"].setText(f"{m.mode}" + (f"  (link lost - rover acts on its own: {m.on_link_loss})" if m.link_fallback else ""))
+        loss = {"home": "lossHome", "explore": "lossExplore", "hold": "lossHold"}.get(m.on_link_loss, "lossHome")
+        L["mode"].setText(tr(m.mode) + (tr("r_fallback", tr(loss)) if m.link_fallback else ""))
         last = next((e for e in reversed(lk.log) if e[1] == "RX"), None)
         if last is not None:
             t, _, c = last
-            L["last"].setText(self._fmt(c) + f"   at t = {t:.1f} s")
+            L["last"].setText(self._fmt(c) + "   " + tr("r_at", t))
         src = {e[2].get("from", "") for e in lk.log if e[2].get("from")}
-        L["clients"].setText(", ".join(sorted(src)) if src else "nobody yet")
+        L["clients"].setText(", ".join(sorted(src)) if src else tr("r_nobody"))
         # append new log lines
         entries = list(lk.log)
         new = entries[max(0, len(entries) - (len(entries) - self._logged)):] if self._logged < len(entries) else []

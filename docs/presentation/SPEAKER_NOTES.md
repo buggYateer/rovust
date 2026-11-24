@@ -164,11 +164,11 @@ Three strategies decide where to go; one planner decides how to get there. The p
 
 ## 17. AI only where it changes what the rover does
 
-Three uses of AI, each with a visible consequence. The terrain classifier is real machine learning — a random forest over texture features — and its predictions enter the planner's cost map, so the rover visibly avoids sand and mud. The fault detector is statistics, and it decides which sensors to trust. The utility explorer is a decision function. We are explicit about the scope: nothing here is a large model; everything trains or runs locally in seconds.
+Three uses of AI, each with a visible consequence. The terrain classifier is real machine learning — a random forest over texture features — and its predictions enter the planner's cost map, so the rover visibly avoids sand and mud. It is fast, too: the forest is evaluated straight from its trees, about one millisecond per prediction instead of ten, with identical answers. The fault detector is statistics, and it decides which sensors to trust. The utility explorer is a decision function. We are explicit about the scope: nothing here is a large model; everything trains or runs locally in seconds.
 
 <div dir="rtl" align="right">
 
-تلات استخدامات للذكاء الاصطناعي، كل واحد ليه أثر واضح. مصنّف التضاريس ده machine learning حقيقي، random forest على خصائص النسيج، وتوقعاته بتدخل في خريطة التكلفة بتاعة المخطّط، فالروفر بيتفادى الرمل والطين قدّامك. كاشف الأعطال ده إحصاء، وهو اللي بيقرر نثق في أنهي حساسات. مستكشف المنفعة دالة قرار. وإحنا واضحين في النطاق: مفيش هنا أي موديل كبير، كل حاجة بتتدرّب أو بتشتغل محلياً في ثواني.
+تلات استخدامات للذكاء الاصطناعي، كل واحد ليه أثر واضح. مصنّف التضاريس ده machine learning حقيقي، random forest على خصائص النسيج، وتوقعاته بتدخل في خريطة التكلفة بتاعة المخطّط، فالروفر بيتفادى الرمل والطين قدّامك. وكمان سريع: بقينا نحسب التوقع من الشجر على طول، فبقى حوالي مللي ثانية بدل عشرة، وبنفس النتيجة بالظبط. كاشف الأعطال ده إحصاء، وهو اللي بيقرر نثق في أنهي حساسات. مستكشف المنفعة دالة قرار. وإحنا واضحين في النطاق: مفيش هنا أي موديل كبير، كل حاجة بتتدرّب أو بتشتغل محلياً في ثواني.
 
 </div>
 
@@ -182,33 +182,33 @@ The three environments stress different things. The cave is about corridors, dar
 
 </div>
 
-## 19. A desktop application that shows truth and belief side by side
+## 19. A desktop app that shows truth and belief side by side
 
-The application is a conventional desktop program, built with Qt. The left panel configures a mission; the two maps show ground truth and belief; the tabs below expose the inner loop — every sensor reading, the motor control loop, statistics and the radio link. Any sensor can be broken with one click while the mission runs, which is how we demonstrate the fault detector and the safety layers.
+The application is a conventional desktop program built with Qt, shown here in English with the light theme and in Egyptian Arabic with the dark theme, where the whole layout mirrors right to left. The header carries the mission — number, world, clock and status — and the controls: new mission, pause, stop, restart, speed up to sixteen times, lights, the phone console and sending the report. The side panel sets up the mission and can fold away to a strip. Six live cards summarise it — mapped, distance, battery, link, behaviour and position error — and below them the two maps, ground truth and belief. The tabs at the bottom expose the inner loop: every sensor, the motor control loop, statistics, the radio link and an event log. Any sensor can be broken with one click while the mission runs. We also designed it to stay calm: the status bar shows one alert at a time with a count of the others, and buttons that cannot act right now are greyed out instead of failing silently.
 
 <div dir="rtl" align="right">
 
-البرنامج ده برنامج ديسكتوب عادي، معمول بـ Qt. اللوحة الشمال بتظبط المهمة، الخريطتين بيعرضوا الحقيقة والاعتقاد، والتابات اللي تحت بتكشف اللوب الداخلي، كل قراية حساس، لوب التحكم في المواتير، الإحصائيات، ووصلة الراديو. أي حساس ممكن تكسره بضغطة واحدة والمهمة شغّالة، وده اللي بنعرض بيه كاشف الأعطال وطبقات الأمان.
+البرنامج ده برنامج ديسكتوب عادي معمول بـ Qt، وهنا شايفينه مرتين: مرة بالإنجليزي والثيم الفاتح، ومرة بالعربي المصري والثيم الغامق، والشاشة كلها بتتقلب من اليمين للشمال. فوق عندك المهمة نفسها، رقمها والبيئة والوقت وحالتها، وجنبها الأزرار: مهمة جديدة، وقّف مؤقت، خلّص، ابدأ من الأول، السرعة لحد ستاشر مرة، النور، كونسول الموبايل، وابعت التقرير. اللوحة الجانبية بتجهّز فيها المهمة، وتقدر تطبّقها لشريط صغير لو عايز مساحة. تحتها ست كروت لايف بيلخّصوا الدنيا: اتكشف قد إيه، مشي قد إيه، البطارية، الإشارة، بيعمل إيه دلوقتي، وتايه قد إيه في الموضع. وبعدهم الخريطتين، الحقيقة واللي الروبوت فاكره. والتابات اللي تحت بتوريك اللي جوّه: كل حساس، لوب المواتير، الإحصائيات، الراديو، وسجل الأحداث. وأي حساس تقدر تبوّظه بضغطة والمهمة شغّالة. وكمان عملناه هادي: شريط الحالة بيعرض تنبيه واحد بس، وجنبه عدد الباقيين، والزرار اللي مينفعش يشتغل دلوقتي بيبقى رمادي بدل ما تدوس عليه ومايحصلش حاجة.
 
 </div>
 
-## 20. Drive it from a phone — through a radio that can fail
+## 20. Phone or gamepad — over a radio that can fail
 
-Remote control is where the communication activity from Robot Behaviour meets the argument for autonomy. Every command from the phone travels through a simulated radio link that weakens with distance and with each wall between the rover and its base. When you drive deep into the cave the link drops, the console tells you so, and after three seconds the rover takes over and drives itself back into range. The lesson writes itself: a rover that cannot decide alone is lost the moment the radio is.
+Remote control is where the communication activity from Robot Behaviour meets the argument for autonomy. The desktop opens a console for a phone or tablet and shows its address and a QR code: scan it and you drive, with the joystick inside a ring of live sonar readings. A game controller works too, on the desktop or on the phone, and it drives like a racing game: cross is gas, triangle is reverse, the stick steers, and the stick alone means "go that way". Whatever you drive with, every command travels through a simulated radio link that weakens with distance and with each wall between the rover and its base. When you drive deep into the cave the link drops, a short alert says so — the same alert rules on the desktop and the phone, held long enough to read, never a popup — and after three seconds the rover takes over and drives itself back into range. The lesson writes itself: a rover that cannot decide alone is lost the moment the radio is.
 
 <div dir="rtl" align="right">
 
-التحكم عن بُعد هو المكان اللي نشاط الاتصالات من Robot Behaviour بيقابل فيه حجّة الاستقلالية. كل أمر من الموبايل بيعدّي على وصلة راديو متحاكية بتضعف مع المسافة ومع كل حيطة بين الروفر والقاعدة. لما تسوق جوه الكهف بعيد، الوصلة بتقع، الكونسول بيقولك، وبعد تلات ثواني الروفر بياخد التحكم ويرجع بنفسه لحد ما يدخل في المدى. الدرس بيكتب نفسه: روفر مش قادر يقرر لوحده بيضيع في اللحظة اللي الراديو بيضيع فيها.
+التحكم عن بُعد هو المكان اللي نشاط الاتصالات من Robot Behaviour بيقابل فيه حجّة الاستقلالية. من البرنامج بتفتح كونسول للموبايل أو التابلت، ويطلعلك العنوان وQR code: تصوّره بالموبايل وتسوق على طول، والجويستيك في النص وحواليه دايرة قرايات السونار، فبتحس بالحيطة قبل ما تخبط فيها. ودراع الألعاب كمان شغّال، بالسلك أو بالبلوتوث، على الكمبيوتر أو على الموبايل، وبيسوق زي ألعاب العربيات بالظبط: إكس بنزين، المثلث رجوع، والدراع بيلفّ، ولو حرّكت الدراع لوحده يبقى بتقوله روح من هنا. وأيًّا كان بتسوق بإيه، كل أمر بيعدّي على وصلة راديو متحاكية بتضعف مع المسافة ومع كل حيطة بين الروفر والقاعدة. لما تدخل جوه الكهف بعيد، الإشارة بتقع، ويطلعلك تنبيه صغير يقولك كده، ونفس قواعد التنبيه دي على الكمبيوتر والموبايل، بيفضل قدامك وقت كفاية تقراه، ومفيش popup ولا اهتزاز. وبعد تلات ثواني الروفر بياخد التحكم ويرجع بنفسه لحد ما يدخل في المدى. الدرس بيكتب نفسه: روفر مش قادر يقرر لوحده بيضيع في اللحظة اللي الراديو بيضيع فيها.
 
 </div>
 
 ## 21. Every mission leaves evidence
 
-Engineering around the robot: every mission produces a report that lands in the team's Drive folder, the same mission object runs headless for the experiments, forty-nine tests pin the physics and the behaviours, and a one-click installer lets anyone on the team run it.
+Engineering around the robot: every mission produces a report that lands in the team's Drive folder, the same mission object runs headless for the experiments, fifty-eight tests pin the physics and the behaviours, and a one-click installer lets anyone on the team run it.
 
 <div dir="rtl" align="right">
 
-الهندسة اللي حوالين الروبوت: كل مهمة بتطلع تقرير بينزل في فولدر Drive بتاع الفريق، نفس كائن المهمة بيشتغل من غير شاشة للتجارب، تسعة وأربعين test بيثبّتوا الفيزياء والسلوكيات، وinstaller بضغطة واحدة بيخلّي أي حد في الفريق يشغّله.
+الهندسة اللي حوالين الروبوت: كل مهمة بتطلع تقرير بينزل في فولدر Drive بتاع الفريق، نفس كائن المهمة بيشتغل من غير شاشة للتجارب، تمانية وخمسين test بيثبّتوا الفيزياء والسلوكيات، وinstaller بضغطة واحدة بيخلّي أي حد في الفريق يشغّله.
 
 </div>
 
@@ -254,11 +254,11 @@ The ablation answers the question the supervisor cares about most: which sensors
 
 ## 26. How we made sure the numbers mean something
 
-A word on method. Forty-nine tests pin the physics and behaviours so that a change in one layer cannot silently break another. The experiments run the identical mission object without a window, many seeds in parallel, and report means with their spread. And several of our hardest bugs were found by the simulated physics itself — the specular echoes erasing walls, for example — and each one turned into a test.
+A word on method. Fifty-eight tests pin the physics, the behaviours, the alert timing and the game controller, so that a change in one layer cannot silently break another. The experiments run the identical mission object without a window, many seeds in parallel, and report means with their spread. And several of our hardest bugs were found by the simulated physics itself — the specular echoes erasing walls, for example — and each one turned into a test.
 
 <div dir="rtl" align="right">
 
-كلمة عن المنهج. تسعة وأربعين test بيثبّتوا الفيزياء والسلوكيات عشان تغيير في طبقة ميكسرش طبقة تانية في السكوت. التجارب بتشغّل نفس كائن المهمة بالظبط من غير شاشة، seeds كتير بالتوازي، وبتطلع متوسطات مع تشتّتها. وكام bug من أصعب اللي قابلناهم المحاكاة الفيزيائية نفسها هي اللي كشفتهم، الصدى المنعكس اللي كان بيمسح الحيطان مثلاً، وكل واحد منهم اتحوّل لـ test.
+كلمة عن المنهج. تمانية وخمسين test بيثبّتوا الفيزياء والسلوكيات وتوقيت التنبيهات ودراع التحكم عشان تغيير في طبقة ميكسرش طبقة تانية في السكوت. التجارب بتشغّل نفس كائن المهمة بالظبط من غير شاشة، seeds كتير بالتوازي، وبتطلع متوسطات مع تشتّتها. وكام bug من أصعب اللي قابلناهم المحاكاة الفيزيائية نفسها هي اللي كشفتهم، الصدى المنعكس اللي كان بيمسح الحيطان مثلاً، وكل واحد منهم اتحوّل لـ test.
 
 </div>
 
@@ -294,10 +294,10 @@ Four natural next steps. Scan matching would close the loop between the map and 
 
 ## 30. Thank you
 
-Thank you. We are happy to run the live demonstration now: a cave mission, the motor loop, a broken sensor, the two localisation modes, driving from a phone, and the radio link failing and the rover returning on its own. Questions are welcome.
+Thank you. We are happy to run the live demonstration now: a cave mission, the motor loop, a broken sensor, the two localisation modes, driving from a phone or a game controller, and the radio link failing and the rover returning on its own. Questions are welcome.
 
 <div dir="rtl" align="right">
 
-شكراً. يسعدنا نعمل العرض الحي دلوقتي: مهمة في الكهف، لوب المواتير، حساس مكسور، وضعي تحديد الموضع، السواقة من الموبايل، ووصلة الراديو وهي بتقع والروفر بيرجع لوحده. أهلاً بأي أسئلة.
+شكراً. يسعدنا نعمل العرض الحي دلوقتي: مهمة في الكهف، لوب المواتير، حساس مكسور، وضعي تحديد الموضع، السواقة من الموبايل أو من دراع التحكم، ووصلة الراديو وهي بتقع والروفر بيرجع لوحده. أهلاً بأي أسئلة.
 
 </div>
