@@ -14,6 +14,7 @@ Underwater the DVL replaces the encoders as the displacement source.
 from __future__ import annotations
 
 import math
+from collections import deque
 
 from .core import Pose, wrap_angle
 
@@ -49,7 +50,11 @@ class PoseEstimator:
         self.heading.theta = start.theta
         self._last_l = robot.drive.enc_l.wheel_angle()
         self._last_r = robot.drive.enc_r.wheel_angle()
-        self.error_history: list[float] = []
+        # recent errors for plots; the mission-long mean is kept as a running sum
+        # (a full list grew without limit and slowed long sessions down)
+        self.error_history: deque = deque(maxlen=4000)
+        self.error_sum = 0.0
+        self.error_n = 0
         self.v_est = 0.0
         self.omega_est = 0.0
 
@@ -97,7 +102,14 @@ class PoseEstimator:
         self.fused.x += ds * math.cos(mid) - dlat * math.sin(mid)
         self.fused.y += ds * math.sin(mid) + dlat * math.cos(mid)
         self.fused.theta = theta
-        self.error_history.append(self.pose.distance_to(r.pose))
+        e = self.pose.distance_to(r.pose)
+        self.error_history.append(e)
+        self.error_sum += e
+        self.error_n += 1
+
+    @property
+    def mean_error(self) -> float:
+        return self.error_sum / self.error_n if self.error_n else 0.0
 
     def error(self) -> float:
         return self.pose.distance_to(self.robot.pose)

@@ -4,6 +4,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout
 
+from .i18n import tr
 from .mapview import MapWidget
 
 
@@ -18,8 +19,8 @@ class MapPopup(QDialog):
         self.view = MapWidget(title)
         self.view.set_mission(mission, kind, layers)
         lay.addWidget(self.view, 1)
-        hint = QLabel("Live view. Click the small map again or close this window to return. Esc closes.")
-        hint.setStyleSheet("color: #888;")
+        hint = QLabel(tr("popupHint"))
+        hint.setObjectName("hint")
         lay.addWidget(hint)
         pw = parent.width() if parent else 1200
         ph = parent.height() if parent else 800

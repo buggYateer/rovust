@@ -93,10 +93,31 @@ class TerrainClassifier:
     # --------------------------------------------------------------- predict
     def predict(self, img: np.ndarray) -> tuple[str, float]:
         self.ensure()
-        proba = self.model.predict_proba(features(img)[None, :])[0]
+        proba = self._proba(features(img)[None, :])
         k = int(np.argmax(proba))
         self.last_label, self.last_proba = CLASSES[k], float(proba[k])
         return self.last_label, self.last_proba
+
+    def _proba(self, X: np.ndarray) -> np.ndarray:
+        """Class probabilities for ONE frame. The same numbers as
+        ``model.predict_proba`` (the mean of every tree's leaf distribution),
+        but asking each tree directly: sklearn's own path goes through joblib
+        and per-tree input checks, ~30 ms per frame, which froze the window."""
+        trees = getattr(self, "_trees", None)
+        if trees is None or getattr(self, "_trees_of", None) is not self.model:
+            try:
+                trees = [e.tree_ for e in self.model.estimators_]
+            except AttributeError:                       # not a forest: use the library
+                return self.model.predict_proba(X)[0]
+            self._trees, self._trees_of = trees, self.model
+        X32 = np.ascontiguousarray(X, dtype=np.float32)
+        acc = None
+        for t in trees:
+            p = t.predict(X32)[0]
+            s = p.sum()
+            p = p / s if s > 0 else p
+            acc = p if acc is None else acc + p
+        return acc / len(trees)
 
     def cost_for(self, label: str) -> float:
         return CLASS_COST.get(label, 1.0)

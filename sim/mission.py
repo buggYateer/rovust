@@ -117,7 +117,7 @@ class Mission:
             "bumps": self.stats["bumps"], "cliff_events": self.stats["cliff_events"],
             "energy_wh": round(self.cfg.battery_wh - self.robot.battery.energy_wh, 3),
             "loc_error_m": round(self.estimator.error(), 3),
-            "loc_error_mean_m": round(float(np.mean(self.estimator.error_history)), 3) if self.estimator.error_history else 0.0,
+            "loc_error_mean_m": round(self.estimator.mean_error, 3),
             "return_reason": self.stats["return_reason"],
         }
 
@@ -139,6 +139,28 @@ class Mission:
         v = self.operator_speed * forward * abs(forward)
         w = self.MAX_TURN * turn * abs(turn) * (1.0 - 0.35 * abs(forward))
         return self.link.send({"type": "drive", "v": v, "w": w, "from": source}, self.time)
+
+    def steer_to_drive(self, x: float, y: float) -> tuple[float, float]:
+        """Point-to-go steering (like a game joystick): (x, y) is where the
+        operator wants to go, in map coordinates (x right/east, y up/north),
+        length = how fast. The rover turns towards that direction and drives
+        once it roughly faces it; circling the stick spins it in place.
+        Returns (forward, turn) for ``operator_drive``. Heading comes from the
+        rover's own estimate: that is the arrow the operator sees on its map."""
+        mag = min(1.0, math.hypot(x, y))
+        if mag < 0.05:
+            return 0.0, 0.0
+        target = math.atan2(y, x)
+        err = math.atan2(math.sin(target - self.estimator.pose.theta), math.cos(target - self.estimator.pose.theta))
+        # turn hard while far off, gently when nearly there; operator_drive squares this
+        turn = max(-1.0, min(1.0, err / (math.pi / 3)))
+        turn = math.copysign(math.sqrt(abs(turn)), turn)
+        # drive only once facing within ~70 degrees, slowing in the turn
+        forward = mag * max(0.0, (math.cos(err) - 0.35) / 0.65)
+        return forward, turn
+
+    def operator_steer(self, x: float, y: float, source: str = "joystick") -> bool:
+        return self.operator_drive(*self.steer_to_drive(x, y), source=source)
 
     def operator_command(self, command: dict) -> bool:
         """Any other operator command (mode, lights, stop, home), over the link."""
@@ -210,6 +232,11 @@ class Mission:
             self.true_path.append(self.robot.pose.copy())
             self.est_path.append(self.estimator.pose.copy())
             self.odom_path.append(self.estimator.odom.copy())
+            if len(self.true_path) > 6000:
+                # long missions: keep every other old point (the shape stays, memory doesn't grow)
+                self.true_path = self.true_path[:-200:2] + self.true_path[-200:]
+                self.est_path = self.est_path[:-200:2] + self.est_path[-200:]
+                self.odom_path = self.odom_path[:-200:2] + self.odom_path[-200:]
 
     def run(self, max_steps: int = 12000) -> dict:
         while not self.done and self.step_count < max_steps:

@@ -4,7 +4,8 @@
     GET  /api/state        JSON telemetry for the page (5 Hz polling)
     GET  /api/map.png      the robot's belief map with its estimate and path
     GET  /api/camera.png   the camera patch, enlarged
-    POST /api/cmd          {"type": "drive", "x": -1..1, "y": -1..1} or
+    POST /api/cmd          {"type": "drive", "x": -1..1, "y": -1..1} (tank: y forward, x turn),
+                           {"type": "steer", "x": -1..1, "y": -1..1} (point-to-go, map frame) or
                            {"type": "mode"|"lights"|"stop"|"home"|"link_loss"|"speed", ...}
 
 Everything the page sends goes through ``Mission.operator_drive`` /
@@ -24,6 +25,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import numpy as np
 
+from ..alerts import AlertTracker, conditions
 from ..render import belief_rgb
 
 PAGE = os.path.join(os.path.dirname(__file__), "console.html")
@@ -62,6 +64,10 @@ class ConsoleServer:
         self.clients = 0
         self.last_cmd_ok = True
         self.restart_requested = False      # set from the console, consumed by the window's timer
+        self.paused = False                 # mirrored by the window, so the console can say so
+        self.alerts = AlertTracker()        # the same calm one-at-a-time alert as the desktop status bar
+        self._alert_mission = None
+        self._alert_lock = threading.Lock()
 
     # ------------------------------------------------------------ lifecycle
     def start(self):
@@ -141,6 +147,9 @@ class ConsoleServer:
             # stick right (+x) must turn the rover right: a clockwise turn is a
             # negative angular velocity in the robot's frame
             ok = m.operator_drive(float(cmd.get("y", 0.0)), -float(cmd.get("x", 0.0)), source=cmd.get("from", "console"))
+        elif t == "steer":
+            # point-to-go joystick: (x, y) is the direction on the map (x right, y up)
+            ok = m.operator_steer(float(cmd.get("x", 0.0)), float(cmd.get("y", 0.0)), source=cmd.get("from", "console"))
         elif t == "speed":
             m.operator_speed = max(0.05, min(0.6, float(cmd.get("value", 0.35))))
             ok = True
@@ -183,7 +192,17 @@ class ConsoleServer:
             "terrain": (m.ai.last[0] if m.ai is not None else None),
             "collisions": r.collisions, "bumps": m.stats["bumps"], "cliff_events": m.stats["cliff_events"],
             "map_size": [m.world.w * m.world.cell, m.world.h * m.world.cell],
+            "alert": self.alert(m),
         }
+
+    def alert(self, m) -> dict:
+        """The alert the operator should see now (debounced and held, see sim/alerts.py)."""
+        with self._alert_lock:                  # several phones may poll at once
+            if m is not self._alert_mission:
+                self.alerts.reset()
+                self._alert_mission = m
+            shown = self.alerts.update(conditions(m, paused=self.paused, operated=True), m.time)
+            return shown.to_dict(self.alerts.more)
 
     def map_png(self) -> bytes:
         m = self.get_mission()
