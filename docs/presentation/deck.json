@@ -46,7 +46,7 @@
       "start": "sec-design"
     },
     "s4": {
-      "description": "Results and tests: 264 measured runs comparing strategies, localisation and sensor ablations, plus 49 unit tests.",
+      "description": "Results and tests: 264 measured runs comparing strategies, localisation and sensor ablations, plus 58 unit tests.",
       "start": "sec-results"
     },
     "s5": {

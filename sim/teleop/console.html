@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
@@ -10,416 +10,837 @@
 <meta name="theme-color" content="#141a1f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rovust">
+<!-- web fonts when the device is online; the system fonts below take over on an offline LAN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
+  /* Landscape: the rover's map fills the glass, the controls float at the thumbs (joystick bottom-left, STOP bottom-right).
+     Portrait: header, map in the upper part, a control deck below with the joystick in the middle.
+     The physical layout never mirrors; only text flips in Arabic. */
   :root {
     --bg: #141a1f; --surface: #1e262d; --surface-2: #26303a; --line: #2f3b46;
-    --text: #e6edf3; --muted: #8b9aa7; --teal: #2dd4bf; --amber: #f5a524; --red: #ef4444;
-    --stick: #2a3540; --stick-knob: #e6edf3;
-    --r: 14px;
+    --text: #e6edf3; --muted: #8b9aa7; --faint: #5d6b77;
+    --teal: #2dd4bf; --amber: #f5a524; --red: #ef4444; --green: #4ade80; --rover: #fb923c;
+    --glass: rgba(20, 26, 31, .78); --glass-line: rgba(230, 237, 243, .10); --glass-solid: rgba(20, 26, 31, .96);
+    --chip: rgba(255, 255, 255, .06); --knob: #e6edf3; --stickbg: rgba(20, 26, 31, .80); --mapbg: #10161b;
+    --hud: "Chakra Petch", "Bahnschrift", "Segoe UI", system-ui, sans-serif;
+    --ui: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --ar: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+    --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+    --gut: max(10px, env(safe-area-inset-left, 0px)); --gutr: max(10px, env(safe-area-inset-right, 0px));
+    --stick: 172px; --stop: 92px; --round: 58px;
   }
   :root[data-theme="light"] {
-    --bg: #eef1f4; --surface: #ffffff; --surface-2: #f3f6f8; --line: #d5dde4;
-    --text: #141a1f; --muted: #5c6b78; --teal: #0f9d8a; --amber: #d97706; --red: #dc2626;
-    --stick: #e2e8ee; --stick-knob: #141a1f;
+    --bg: #e9edf1; --surface: #ffffff; --surface-2: #eef2f5; --line: #d5dde4;
+    --text: #141a1f; --muted: #5c6b78; --faint: #8b9aa7;
+    --teal: #0f9d8a; --amber: #d97706; --red: #dc2626; --green: #16a34a;
+    --glass: rgba(255, 255, 255, .88); --glass-line: rgba(20, 26, 31, .12); --glass-solid: rgba(255, 255, 255, .98);
+    --chip: rgba(20, 26, 31, .06); --knob: #141a1f; --stickbg: rgba(255, 255, 255, .86); --mapbg: #2a333c;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; margin: 0; overscroll-behavior: none; overflow-x: hidden; max-width: 100vw; }
-  body {
-    background: var(--bg); color: var(--text);
-    font: 15px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-    font-variant-numeric: tabular-nums;
-    touch-action: pan-y; user-select: none;
-    display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); height: 100dvh;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
+  html, body { height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; background: var(--bg); color: var(--text); }
+  body { font: 14px/1.4 var(--ui); user-select: none; -webkit-user-select: none; touch-action: none; }
+  :lang(ar) body, [dir="rtl"] { font-family: var(--ar); }
+  [hidden] { display: none !important; }
+  button { font: inherit; color: inherit; }
+  button:active { transform: scale(.95); }
+  button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
 
-  /* ------------------------------------------------------------ header */
-  header {
-    display: flex; align-items: center; gap: 18px; padding: 10px 16px;
-    border-bottom: 1px solid var(--line); background: var(--surface);
-  }
-  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: .01em; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  header h1 small { color: var(--muted); font-weight: 400; margin-left: 8px; }
-  .meter { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; flex: none; }
-  .meter b { color: var(--text); font-weight: 600; font-size: 15px; }
-  .bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
-  .bars i { display: block; width: 4px; background: var(--line); border-radius: 1px; }
-  .bars i:nth-child(1){height:5px} .bars i:nth-child(2){height:8px} .bars i:nth-child(3){height:11px} .bars i:nth-child(4){height:14px}
-  .bars.l1 i:nth-child(-n+1), .bars.l2 i:nth-child(-n+2), .bars.l3 i:nth-child(-n+3), .bars.l4 i { background: var(--teal); }
-  .bars.lost i { background: var(--red); opacity: .6; }
-  .batt { width: 34px; height: 14px; border: 1.5px solid var(--muted); border-radius: 3px; position: relative; }
-  .batt::after { content: ""; position: absolute; right: -5px; top: 3px; width: 3px; height: 6px; background: var(--muted); border-radius: 0 1px 1px 0; }
+  .glass { background: var(--glass); border: 1px solid var(--glass-line); }
+  /* blur only where it is cheap: a mouse-driven computer. On phones and tablets it is re-composited on every map redraw. */
+  @media (pointer: fine) { .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); } }
+
+  .screen { position: fixed; inset: 0; overflow: hidden; direction: ltr; }
+  .mapwrap { position: absolute; inset: 0; overflow: hidden; }
+  #map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+  /* ---------------------------------------------------------------- header */
+  .topbar { position: absolute; top: max(8px, var(--st)); left: var(--gut); right: var(--gutr); min-height: 44px; border-radius: 14px;
+    display: flex; flex-wrap: nowrap; align-items: center; column-gap: 10px; row-gap: 6px; padding: 5px 6px 5px 12px; z-index: 4; }
+  .topbar > * { flex: none; }
+  .brand { order: 1; font: 700 15px var(--hud); letter-spacing: .04em; white-space: nowrap; }
+  .brand small { font: 500 12px var(--ui); color: var(--muted); margin-inline-start: 6px; letter-spacing: 0; }
+  :lang(ar) .brand small { font-family: var(--ar); }
+  .pill { order: 2; font: 600 12px var(--hud); letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: rgba(45, 212, 191, .14); color: var(--teal);
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  :lang(ar) .pill { font-family: var(--ar); letter-spacing: 0; text-transform: none; }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+  .pill.warn { background: rgba(245, 165, 36, .16); color: var(--amber); }
+  .pill.bad { background: rgba(239, 68, 68, .16); color: var(--red); }
+  .pill.idle { background: rgba(139, 154, 167, .14); color: var(--muted); }
+  /* the current alert: a short chip in the header, never anything that pops up */
+  .achip { order: 3; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 8px; border-radius: 8px; font-weight: 600; font-size: 12.5px; white-space: nowrap;
+    max-width: 230px; min-width: 0; background: var(--chip); color: var(--text); flex: 0 1 auto; }
+  .achip[dir="rtl"] { font: 600 13px var(--ar); }
+  .achip span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .achip svg { width: 14px; height: 14px; flex: none; }
+  .achip.warn { background: rgba(245, 165, 36, .18); color: var(--amber); }
+  .achip.bad { background: rgba(239, 68, 68, .2); color: var(--red); }
+  .achip.info { background: var(--chip); color: var(--text); }
+  .achip button { border: 0; border-radius: 6px; padding: 2px 7px; background: var(--amber); color: #141a1f; font-weight: 600; font-size: 11.5px; cursor: pointer; flex: none; }
+  .achip .more { font: 600 10.5px var(--hud); background: var(--chip); border-radius: 5px; padding: 0 5px; flex: none; direction: ltr; unicode-bidi: isolate; }
+  .spacer { order: 4; flex: 1 1 0; min-width: 0; }
+  .meter { display: flex; align-items: center; gap: 6px; font: 600 13px var(--hud); white-space: nowrap; }
+  #linkmeter { order: 5; } #battmeter { order: 6; }
+  .meter span { color: var(--muted); font: 500 11px var(--ui); }
+  :lang(ar) .meter span { font-family: var(--ar); }
+  .bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 13px; }
+  .bars i { width: 3.5px; background: var(--line); border-radius: 1px; }
+  .bars i:nth-child(1) { height: 4px } .bars i:nth-child(2) { height: 7px } .bars i:nth-child(3) { height: 10px } .bars i:nth-child(4) { height: 13px }
+  .bars i.on { background: var(--teal); } .bars.weak i.on { background: var(--amber); } .bars.lost i { background: var(--red); opacity: .55; }
+  .batt { width: 26px; height: 13px; border: 1.5px solid var(--muted); border-radius: 3px; padding: 1.5px; position: relative; }
+  .batt::after { content: ""; position: absolute; right: -4.5px; top: 3px; width: 2.5px; height: 5px; background: var(--muted); border-radius: 0 1px 1px 0; }
   .batt i { display: block; height: 100%; background: var(--teal); border-radius: 1px; }
   .batt.low i { background: var(--red); }
-  header .spacer { flex: 1; }
-  .status { padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--muted); }
-  .status.exploring, .status.returning { color: var(--teal); }
-  .status.fell, .status.battery_dead { color: var(--red); }
-  .status.stopped, .status.returned { color: var(--muted); }
-  .iconbtn { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; width: 34px; height: 34px; font-size: 16px; cursor: pointer; }
+  :lang(ar) .batt { transform: scaleX(-1); }            /* in Arabic the charge fills from the right */
+  .padI { order: 7; display: none; color: var(--teal); } .padI.on { display: inline-flex; } .padI svg { width: 22px; height: 22px; }
+  .ibtn { width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--glass-line); background: var(--chip); display: grid; place-items: center; cursor: pointer; padding: 0; }
+  #fsbtn { order: 8; } #langbtn { order: 9; } #morebtn { order: 10; }
+  .ibtn svg { width: 16px; height: 16px; }
+  .lng { font: 700 13px var(--ar); }
+  .brk { display: none; }
 
-  /* ------------------------------------------------------------ layout */
-  main { display: grid; grid-template-columns: minmax(280px, 46%) 1fr; gap: 14px; padding: 14px; min-height: 0; min-width: 0; }
-  main > *, .side > * { min-width: 0; }
-  .stickpane { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }
-  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 0; }
-  .side { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 0; overflow-y: auto; }
+  /* ---------------------------------------------------------------- read-outs on the map */
+  .stats { position: absolute; top: calc(max(8px, var(--st)) + 54px); left: var(--gut); border-radius: 14px; padding: 7px 14px; display: flex; gap: 18px; z-index: 3; }
+  .stat > span { display: block; font: 500 10px var(--ui); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+  :lang(ar) .stat > span { font: 500 11px var(--ar); letter-spacing: 0; text-transform: none; }
+  .stat b { font: 600 20px/1.1 var(--hud); font-variant-numeric: tabular-nums; white-space: nowrap; direction: ltr; unicode-bidi: isolate; display: block; }
+  :lang(ar) .stat { text-align: right; }
+  .stat b small { font-size: 12px; color: var(--muted); margin-left: 2px; }
+  .stat b.warn { color: var(--amber); } .stat b.bad { color: var(--red); }
+  .cam { position: absolute; top: calc(max(8px, var(--st)) + 54px); right: var(--gutr); width: 104px; border-radius: 14px; padding: 5px; z-index: 3; cursor: pointer; }
+  .cam img { display: block; width: 100%; aspect-ratio: 1; border-radius: 10px; image-rendering: pixelated; background: var(--surface-2); }
+  .cam div { font: 500 10px var(--ui); color: var(--muted); text-align: center; padding-top: 3px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :lang(ar) .cam div { font: 500 11px var(--ar); text-transform: none; letter-spacing: 0; }
 
-  /* ------------------------------------------------------------ stick */
-  #stickwrap { display: grid; place-items: center; padding: 10px; }
-  #stick { display: block; width: min(100%, calc(100vh - 170px)); aspect-ratio: 1; max-height: 100%; touch-action: none; }
-  .stickfoot { display: flex; align-items: center; gap: 14px; padding: 0 6px 6px; color: var(--muted); font-size: 13px; }
-  .stickfoot b { color: var(--text); font-weight: 600; min-width: 70px; display: inline-block; }
-  input[type=range] { flex: 1; accent-color: var(--amber); }
+  /* ---------------------------------------------------------------- controls (landscape: floating at the thumbs) */
+  .controls { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+  .controls > * { pointer-events: auto; }
+  .stickzone { position: absolute; left: var(--gut); bottom: max(10px, var(--sb)); display: grid; justify-items: center; gap: 6px; }
+  #stick { width: var(--stick); height: var(--stick); touch-action: none; cursor: grab; display: block; }
+  .speed { display: flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px; }
+  .speed button { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--chip); font: 600 16px var(--ui); cursor: pointer; line-height: 1; padding: 0; }
+  .speed b { font: 600 13px var(--hud); min-width: 72px; text-align: center; direction: ltr; }
+  .actions { position: absolute; right: var(--gutr); bottom: max(12px, var(--sb)); display: grid; grid-template-columns: auto auto; gap: 10px; align-items: end; justify-items: end; }
+  .modes { grid-column: 1 / -1; display: flex; border-radius: 14px; padding: 3px; gap: 2px; }
+  .modes button { font: 600 12px var(--hud); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: none; border: 0; padding: 9px 12px; border-radius: 11px; cursor: pointer; white-space: nowrap; }
+  :lang(ar) .modes button { font: 600 13px var(--ar); letter-spacing: 0; text-transform: none; }
+  .modes button.on { background: var(--amber); color: #141a1f; }
+  .side-btns { display: flex; gap: 10px; }
+  .round { width: var(--round); height: var(--round); border-radius: 50%; display: grid; place-items: center; align-content: center; gap: 2px; cursor: pointer; font: 600 9.5px var(--ui); text-transform: uppercase; letter-spacing: .05em; padding: 0; }
+  :lang(ar) .round { font: 600 11px var(--ar); text-transform: none; letter-spacing: 0; }
+  .round svg { width: 20px; height: 20px; }
+  .round.on { color: var(--amber); border-color: rgba(245, 165, 36, .7); }
+  .stop { width: var(--stop); height: var(--stop); border-radius: 50%; border: 0; cursor: pointer; color: #fff; font: 700 17px var(--hud); letter-spacing: .1em; padding: 0;
+    background: radial-gradient(circle at 35% 30%, #ff6b6b, #c81e1e 70%); box-shadow: 0 0 0 4px rgba(239, 68, 68, .25); }
+  :lang(ar) .stop { font: 700 19px var(--ar); letter-spacing: 0; }
+  .stop.held { background: radial-gradient(circle at 35% 30%, #3fe0c6, #0f9d8a 70%); box-shadow: 0 0 0 4px rgba(45, 212, 191, .25); font-size: 15px; }
 
-  /* ------------------------------------------------------------ views */
-  .views { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
-  .views img { display: block; image-rendering: pixelated; border-radius: 10px; background: var(--surface-2); }
-  #map { width: 100%; max-height: 32vh; object-fit: contain; }
-  #cam { width: 96px; height: 96px; }
-  .caption { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  /* ---------------------------------------------------------------- drawer, overlay, toast */
+  .drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(320px, 88vw); padding: max(16px, var(--st)) var(--gutr) 16px 18px;
+    transform: translateX(105%); transition: transform .25s ease-out; display: flex; flex-direction: column; gap: 12px;
+    border-width: 0 0 0 1px; z-index: 6; background: var(--glass-solid); overflow-y: auto; touch-action: pan-y; }
+  .drawer.open { transform: none; }
+  .drawer[dir="rtl"] { padding: max(16px, var(--st)) 18px 16px var(--gutr); }
+  .drawer h3 { font: 700 13px var(--hud); letter-spacing: .1em; text-transform: uppercase; margin: 0; display: flex; justify-content: space-between; align-items: center; }
+  .drawer[dir="rtl"] h3 { font: 700 15px var(--ar); letter-spacing: 0; text-transform: none; }
+  .drawer dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; margin: 0; font-size: 13px; }
+  .drawer dt { color: var(--muted); } .drawer dd { margin: 0; font: 600 13px var(--hud); text-align: end; direction: ltr; unicode-bidi: isolate; }
+  .drawer dd.txt { font-family: inherit; direction: inherit; }
+  .drawer .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: -6px; }
+  .drawer[dir="rtl"] .lbl { font-size: 12px; text-transform: none; letter-spacing: 0; }
+  .drawer .hint { font-size: 12px; color: var(--muted); margin: 0; }
+  .drawer .hint.key { color: var(--text); }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border-radius: 10px; padding: 3px; flex: none; }
+  .seg.two { grid-template-columns: repeat(2, 1fr); }
+  .seg button { border: 0; background: none; color: var(--muted); padding: 9px 4px; border-radius: 8px; font-weight: 600; font-size: 12.5px; cursor: pointer; }
+  .seg button.on { background: var(--teal); color: #141a1f; }
 
-  /* ------------------------------------------------------------ telemetry */
-  .tele { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 16px; padding: 12px 16px; align-content: start; overflow: auto; }
-  .tele div span { display: block; color: var(--muted); font-size: 12px; }
-  .tele div b { font-size: 18px; font-weight: 600; }
-  .tele div b.warn { color: var(--amber); }
-  .tele div b.bad { color: var(--red); }
-  #notice { grid-column: 1 / -1; color: var(--amber); font-size: 13px; min-height: 1.2em; }
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10, 14, 17, .6); z-index: 7; padding: 16px; }
+  .overlay .card { width: min(360px, 100%); border-radius: 18px; padding: 18px; display: grid; gap: 10px; border: 1px solid rgba(239, 68, 68, .5); background: var(--glass-solid); }
+  .overlay .card.good { border-color: rgba(45, 212, 191, .5); }
+  .overlay .card.idle { border-color: var(--glass-line); }
+  .overlay h4 { margin: 0; font: 700 18px var(--hud); color: var(--red); letter-spacing: .04em; }
+  .overlay .good h4 { color: var(--teal); } .overlay .idle h4 { color: var(--text); }
+  .overlay [dir="rtl"] h4 { font-family: var(--ar); letter-spacing: 0; }
+  .overlay p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .overlay .row { display: flex; gap: 8px; justify-content: flex-end; }
+  .btn { border: 1px solid var(--line); background: var(--surface-2); padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+  .btn.primary { background: var(--amber); color: #141a1f; border-color: var(--amber); }
 
-  /* ------------------------------------------------------------ controls */
-  .controls { display: grid; gap: 10px; padding: 12px; }
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border-radius: 10px; padding: 3px; }
-  .seg button { border: 0; background: transparent; color: var(--muted); padding: 10px 6px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
-  .seg button.on { background: var(--amber); color: #141a1f; }
-  .seg button:active, .btn:active { transform: scale(.97); }
-  .seg.loss button.on { background: var(--teal); }
-  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .btn { border: 1px solid var(--line); background: var(--surface-2); color: var(--text); padding: 12px 8px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
-  .btn.on { border-color: var(--amber); color: var(--amber); }
-  .btn.danger { color: var(--red); border-color: var(--red); }
-  .hint { color: var(--muted); font-size: 12px; }
-  .label { color: var(--muted); font-size: 12px; margin: 2px 2px -4px; }
-  #banner { display: none; padding: 10px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 600; font-size: 14px; }
-  #banner.weak { background: var(--amber); color: #141a1f; }
-  #banner.show { display: block; grid-column: 1 / -1; }
-  #banner.over { background: var(--surface); color: var(--text); border: 2px solid var(--red); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  #banner.over.good { border-color: var(--teal); }
-  #banner.over b { color: var(--red); } #banner.over.good b { color: var(--teal); }
-  #banner .btn { padding: 8px 14px; margin-left: auto; }
-  #toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--red); color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9; max-width: 90vw; text-align: center; }
-  #toast.show { opacity: 1; }
+  /* small, only for the result of the operator's own taps; inside the map area, clear of the header and the read-outs */
+  .toast { position: absolute; left: 50%; top: calc(max(8px, var(--st)) + 58px); transform: translateX(-50%); font-weight: 600; font-size: 12.5px; padding: 6px 12px; border-radius: 10px;
+    opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 5; max-width: 300px; text-align: center; }
+  .toast.show { opacity: 1; }
 
-  /* ------------------------------------------------------------ portrait / phone */
-  @media (orientation: portrait), (max-width: 760px) {
-    main { display: flex; flex-direction: column; overflow-y: auto; touch-action: pan-y; }
-    main > *, .side > * { flex: none; }
-    .side { display: contents; }
-    #banner { order: 0; }
-    .views { order: 1; }
-    .tele { order: 2; grid-template-columns: repeat(2, 1fr); overflow: visible; }
-    .stickpane { order: 3; display: block; }
-    #stickwrap { display: block; }
-    #stick { display: block; width: min(100%, 34vh, 260px); margin: 0 auto; }
-    #stickwrap { padding: 6px; }
-    .controls { order: 4; }
-    header h1 small { display: none; }
+  /* ---------------------------------------------------------------- landscape sizes */
+  @media (orientation: landscape) and (max-height: 400px) {
+    :root { --stick: 150px; --stop: 80px; --round: 52px; }
+    .stats { padding: 5px 12px; gap: 14px; } .stat b { font-size: 17px; }
+    .cam { width: 84px; }
+    .modes button { padding: 8px 10px; }
   }
-  /* phone held sideways: little height, keep the stick usable and let the right column scroll */
-  @media (orientation: landscape) and (max-height: 520px) {
-    header { padding: 6px 12px; gap: 12px; }
-    header h1 { font-size: 15px; }
-    main { padding: 8px; gap: 8px; }
-    .stickpane { grid-template-rows: 1fr auto; }
-    #stickwrap { padding: 4px; }
-    #stick { width: min(100%, calc(100vh - 120px)); }
-    .stickfoot { padding: 0 4px 2px; }
-    .views img#map { max-height: 26vh; }
-    #cam { width: 64px; height: 64px; }
-    .tele { padding: 8px 12px; gap: 6px 12px; }
-    .tele div b { font-size: 15px; }
-    .controls { padding: 8px; gap: 6px; }
-    .seg button, .btn { padding: 8px 6px; }
+  @media (orientation: landscape) and (max-width: 900px) { .brand small, #lat { display: none; } }
+  @media (orientation: landscape) and (min-width: 1000px) and (min-height: 640px) {
+    :root { --stick: 210px; --stop: 104px; --round: 62px; }
+    .cam { width: 132px; }
   }
-  /* compact phone mode: joystick, the three numbers that matter, and the buttons */
-  .iconbtn.more { display: none; width: auto; padding: 0 10px; font-size: 13px; }
-  @media (max-width: 760px), (max-height: 520px) {
-    .iconbtn.more { display: inline-block; }
-    body.compact .views, body.compact .tele .extra, body.compact #loss, body.compact #losslabel, body.compact #modehint { display: none; }
-    body.compact .tele { grid-template-columns: repeat(3, 1fr); }
-    header { flex-wrap: wrap; gap: 8px 10px; padding: 8px 12px; }
-    header h1 { font-size: 16px; }
-    body.compact header h1 .word { display: none; }
-    body.compact .meter { gap: 6px; font-size: 12px; }
-    body.compact .meter b { font-size: 14px; }
-    body.compact header .status, body.compact header #latency { display: none; }
-    body.compact header h1 small { display: none; }
-    body.compact .seg button { font-size: 14px; padding: 10px 2px; }
-    body.compact .btn { padding: 10px 4px; font-size: 14px; }
-    body.compact .side { grid-template-rows: auto 1fr; }
-    body.compact .tele { overflow: visible; }
+
+  /* ---------------------------------------------------------------- portrait: header / map / control deck */
+  @media (orientation: portrait) {
+    :root { --stick: min(250px, max(140px, calc(100vw - 200px)), 30vh); --stop: min(96px, 22vw); --round: min(58px, 14vw); }
+    .screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+    .topbar { position: relative; top: auto; left: auto; right: auto; margin: max(8px, var(--st)) var(--gut) 0 var(--gutr); flex-wrap: wrap; padding: 6px 6px 6px 12px; }
+    .brk { display: block; order: 20; flex: 0 0 100%; height: 0; }
+    #linkmeter { order: 21; } #battmeter { order: 22; }
+    .spacer2 { display: block; order: 23; flex: 1 1 0; min-width: 0; }
+    .achip { order: 24; max-width: 62vw; }
+    #fsbtn, #lat, .brand small { display: none; }
+    .mapwrap { position: relative; inset: auto; margin: 8px var(--gut) 0 var(--gutr); border-radius: 14px; border: 1px solid var(--line); background: var(--mapbg); }
+    .stats { top: 8px; left: 8px; gap: 12px; padding: 6px 10px; } .stat b { font-size: 17px; }
+    .cam { top: 8px; right: 8px; width: min(84px, 20vw); }
+    .toast { top: auto; bottom: 10px; max-width: calc(100% - 24px); }
+    .controls { position: relative; inset: auto; pointer-events: auto; z-index: 3; display: grid; width: 100%; max-width: 560px; margin: 0 auto;
+      grid-template-columns: 1fr auto 1fr; grid-template-areas: "modes modes modes" "left stick right";
+      align-items: center; justify-items: center; gap: 10px 6px; padding: 10px 12px max(12px, var(--sb)); }
+    .stickzone, .actions { position: static; }
+    .actions { display: contents; }
+    .stickzone { grid-area: stick; }
+    .modes { grid-area: modes; width: 100%; justify-content: stretch; }
+    .modes button { flex: 1 1 0; padding: 10px 4px; }
+    .side-btns { grid-area: left; flex-direction: column; gap: 12px; }
+    .stop { grid-area: right; }
   }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  button:focus-visible, input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .spacer2 { display: none; }
+  @media (orientation: portrait) and (min-width: 600px) {
+    :root { --stick: min(260px, 26vh); --stop: 104px; --round: 64px; }
+    /* a tablet has room for a one-line header */
+    .topbar { flex-wrap: nowrap; }
+    .brk, .spacer2 { display: none; }
+    .achip { order: 3; }
+    #linkmeter { order: 5; } #battmeter { order: 6; }
+    .brand small, #lat { display: inline; }
+    .controls { padding-top: 14px; gap: 14px 24px; }
+    .stats { gap: 18px; padding: 8px 14px; } .stat b { font-size: 20px; }
+    .cam { width: 120px; }
+    .achip { max-width: 320px; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<header>
-  <h1 id="title">Rovust <span class="word">console</span> <small id="env">connecting…</small></h1>
-  <div class="meter" title="radio link to the rover"><span class="bars l4" id="linkbars"><i></i><i></i><i></i><i></i></span><b id="link">—</b><span id="latency"></span></div>
-  <div class="meter" title="battery"><span class="batt" id="battwrap"><i id="batt" style="width:100%"></i></span><b id="battpct">—</b></div>
-  <div class="spacer"></div>
-  <span class="status" id="status">—</span>
-  <button class="iconbtn more" id="morebtn" title="Show map and statistics">More</button>
-  <button class="iconbtn" id="themebtn" title="Switch light / dark">◐</button>
-</header>
+<div class="screen" id="screen">
+  <div class="topbar glass" id="topbar">
+    <div class="brand">ROVUST <small id="env"></small></div>
+    <span class="pill idle" id="status">—</span>
+    <span class="achip" id="achip" role="status" aria-live="polite" hidden></span>
+    <div class="spacer"></div>
+    <div class="meter" id="linkmeter"><span class="bars" id="bars"><i></i><i></i><i></i><i></i></span><b id="link">—</b><span id="lat"></span></div>
+    <div class="meter" id="battmeter"><span class="batt" id="battwrap"><i id="batt" style="width:0"></i></span><b id="battpct">—</b></div>
+    <span class="padI" id="padI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"/><path d="M17.3 5H6.7a4 4 0 0 0-3.95 3.37l-.9 5.66A3 3 0 0 0 7 16.5l1.5-1.5h7l1.5 1.5a3 3 0 0 0 5.15-2.47l-.9-5.66A4 4 0 0 0 17.3 5z"/></svg></span>
+    <button class="ibtn" id="fsbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+    <button class="ibtn lng" id="langbtn" aria-label="English / عربي">EN</button>
+    <button class="ibtn" id="morebtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+    <i class="brk"></i><span class="spacer2"></span>
+  </div>
 
-<div id="toast" role="alert"></div>
-<main>
-  <div id="banner" role="status"></div>
-  <section class="stickpane">
-    <div class="panel" id="stickwrap"><canvas id="stick" width="420" height="420" aria-label="joystick with sonar ring"></canvas></div>
-    <div class="stickfoot">
-      <span>Top speed <b id="speedval">0.35 m/s</b></span>
-      <input type="range" id="speed" min="0.05" max="0.6" step="0.05" value="0.35" aria-label="top speed">
+  <div class="mapwrap" id="mapwrap">
+    <canvas id="map" aria-label="the rover's map"></canvas>
+    <div class="stats glass" id="stats">
+      <div class="stat"><span data-i="speed"></span><b><span id="velN">—</span><small>m/s</small></b></div>
+      <div class="stat"><span data-i="front"></span><b id="front"><span id="frontN">—</span><small>m</small></b></div>
+      <div class="stat"><span data-i="mapped"></span><b><span id="covN">—</span><small>%</small></b></div>
     </div>
-  </section>
+    <div class="cam glass" id="camcard"><img id="cam" alt=""><div id="terrain"></div></div>
+    <div class="toast glass" id="toast" role="alert"></div>
+  </div>
 
-  <section class="side">
-    <div class="views">
-      <div><img id="map" alt="the rover's map"><div class="caption">Map built by the rover — orange is the rover, green its path, white dot the base</div></div>
-      <div><img id="cam" alt="camera"><div class="caption" id="terrain">camera</div></div>
+  <div class="controls" id="controls">
+    <div class="stickzone">
+      <canvas id="stick" width="360" height="360"></canvas>
+      <div class="speed glass"><button id="slower" aria-label="slower">−</button><b id="speedval">0.35 m/s</b><button id="faster" aria-label="faster">+</button></div>
     </div>
-
-    <div class="panel tele">
-      <div><span>Driving</span><b id="beh">—</b></div>
-      <div><span>Speed</span><b id="vel">—</b></div>
-      <div><span>Nearest ahead</span><b id="front">—</b></div>
-      <div class="extra"><span>Mapped</span><b id="cov">—</b></div>
-      <div class="extra"><span>Distance driven</span><b id="dist">—</b></div>
-      <div class="extra"><span>Bumps / cliffs</span><b id="events">—</b></div>
-      <div id="notice"></div>
-    </div>
-
-    <div class="panel controls">
-      <div class="label">Who drives</div>
-      <div class="seg" id="modes">
-        <button data-mode="manual">Manual</button>
-        <button data-mode="assisted">Assisted</button>
-        <button data-mode="autonomous">Autonomous</button>
+    <div class="actions">
+      <div class="modes glass" id="modes" role="group" aria-label="Who drives">
+        <button data-mode="manual" data-i="manual"></button>
+        <button data-mode="assisted" data-i="assisted"></button>
+        <button data-mode="autonomous" data-i="auto"></button>
       </div>
-      <div class="hint" id="modehint">Assisted: you steer, the rover still stops for walls and cliffs.</div>
-      <div class="label" id="losslabel">If the link drops for 3 s</div>
-      <div class="seg loss" id="loss">
-        <button data-loss="hold">Wait</button>
-        <button data-loss="explore">Explore alone</button>
-        <button data-loss="home">Return home</button>
+      <div class="side-btns">
+        <button class="round glass" id="lights"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg><span data-i="lights"></span></button>
+        <button class="round glass" id="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg><span data-i="home"></span></button>
       </div>
-      <div class="row">
-        <button class="btn" id="lights">Headlights</button>
-        <button class="btn" id="home">Return home</button>
-        <button class="btn danger" id="stop">Stop</button>
-      </div>
+      <button class="stop" id="stop"></button>
     </div>
-  </section>
-</main>
+  </div>
+
+  <aside class="drawer glass" id="drawer">
+    <h3><span data-i="details"></span><button class="ibtn" id="closedrawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></h3>
+    <dl>
+      <dt data-i="dBeh"></dt><dd class="txt" id="beh">—</dd>
+      <dt data-i="dTime"></dt><dd id="mtime">—</dd>
+      <dt data-i="dDist"></dt><dd id="dist">—</dd>
+      <dt data-i="dBumps"></dt><dd id="events">—</dd>
+      <dt data-i="dHdg"></dt><dd id="hdg">—</dd>
+      <dt data-i="dLat"></dt><dd id="latency">—</dd>
+      <dt data-i="dPackets"></dt><dd id="packets">—</dd>
+      <dt data-i="dCam"></dt><dd class="txt" id="terrain2">—</dd>
+    </dl>
+    <p class="hint" id="modehint"></p>
+    <div class="lbl" data-i="lossL"></div>
+    <div class="seg" id="loss"><button data-loss="hold" data-i="lHold"></button><button data-loss="explore" data-i="lExplore"></button><button data-loss="home" data-i="lHome"></button></div>
+    <div class="lbl" data-i="mapL"></div>
+    <div class="seg two" id="mapview"><button data-v="follow" data-i="mFollow"></button><button data-v="whole" data-i="mWhole"></button></div>
+    <div class="lbl" data-i="themeL"></div>
+    <div class="seg two" id="theme"><button data-t="dark" data-i="tDark"></button><button data-t="light" data-i="tLight"></button></div>
+    <p class="hint key" data-i="stickHint"></p>
+    <p class="hint" data-i="keysHint"></p>
+  </aside>
+
+  <div class="overlay" id="over" hidden>
+    <div class="card" id="overcard">
+      <h4 id="overT"></h4>
+      <p id="overP"></p>
+      <div class="row" id="overRow"><button class="btn primary" id="restart" data-i="restartB"></button></div>
+    </div>
+  </div>
+</div>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const root = document.documentElement;
-  const phone = matchMedia('(max-width: 760px), (max-height: 520px)').matches;
+  const phone = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 760px), (max-height: 520px)').matches;
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+  // timing counters for profiling: open the page with #perf
+  const PERF = /perf/.test(location.hash) ? (window.__perf = { map: [], stick: [], render: [] }) : null;
+  const timed = (k, f) => { if (!PERF) return f(); const t0 = performance.now(); f(); PERF[k].push(performance.now() - t0); };
 
-  // ---------------------------------------------------------------- theme
-  const saved = (() => { try { return localStorage.getItem('rover-theme'); } catch { return null; } })();
-  if (saved) root.dataset.theme = saved;
+  // ================================================================ strings (English + Egyptian Arabic)
+  const STR = {
+    en: {
+      speed: 'Speed', front: 'Nearest ahead', mapped: 'Mapped', manual: 'Manual', assisted: 'Assisted', auto: 'Auto',
+      lights: 'Lights', home: 'Home', stop: 'STOP', resume: 'GO',
+      details: 'Details', dBeh: 'Doing now', dTime: 'Mission time', dDist: 'Distance driven', dBumps: 'Bumps / cliffs', dHdg: 'Heading',
+      dLat: 'Radio delay', dPackets: 'Commands arrived / lost', dCam: 'Camera sees',
+      lossL: 'If the link drops for 3 s', lHold: 'Wait', lExplore: 'Explore', lHome: 'Go home',
+      mapL: 'Map', mFollow: 'Follow rover', mWhole: 'Whole map', themeL: 'Look', tDark: 'Dark', tLight: 'Light',
+      stickHint: 'Push the stick where you want to go; circle it to spin in place.',
+      keysHint: 'Keyboard: W A S D or arrows drive like a car, Space stops. Controller: ✕ gas · △ reverse · stick or d-pad steers · Start stop · ○ lights · □ home · L1/R1 mode · R2/L2 + right stick drive.',
+      hints: { manual: 'Manual: you drive and nothing stops you, not even a cliff.', assisted: 'Assisted: you steer, the rover still stops for walls and cliffs.', autonomous: 'Auto: the rover explores and comes back by itself.' },
+      tMode: { manual: 'Manual', assisted: 'Assisted', autonomous: 'Auto' },
+      env: { cave: 'Cave', mars: 'Mars', underwater: 'Underwater' },
+      stExploring: 'Exploring', stManual: 'Manual', stAssisted: 'Assisted', stStopped: 'Stopped', stReturning: 'Returning', stWeak: 'Weak link', stOver: 'Mission over',
+      stLost: { hold: 'No link · waiting', explore: 'No link · exploring', home: 'No link · going home' }, stLostIn: (n) => `No link · alone in ${n} s`,
+      stNoMission: 'No mission', stOffline: 'Not connected',
+      overT: 'MISSION OVER', restartB: 'New mission', noMissionT: 'No mission running', noMissionP: 'Start a mission on the computer; this screen connects by itself.',
+      offlineP: 'Cannot reach the simulator. Check that the computer is on the same Wi-Fi and the console is open.',
+      tStopped: 'Stopped · GO to drive again', tGo: 'Driving again', tMissionOver: 'Mission over · start a new one first', tNoLink: 'No link · not delivered', tOffline: 'Cannot reach the simulator',
+      tFs: 'Full screen not allowed here', padOn: 'Controller connected', padOff: 'Controller disconnected',
+      noLink: 'no link', delay: (s) => `${s} s delay`, camera: 'Camera',
+      terrain: { ground: 'ground', rock: 'rock', sand: 'sand', mud: 'mud', bedrock: 'bedrock', pit: 'a pit', water: 'water' },
+      beh: { STOP: 'Emergency stop', ESCAPE: 'Backing off a bump', CLIFF: 'Stopped at an edge', SLOPE: 'Too steep, turning away', AVOID: 'Avoiding a wall', HOME: 'Going home',
+             SCAN: 'Looking around', EXPLORE: 'Exploring', TELEOP: 'You are driving', WANDER: 'Wandering', HOLD: 'Waiting for the link' },
+      // short header words: no numbers, no advice
+      a: {
+        stuck: (t) => (t === 'sand' ? 'Stuck in sand' : 'Stuck in mud'),
+        linkWeak: () => 'Weak signal', linkLost: () => 'Link lost', batt: () => 'Battery low', gas: () => 'Gas nearby',
+        fault: (n) => `${n} failed`, dark: () => 'Too dark', paused: () => 'Paused', ended: () => 'Mission over',
+      },
+      aDarkBtn: 'Lights on',
+    },
+    ar: {
+      speed: 'السرعة', front: 'أقرب حاجة', mapped: 'اتكشف', manual: 'إنت سايق', assisted: 'إنت + هو', auto: 'لوحده',
+      lights: 'النور', home: 'رجوع', stop: 'وقّف', resume: 'كمّل',
+      details: 'التفاصيل', dBeh: 'بيعمل إيه', dTime: 'بقاله شغال', dDist: 'مشي قد إيه', dBumps: 'خبطات / حواف', dHdg: 'اتجاهه',
+      dLat: 'تأخير الإشارة', dPackets: 'أوامر وصلت / ضاعت', dCam: 'الكاميرا شايفة',
+      lossL: 'لو الإشارة فصلت 3 ثواني', lHold: 'يستنى', lExplore: 'يستكشف', lHome: 'يرجع',
+      mapL: 'الخريطة', mFollow: 'ماشية معاه', mWhole: 'الخريطة كلها', themeL: 'الشكل', tDark: 'غامق', tLight: 'فاتح',
+      stickHint: 'حرّك العصاية ناحية المكان اللي عايزه يروحه، ولو لفّيتها حوالين نفسها هيلف في مكانه',
+      keysHint: 'الكيبورد: W A S D أو الأسهم بتسوقه زي العربية، والمسافة توقّفه. الدراع: ✕ بنزين · △ ورا · العصاية أو الأسهم للاتجاه · Start وقّف · ○ النور · □ رجوع · L1/R1 الوضع · R2/L2 مع العصاية اليمين سواقة.',
+      hints: { manual: 'إنت سايق: محدش هيوقفك، ولا حتى لو قدامه حفرة.', assisted: 'إنت + هو: إنت بتوجّه، وهو بيقف لوحده قبل الحيطة أو الحفرة.', autonomous: 'لوحده: الروبوت بيستكشف ويرجع من غيرك.' },
+      tMode: { manual: 'إنت سايق', assisted: 'إنت + هو', autonomous: 'لوحده' },
+      env: { cave: 'كهف', mars: 'المريخ', underwater: 'تحت المية' },
+      stExploring: 'بيستكشف', stManual: 'إنت سايق', stAssisted: 'إنت + هو', stStopped: 'واقف', stReturning: 'راجع', stWeak: 'الإشارة ضعيفة', stOver: 'المهمة خلصت',
+      stLost: { hold: 'مفيش إشارة · مستني', explore: 'مفيش إشارة · بيستكشف', home: 'مفيش إشارة · راجع' }, stLostIn: (n) => `مفيش إشارة · لوحده بعد ${n} ث`,
+      stNoMission: 'مفيش مهمة', stOffline: 'مش متوصل',
+      overT: 'المهمة خلصت', restartB: 'مهمة جديدة', noMissionT: 'مفيش مهمة شغالة', noMissionP: 'ابدأ مهمة من الكمبيوتر، والشاشة دي هتتوصل لوحدها.',
+      offlineP: 'مش قادر أوصل للبرنامج. اتأكد إن الكمبيوتر على نفس الواي فاي وإن الكونسول مفتوح.',
+      tStopped: 'وقف · دوس «كمّل» علشان تسوق', tGo: 'نسوق تاني', tMissionOver: 'المهمة خلصت · ابدأ واحدة جديدة', tNoLink: 'مفيش إشارة · الأمر ما وصلش', tOffline: 'مش قادر أوصل للبرنامج',
+      tFs: 'ملء الشاشة مش مسموح هنا', padOn: 'الدراع اتوصل', padOff: 'الدراع اتفصل',
+      noLink: 'مفيش', delay: (s) => `تأخير ${s} ث`, camera: 'الكاميرا',
+      terrain: { ground: 'أرض عادية', rock: 'صخر', sand: 'رمل', mud: 'طين', bedrock: 'صخر ناشف', pit: 'حفرة', water: 'مية' },
+      beh: { STOP: 'وقفة طوارئ', ESCAPE: 'بيرجع لورا بعد خبطة', CLIFF: 'وقف عند حافة', SLOPE: 'الطلعة جامدة، بيلف', AVOID: 'بيتفادى حيطة', HOME: 'راجع', SCAN: 'بيبص حواليه',
+             EXPLORE: 'بيستكشف', TELEOP: 'إنت اللي سايق', WANDER: 'بيلف يدوّر على طريق', HOLD: 'مستني الإشارة' },
+      a: {
+        stuck: (t) => (t === 'sand' ? 'غارز في الرمل' : 'غارز في الطين'),
+        linkWeak: () => 'الإشارة ضعيفة', linkLost: () => 'الإشارة فصلت', batt: () => 'البطارية قليلة', gas: () => 'فيه غاز',
+        fault: (n) => `${n} باظ`, dark: () => 'الدنيا ضلمة', paused: () => 'المهمة واقفة', ended: () => 'المهمة خلصت',
+      },
+      aDarkBtn: 'ولّع النور',
+    },
+  };
+  let LANG = store.get('rover-lang') === 'en' ? 'en' : 'ar';
+  const tr = (k) => STR[LANG][k];
+
+  // ================================================================ cheap DOM writes: only when the value changed
+  const memo = new Map();
+  const setText = (id, v) => { v = String(v); if (memo.get(id) === v) return; memo.set(id, v); $(id).textContent = v; };
+  const setClass = (el, v) => { if (el.className !== v) el.className = v; };
+
+  // ================================================================ theme
+  const savedTheme = store.get('rover-theme');
+  if (savedTheme) root.dataset.theme = savedTheme;
   else if (matchMedia('(prefers-color-scheme: light)').matches) root.dataset.theme = 'light';
   let C = {};
   function readColors() {
     const cs = getComputedStyle(root);
-    for (const k of ['bg', 'line', 'muted', 'teal', 'amber', 'red', 'stick', 'stick-knob']) C[k] = cs.getPropertyValue('--' + k).trim();
+    for (const k of ['bg', 'mapbg', 'line', 'muted', 'teal', 'amber', 'red', 'rover', 'knob', 'stickbg', 'glass-line']) C[k] = cs.getPropertyValue('--' + k).trim();
   }
-  readColors();
-  $('themebtn').onclick = () => {
-    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
-    try { localStorage.setItem('rover-theme', root.dataset.theme); } catch {}
-    readColors(); requestDraw();
-  };
-
-  // --------------------------------------------------------- compact mode
-  let compact = phone;
-  const savedCompact = (() => { try { return localStorage.getItem('rover-compact'); } catch { return null; } })();
-  if (savedCompact !== null) compact = savedCompact === '1';
-  function applyCompact() {
-    document.body.classList.toggle('compact', compact && phone);
-    $('morebtn').textContent = compact ? 'More' : 'Less';
-    if (!compact) refreshImages();
+  function setTheme(t) {
+    root.dataset.theme = t; store.set('rover-theme', t);
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#e9edf1' : '#141a1f');
+    for (const b of $('theme').children) b.classList.toggle('on', b.dataset.t === t);
+    readColors(); mapDirty = stickDirty = true;
   }
-  $('morebtn').onclick = () => { compact = !compact; try { localStorage.setItem('rover-compact', compact ? '1' : '0'); } catch {} applyCompact(); };
-  applyCompact();
 
-  // ------------------------------------------------------------- helpers
-  let toastTimer = 0;
-  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+  // ================================================================ helpers
+  const buzz = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+  let toastT = 0;
+  function toast(msg, color) { const t = $('toast'); t.textContent = msg; t.style.color = color || ''; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
   const post = (body) => fetch('/api/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true })
-    .then(r => r.json()).then(r => {
-      if (!r.ok && body.type !== 'drive') toast(r.reason === 'mission_over' ? 'Mission over - start a new mission first' : 'No radio link - the rover did not receive that');
-      return r.ok; })
-    .catch(() => { toast('Cannot reach the simulator'); return false; });
+    .then((r) => r.json()).then((r) => {
+      if (!r.ok && body.type !== 'drive' && body.type !== 'steer') toast(r.reason === 'mission_over' ? tr('tMissionOver') : tr('tNoLink'), 'var(--amber)');
+      return r.ok;
+    })
+    .catch(() => { if (body.type !== 'drive' && body.type !== 'steer') toast(tr('tOffline'), 'var(--red)'); return false; });
+  const fmtTime = (s) => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 
-  // ------------------------------------------------------------- joystick
-  const cv = $('stick'), ctx = cv.getContext('2d');
-  let stick = { x: 0, y: 0, active: false }, state = null, lastSend = 0, drawPending = false;
+  let state = null, online = true, latched = false, view = store.get('rover-view') || 'follow', topSpeed = 0.35, speedEditAt = 0;
+  let mapDirty = true, stickDirty = true;
 
-  function requestDraw() {
-    if (drawPending) return;
-    drawPending = true;
-    requestAnimationFrame(() => { drawPending = false; draw(); });
+  // ================================================================ map: the PNG is copied once into an offscreen canvas, then blitted only when something changed
+  const mapCv = $('map'), mctx = mapCv.getContext('2d', { alpha: false });
+  const off = document.createElement('canvas'), octx = off.getContext('2d');
+  let haveMap = false, DPR = 1, VW = 0, VH = 0, isPortrait = false;
+  function resize() {                                   // the only place that reads layout
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    const r = $('mapwrap').getBoundingClientRect();
+    VW = Math.max(1, Math.round(r.width)); VH = Math.max(1, Math.round(r.height));
+    mapCv.width = Math.round(VW * DPR); mapCv.height = Math.round(VH * DPR);
+    isPortrait = matchMedia('(orientation: portrait)').matches;
+    const sb = $('stick'), px = Math.round(sb.getBoundingClientRect().width * DPR) || 360;
+    if (sb.width !== px) { sb.width = sb.height = px; }
+    placeToast();
+    mapDirty = stickDirty = true;
   }
-
-  function draw() {
-    const W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, R = W * 0.46, r = W * 0.36, knob = W * 0.13;
-    ctx.clearRect(0, 0, W, H);
-    const sonar = state ? state.sonar : [];
-    const n = sonar.length || 8, step = 2 * Math.PI / n;
-    for (let i = 0; i < n; i++) {
-      const s = sonar[i] || { a: i * 360 / n, d: 1, max: 1, ok: true };
-      const frac = Math.min(1, s.d / s.max);
-      const a = -Math.PI / 2 - (s.a * Math.PI / 180);
-      const inner = r + 5, outer = inner + (R - inner) * (1 - frac) + 6;
-      ctx.beginPath();
-      ctx.arc(cx, cy, outer, a - step / 2 + 0.02, a + step / 2 - 0.02);
-      ctx.arc(cx, cy, inner, a + step / 2 - 0.02, a - step / 2 + 0.02, true);
-      ctx.closePath();
-      let col = C.line;
-      if (!s.ok || frac < 0.18) col = C.red;
-      else if (frac < 0.4) col = C.amber;
-      else if (frac < 0.98) col = C.teal;
-      ctx.globalAlpha = frac < 0.98 || !s.ok ? 0.85 : 0.35;
-      ctx.fillStyle = col; ctx.fill();
+  // landscape: the toast sits centred in the free gap between the read-outs and the camera
+  function placeToast() {
+    const t = $('toast');
+    if (isPortrait) { t.style.left = ''; t.style.maxWidth = ''; return; }
+    const a = $('stats').getBoundingClientRect(), b = $('camcard').getBoundingClientRect(), w = Math.max(140, b.left - a.right - 20);
+    t.style.left = Math.round((a.right + b.left) / 2) + 'px'; t.style.maxWidth = Math.min(300, w) + 'px';
+  }
+  function drawMap() {
+    const c = mctx; c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    c.fillStyle = C.mapbg; c.fillRect(0, 0, VW, VH);
+    if (!haveMap || !state || !state.mission) return;
+    const iw = off.width, ih = off.height, cell = state.map_size[0] / iw;
+    const fit = Math.min(VW / iw, VH / ih) * 0.94;
+    const rx = state.pose.x / cell, ry = ih - state.pose.y / cell;    // the PNG is already drawn y-up
+    let s, ox, oy;
+    if (view === 'whole') { s = fit; ox = (VW - iw * s) / 2; oy = (VH - ih * s) / 2; }
+    else { s = Math.max(fit, Math.min(16, Math.max(9, Math.min(VW, VH) / 40))); ox = VW / 2 - rx * s; oy = VH * (isPortrait ? 0.55 : 0.5) - ry * s; }
+    c.imageSmoothingEnabled = false;
+    c.drawImage(off, ox, oy, iw * s, ih * s);
+    const px = ox + rx * s, py = oy + ry * s, th = -state.pose.theta;
+    if (state.headlights) {
+      c.fillStyle = 'rgba(255,236,180,.20)'; c.beginPath(); c.moveTo(px, py); c.arc(px, py, Math.max(60, s * 8), th - .45, th + .45); c.closePath(); c.fill();
     }
-    ctx.globalAlpha = 1;
-    ctx.beginPath(); ctx.arc(cx, cy, R + 10, 0, 2 * Math.PI); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.fillStyle = C.stick; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(cx, cy - r + 10); ctx.lineTo(cx - 8, cy - r + 26); ctx.lineTo(cx + 8, cy - r + 26); ctx.closePath();
-    ctx.fillStyle = C.muted; ctx.fill();
-    const cl = state ? state.cliff : [];
-    const pos = [[-0.45, -0.95], [0.45, -0.95], [-0.95, 0], [0.95, 0], [-0.45, 0.95], [0.45, 0.95]];
-    cl.forEach((on, i) => { if (!pos[i]) return; ctx.beginPath(); ctx.arc(cx + pos[i][0] * r * 0.8, cy + pos[i][1] * r * 0.8, 6, 0, 2 * Math.PI); ctx.fillStyle = on ? C.red : C.teal; ctx.globalAlpha = on ? 1 : 0.5; ctx.fill(); ctx.globalAlpha = 1; });
-    const kx = cx + stick.x * (r - knob), ky = cy - stick.y * (r - knob);
-    ctx.beginPath(); ctx.arc(kx, ky, knob, 0, 2 * Math.PI);
-    ctx.fillStyle = stick.active ? C.amber : C['stick-knob']; ctx.fill();
-    if (!stick.active) { ctx.fillStyle = C.bg; ctx.font = `600 ${W * 0.04}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('drive', kx, ky); }
+    c.save(); c.translate(px, py); c.rotate(th);
+    c.fillStyle = C.rover || '#fb923c'; c.strokeStyle = '#141a1f'; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(12, 0); c.lineTo(-7, -7.5); c.lineTo(-4, 0); c.lineTo(-7, 7.5); c.closePath(); c.fill(); c.stroke();
+    c.restore();
+  }
+  let tapAt = null;
+  mapCv.addEventListener('pointerdown', (e) => { tapAt = [e.clientX, e.clientY]; });
+  mapCv.addEventListener('pointerup', (e) => {
+    if (tapAt && Math.hypot(e.clientX - tapAt[0], e.clientY - tapAt[1]) < 10) setView(view === 'whole' ? 'follow' : 'whole');
+    tapAt = null;
+  });
+  function setView(v) { view = v; store.set('rover-view', v); for (const b of $('mapview').children) b.classList.toggle('on', b.dataset.v === v); mapDirty = true; }
+
+  // ================================================================ joystick with the sonar ring around it
+  const stick = $('stick'), sctx = stick.getContext('2d');
+  const touch = { x: 0, y: 0, active: false };          // stick space: x right +, y up +
+  let shown = { x: 0, y: 0 }, shownActive = false;
+  let stickRect = null;
+  function drawStick() {
+    const c = sctx, size = stick.width, r = size / 2;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, size, size);
+    c.translate(r, r);
+    const sonar = state && state.sonar ? state.sonar : [];
+    const n = sonar.length || 8, step = 2 * Math.PI / n;
+    c.lineWidth = size * .05; c.lineCap = 'round';
+    for (let i = 0; i < n; i++) {
+      const s = sonar[i];
+      let col = C.line, alpha = .35;
+      if (s) {
+        const frac = Math.min(1, s.d / (s.max || 1));
+        if (!s.ok || s.d < .4 || frac < .18) col = C.red; else if (s.d < 1 || frac < .4) col = C.amber; else if (frac < .98) col = C.teal;
+        alpha = (!s.ok || frac < .98) ? .95 : .35;
+      }
+      const a = -Math.PI / 2 - (s ? s.a * Math.PI / 180 : i * step);   // sensor angle is counter-clockwise from ahead; ahead is up
+      c.strokeStyle = col; c.globalAlpha = alpha;
+      c.beginPath(); c.arc(0, 0, r * .9, a - step / 2 + .07, a + step / 2 - .07); c.stroke();
+    }
+    c.globalAlpha = 1;
+    c.fillStyle = C.stickbg; c.beginPath(); c.arc(0, 0, r * .78, 0, 7); c.fill();
+    c.strokeStyle = C['glass-line']; c.lineWidth = Math.max(1, size * .006); c.stroke();
+    c.beginPath(); c.moveTo(-r * .6, 0); c.lineTo(r * .6, 0); c.moveTo(0, -r * .6); c.lineTo(0, r * .6); c.stroke();
+    const cl = state && state.cliff ? state.cliff : [];
+    const pos = [[-.4, -.62], [.4, -.62], [-.66, 0], [.66, 0], [-.4, .62], [.4, .62]];
+    cl.forEach((on, i) => { if (!pos[i]) return; c.fillStyle = on ? C.red : C.teal; c.globalAlpha = on ? 1 : .45; c.beginPath(); c.arc(pos[i][0] * r, pos[i][1] * r, size * .015, 0, 7); c.fill(); });
+    c.globalAlpha = 1;
+    const kx = shown.x * r * .5, ky = -shown.y * r * .5, live = shown.x || shown.y || touch.active;
+    c.fillStyle = live ? 'rgba(245,165,36,.25)' : 'rgba(245,165,36,.12)'; c.beginPath(); c.arc(kx, ky, r * .3, 0, 7); c.fill();
+    c.fillStyle = live ? C.amber : C.knob; c.beginPath(); c.arc(kx, ky, r * .2, 0, 7); c.fill();
+  }
+  function setTouch(e) {
+    const b = stickRect, r = b.width / 2;
+    let x = (e.clientX - b.left - r) / (r * .5), y = -(e.clientY - b.top - r) / (r * .5);
+    const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; }
+    if (m < .12) { x = 0; y = 0; }                // small round dead zone: a resting thumb sends nothing
+    touch.x = x; touch.y = y;
+  }
+  stick.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); try { stick.setPointerCapture(e.pointerId); } catch (err) {}
+    stickRect = stick.getBoundingClientRect();     // read once per touch, not per move
+    touch.active = true; setTouch(e); buzz(8);
+  });
+  stick.addEventListener('pointermove', (e) => { if (touch.active) { e.preventDefault(); setTouch(e); } });
+  const release = () => { touch.active = false; touch.x = touch.y = 0; };
+  stick.addEventListener('pointerup', release); stick.addEventListener('pointercancel', release); stick.addEventListener('lostpointercapture', release);
+
+  // ---------------------------------------------------------------- keyboard (physical keys: the keyboard language does not matter)
+  const keys = {};
+  addEventListener('keydown', (e) => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) { keys[e.code] = true; e.preventDefault(); }
+    if (e.code === 'Space' && !e.repeat) { e.preventDefault(); toggleStop(); }
+  });
+  addEventListener('keyup', (e) => { keys[e.code] = false; });
+  addEventListener('blur', () => { for (const k in keys) keys[k] = false; release(); });
+
+  // ---------------------------------------------------------------- game controller (USB dongle or Bluetooth), standard mapping
+  const pad = { prev: [], any: false };
+  const padList = () => (navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : []);
+  addEventListener('gamepadconnected', () => { pad.any = true; $('padI').classList.add('on'); toast(tr('padOn'), 'var(--teal)'); });
+  addEventListener('gamepaddisconnected', () => { pad.any = padList().length > 0; $('padI').classList.toggle('on', pad.any); toast(tr('padOff'), 'var(--amber)'); });
+  function readPad() {
+    if (!pad.any) return null;                     // no controller: no polling cost at all
+    const g = padList()[0]; if (!g) return null;
+    // standard mapping, PlayStation names: 0 ✕, 1 ○, 2 □, 3 △, 4 L1, 5 R1, 6 L2, 7 R2, 9 Start, 12-15 d-pad up/down/left/right
+    const b = g.buttons.map((x) => x.pressed), hit = b.map((p, i) => p && !pad.prev[i]); pad.prev = b;
+    if (hit[9]) toggleStop();                              // Start = STOP (latches like the button)
+    if (hit[1]) $('lights').click();                       // ○ lights
+    if (hit[2]) $('home').click();                         // □ return home
+    if (hit[4] || hit[5]) {                                // L1 / R1: previous / next mode
+      const ms = [...$('modes').children]; let i = ms.findIndex((x) => x.classList.contains('on')); if (i < 0) i = 1;
+      ms[(i + (hit[5] ? 1 : ms.length - 1)) % ms.length].click();
+    }
+    const dz = (v) => (Math.abs(v) < .15 ? 0 : (v - Math.sign(v) * .15) / .85);
+    const padX = (b[15] ? 1 : 0) - (b[14] ? 1 : 0), padY = (b[12] ? 1 : 0) - (b[13] ? 1 : 0);
+    // ✕ gas / △ reverse, steered by the left stick's X or the d-pad left/right, like a driving game
+    let car = null;
+    if (b[0] !== b[3]) car = { x: padX || dz(g.axes[0] || 0), y: b[0] ? 1 : -1 };
+    // otherwise the left stick and the d-pad both say "go that way" on the map (stick up = map up, diagonals allowed)
+    let sx = dz(g.axes[0] || 0), sy = -dz(g.axes[1] || 0);
+    if (padX || padY) { const m = Math.hypot(padX, padY); sx = padX / m; sy = padY / m; }
+    // R2 / L2 + right stick: analog car driving
+    const rt = g.buttons[7] ? g.buttons[7].value : 0, lt = g.buttons[6] ? g.buttons[6].value : 0;
+    const dy = (rt > .05 || lt > .05) ? rt - lt : 0, dx = dz(g.axes[2] || 0);
+    return { car, held: b[0] || b[3], steer: { x: sx, y: sy }, drive: { x: dx, y: dy } };
   }
 
-  function pointer(e) {
-    const b = cv.getBoundingClientRect(), s = cv.width / b.width;
-    const x = (e.clientX - b.left) * s - cv.width / 2, y = (e.clientY - b.top) * s - cv.height / 2;
-    const r = cv.width * 0.36 - cv.width * 0.13;
-    let nx = x / r, ny = -y / r; const m = Math.hypot(nx, ny);
-    if (m > 1) { nx /= m; ny /= m; }
-    if (Math.abs(nx) < 0.12) nx = 0;          // dead zone: straight ahead is easy to hold
-    if (Math.abs(ny) < 0.08) ny = 0;
-    stick.x = nx; stick.y = ny;
+  // ---------------------------------------------------------------- one sender for touch, controller and keyboard
+  // "steer": (x, y) is where to go on the map (map x = right, map y = up; the map is drawn north-up, so stick up = map up)
+  //          and its length is the speed; the rover turns to face it, then drives (circling the stick spins it in place).
+  // "drive": tank control, y = forward, x = turn right (keyboard, and the controller's triggers + right stick).
+  let lastSend = 0, sentX = 0, sentY = 0, sentType = null;
+  function driveTick(now) {
+    let x = 0, y = 0, type = null;
+    const gp = readPad();
+    if (touch.active) { if (touch.x || touch.y) { x = touch.x; y = touch.y; } type = 'steer'; }
+    else if (gp && gp.car) { x = gp.car.x; y = gp.car.y; type = 'drive'; }
+    else if (gp && !gp.held && (gp.steer.x || gp.steer.y)) { x = gp.steer.x; y = gp.steer.y; type = 'steer'; }
+    else if (gp && !gp.held && (gp.drive.x || gp.drive.y)) { x = gp.drive.x; y = gp.drive.y; type = 'drive'; }
+    else {
+      const ky = (keys.ArrowUp || keys.KeyW ? 1 : 0) - (keys.ArrowDown || keys.KeyS ? 1 : 0);
+      const kx = (keys.ArrowRight || keys.KeyD ? .75 : 0) - (keys.ArrowLeft || keys.KeyA ? .75 : 0);
+      if (kx || ky) { x = kx; y = ky; type = 'drive'; }
+    }
+    if (latched) { x = 0; y = 0; type = null; }
+    if (x !== shown.x || y !== shown.y) { shown = { x, y }; stickDirty = true; }
+    if (touch.active !== shownActive) { shownActive = touch.active; stickDirty = true; }
+    if (sentType && type !== sentType) {                       // released, or switched control style: one zero for the old one
+      post({ type: sentType, x: 0, y: 0 });
+      sentType = null; lastSend = now; sentX = sentY = 0;
+    }
+    if (type) {
+      const changed = Math.abs(x - sentX) > .03 || Math.abs(y - sentY) > .03;
+      // at most every 150 ms while the input moves, every 400 ms while held still (the rover's watchdog stops it after 1 s of silence)
+      if ((changed && now - lastSend >= 150) || now - lastSend >= 400 || !sentType) {
+        lastSend = now; sentX = x; sentY = y; sentType = type;
+        post({ type, x, y });
+      }
+    }
   }
-  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); cv.setPointerCapture(e.pointerId); stick.active = true; pointer(e); send(true); requestDraw(); });
-  cv.addEventListener('pointermove', (e) => { if (stick.active) { e.preventDefault(); pointer(e); send(); requestDraw(); } });
-  const release = () => { stick.active = false; stick.x = stick.y = 0; send(true); requestDraw(); };
-  cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', release);
 
-  function send(force) {
-    const now = performance.now();
-    if (!force && now - lastSend < 120) return;
-    lastSend = now;
-    post({ type: 'drive', x: stick.x, y: stick.y });
+  // ================================================================ buttons
+  function toggleStop() {
+    latched = !latched;
+    $('stop').classList.toggle('held', latched); $('stop').textContent = latched ? tr('resume') : tr('stop');
+    if (latched) { release(); post({ type: 'stop' }); buzz([30, 40, 30]); toast(tr('tStopped'), 'var(--red)'); }
+    else { buzz(12); toast(tr('tGo'), 'var(--teal)'); }
+    render(false);
   }
-  setInterval(() => { if (stick.active) send(true); }, 400);   // keep the rover's watchdog fed
+  $('stop').onclick = toggleStop;
+  $('lights').onclick = () => { buzz(10); post({ type: 'lights', on: !(state && state.headlights) }); };
+  $('home').onclick = () => { buzz(10); if (latched) toggleStop(); post({ type: 'home' }); };
+  $('modes').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    buzz(10);
+    for (const x of $('modes').children) x.classList.toggle('on', x === b);
+    post({ type: 'mode', mode: b.dataset.mode });
+    $('modehint').textContent = tr('hints')[b.dataset.mode] || '';
+  });
+  $('loss').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    for (const x of $('loss').children) x.classList.toggle('on', x === b);
+    post({ type: 'link_loss', action: b.dataset.loss });
+  });
+  function setTop(v) {
+    topSpeed = Math.max(.05, Math.min(.6, Math.round(v * 100) / 100)); speedEditAt = performance.now();
+    setText('speedval', topSpeed.toFixed(2) + ' m/s'); buzz(6);
+    post({ type: 'speed', value: topSpeed });
+  }
+  $('slower').onclick = () => setTop(topSpeed - .05);
+  $('faster').onclick = () => setTop(topSpeed + .05);
+  $('morebtn').onclick = () => $('drawer').classList.toggle('open');
+  $('closedrawer').onclick = () => $('drawer').classList.remove('open');
+  $('camcard').onclick = () => $('drawer').classList.add('open');
+  $('mapview').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setView(b.dataset.v); });
+  $('theme').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setTheme(b.dataset.t); });
+  $('fsbtn').onclick = async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else { await root.requestFullscreen(); try { await screen.orientation.lock('landscape'); } catch (e) {} }
+    } catch (e) { toast(tr('tFs'), 'var(--amber)'); }
+  };
+  $('restart').onclick = () => post({ type: 'restart' });
+  $('langbtn').onclick = () => { LANG = LANG === 'ar' ? 'en' : 'ar'; store.set('rover-lang', LANG); applyLang(); };
+  $('achip').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]');
+    if (b && b.dataset.act === 'lights') { buzz(10); post({ type: 'lights', on: true }); }
+  });
 
-  const keys = {};   // physical key codes: independent of the keyboard language
-  addEventListener('keydown', (e) => { keys[e.code] = true; keyDrive(); });
-  addEventListener('keyup', (e) => { keys[e.code] = false; keyDrive(); });
-  function keyDrive() {
-    const y = (keys['ArrowUp'] || keys['KeyW'] ? 1 : 0) - (keys['ArrowDown'] || keys['KeyS'] ? 1 : 0);
-    const x = (keys['ArrowRight'] || keys['KeyD'] ? 0.75 : 0) - (keys['ArrowLeft'] || keys['KeyA'] ? 0.75 : 0);
-    stick.x = x; stick.y = y; stick.active = !!(x || y); send(true); requestDraw();
+  // ================================================================ the alert chip (debounced and held by the simulator; shown quietly, no sound, no popup)
+  const IC = {
+    warn: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>',
+    dark: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+  };
+  const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  let chipKey = '';
+  function renderChip(al) {
+    const el = $('achip');
+    const hide = !al || !state || !state.mission || state.done || al.key === 'ok' || al.sev === 'good';
+    if (hide) { if (!el.hidden) { el.hidden = true; chipKey = ''; } return; }
+    const f = STR[LANG].a[al.key];
+    let txt = String(al.key);
+    if (f) { try { txt = f(...(Array.isArray(al.args) ? al.args : [])); } catch (e) { /* keep the key */ } }
+    const key = [LANG, al.sev, txt, al.act || '', al.more | 0].join('|');
+    if (key === chipKey) return;                     // nothing changed: no DOM work
+    chipKey = key;
+    el.hidden = false;
+    el.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+    el.className = 'achip ' + (al.sev || 'info');
+    const ic = al.key === 'dark' ? 'dark' : al.key === 'paused' ? 'pause' : 'warn';
+    const act = al.act === 'lights' ? `<button data-act="lights">${esc(tr('aDarkBtn'))}</button>` : '';
+    const more = al.more > 0 ? `<b class="more">+${al.more | 0}</b>` : '';
+    el.innerHTML = `${svg(ic)}<span>${esc(txt)}</span>${act}${more}`;
   }
 
-  // ------------------------------------------------------------- controls
-  $('speed').oninput = (e) => { $('speedval').textContent = (+e.target.value).toFixed(2) + ' m/s'; post({ type: 'speed', value: +e.target.value }); };
-  $('modes').onclick = (e) => { const b = e.target.closest('button'); if (b) post({ type: 'mode', mode: b.dataset.mode }); };
-  $('loss').onclick = (e) => { const b = e.target.closest('button'); if (b) post({ type: 'link_loss', action: b.dataset.loss }); };
-  $('lights').onclick = () => post({ type: 'lights', on: !(state && state.headlights) });
-  $('home').onclick = () => post({ type: 'home' });
-  $('stop').onclick = () => { stick.x = stick.y = 0; stick.active = false; post({ type: 'stop' }); requestDraw(); };
-  const hints = { manual: 'Manual: you drive, nothing stops you — not even a cliff.', assisted: 'Assisted: you steer, the rover still stops for walls and cliffs.', autonomous: 'Autonomous: the rover explores and returns by itself.' };
+  // ================================================================ language
+  function applyLang() {
+    root.lang = LANG;
+    const rtl = LANG === 'ar';
+    document.querySelectorAll('[data-i]').forEach((el) => { const v = STR[LANG][el.dataset.i]; if (typeof v === 'string') el.textContent = v; });
+    for (const id of ['drawer', 'stats', 'toast', 'overcard', 'camcard']) $(id).dir = rtl ? 'rtl' : 'ltr';
+    $('langbtn').textContent = rtl ? 'EN' : 'ع';
+    $('langbtn').title = rtl ? 'English' : 'عربي';
+    $('fsbtn').title = $('fsbtn').ariaLabel = rtl ? 'ملء الشاشة' : 'Full screen';
+    $('morebtn').title = $('morebtn').ariaLabel = rtl ? 'التفاصيل والإعدادات' : 'Details and settings';
+    $('closedrawer').ariaLabel = rtl ? 'اقفل' : 'Close';
+    $('padI').title = rtl ? 'الدراع متوصل' : 'Controller connected';
+    $('linkmeter').title = rtl ? 'الإشارة للروبوت' : 'radio link to the rover';
+    $('battmeter').title = rtl ? 'البطارية' : 'battery';
+    $('stick').ariaLabel = rtl ? 'جويستيك وحواليه قراية السونار' : 'joystick with the sonar ring';
+    $('modes').setAttribute('aria-label', rtl ? 'مين اللي سايق' : 'Who drives');
+    $('stop').textContent = latched ? tr('resume') : tr('stop');
+    memo.clear(); chipKey = '';
+    render(false);
+    requestAnimationFrame(() => { resize(); });       // text widths changed: re-place the toast
+  }
 
-  // ------------------------------------------------------------- polling
-  const envNames = { cave: 'Cave', mars: 'Mars surface', underwater: 'Underwater site' };
-  let polling = false;
+  // ================================================================ state -> screen
+  let lastPoseKey = '', lastSonarKey = '';
+  function render(fromPoll) { timed('render', () => render_(fromPoll)); }
+  function render_(fromPoll) {
+    const s = state;
+    if (!online) {
+      setStatus(tr('stOffline'), 'bad'); setText('env', '');
+      showOverlay('bad', tr('stOffline'), tr('offlineP'), false); renderChip(null);
+      return;
+    }
+    if (!s) return;
+    if (!s.mission) {
+      setStatus(tr('stNoMission'), 'idle'); setText('env', '');
+      showOverlay('idle', tr('noMissionT'), tr('noMissionP'), false); renderChip(null);
+      return;
+    }
+    setText('env', (tr('env')[s.env] || s.env) + ' · ' + fmtTime(s.time));
+    // link
+    const lk = s.link, pct = Math.round(lk.strength * 100), lvl = lk.state === 'lost' ? 0 : Math.max(1, Math.min(4, Math.round(lk.strength * 4)));
+    const bars = $('bars'); setClass(bars, 'bars' + (lk.state === 'lost' ? ' lost' : lk.state === 'weak' ? ' weak' : ''));
+    const bk = 'b' + lvl; if (memo.get('bars') !== bk) { memo.set('bars', bk); [...bars.children].forEach((b, i) => b.classList.toggle('on', i < lvl)); }
+    setText('link', lk.state === 'lost' ? tr('noLink') : pct + '%');
+    setText('lat', lk.latency ? tr('delay')(lk.latency.toFixed(1)) : '');
+    // battery
+    const bf = Math.round(s.battery.fraction * 100);
+    if (memo.get('battw') !== bf) { memo.set('battw', bf); $('batt').style.width = bf + '%'; $('battwrap').classList.toggle('low', bf < 20); }
+    setText('battpct', bf + '%');
+    // status pill
+    if (s.done) setStatus(tr('stOver'), 'bad');
+    else if (lk.state === 'lost' && s.mode !== 'autonomous') setStatus(s.fallback ? tr('stLost')[s.on_link_loss] : tr('stLostIn')(Math.max(0, Math.ceil(3 - lk.lost_for))), 'bad');
+    else if (s.status === 'returning') setStatus(tr('stReturning'), '');
+    else if (latched) setStatus(tr('stStopped'), 'idle');
+    else if (lk.state === 'weak' && s.mode !== 'autonomous') setStatus(tr('stWeak'), 'warn');
+    else setStatus({ manual: tr('stManual'), assisted: tr('stAssisted'), autonomous: tr('stExploring') }[s.effective_mode] || tr('stExploring'), '');
+    // read-outs
+    setText('velN', Math.abs(s.speed.v).toFixed(2));
+    const ahead = s.sonar.filter((x) => Math.abs(x.a) <= 45 && x.ok);
+    if (!ahead.length) { setText('frontN', '—'); setClass($('front'), ''); }
+    else {
+      const front = Math.min(...ahead.map((x) => x.d)), mx = Math.max(...ahead.map((x) => x.max));
+      setText('frontN', front >= mx - .01 ? mx.toFixed(1) + '+' : front.toFixed(2));
+      setClass($('front'), front < .4 ? 'bad' : front < .9 ? 'warn' : '');
+    }
+    setText('covN', Math.round(s.coverage * 100));
+    const terr = s.terrain && s.terrain !== '?' ? (tr('terrain')[s.terrain] || s.terrain) : '';
+    setText('terrain', terr || tr('camera'));
+    // drawer (cheap text writes, and only when visible)
+    if ($('drawer').classList.contains('open')) {
+      setText('beh', tr('beh')[s.behaviour] || String(s.behaviour || '—').toLowerCase());
+      setText('mtime', fmtTime(s.time));
+      setText('dist', s.distance.toFixed(1) + ' m');
+      setText('events', `${s.bumps} / ${s.cliff_events}`);
+      setText('hdg', Math.round(((s.pose.theta * 180 / Math.PI) % 360 + 360) % 360) + '°');
+      setText('latency', (lk.latency || 0).toFixed(1) + ' s');
+      setText('packets', `${lk.delivered} / ${lk.dropped}`);
+      setText('terrain2', terr || '—');
+      setText('modehint', tr('hints')[s.mode] || '');
+    }
+    // controls mirror the rover (the desktop can change them too)
+    const ck = s.mode + '|' + s.on_link_loss + '|' + s.headlights + '|' + s.status;
+    if (memo.get('ctl') !== ck) {
+      memo.set('ctl', ck);
+      [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.mode === s.mode));
+      [...$('loss').children].forEach((b) => b.classList.toggle('on', b.dataset.loss === s.on_link_loss));
+      $('lights').classList.toggle('on', !!s.headlights);
+      $('home').classList.toggle('on', s.status === 'returning');
+    }
+    if (performance.now() - speedEditAt > 1500 && s.speed.max) { topSpeed = s.speed.max; setText('speedval', topSpeed.toFixed(2) + ' m/s'); }
+    // mission over
+    if (s.done) showOverlay((s.status === 'returned' || s.status === 'stopped') ? 'good' : 'bad', tr('overT'), s.end_reason || '', true);
+    else if (!$('over').hidden) $('over').hidden = true;
+    renderChip(s.alert);
+    // redraw only what the new state changes
+    const pk = s.pose.x + ',' + s.pose.y + ',' + s.pose.theta + ',' + s.headlights;
+    if (pk !== lastPoseKey) { lastPoseKey = pk; mapDirty = true; }
+    const sk = s.sonar.map((x) => x.d.toFixed(2) + x.ok).join() + s.cliff.join();
+    if (sk !== lastSonarKey) { lastSonarKey = sk; stickDirty = true; }
+  }
+  function setStatus(txt, cls) { setText('status', txt); setClass($('status'), 'pill' + (cls ? ' ' + cls : '')); }
+  function showOverlay(kind, title, text, restart) {
+    if ($('over').hidden) $('over').hidden = false;
+    setClass($('overcard'), 'card ' + kind);
+    setText('overT', title); setText('overP', text); $('overRow').hidden = !restart;
+  }
+
+  // ================================================================ polling: state about 4 Hz, the map picture at most once a second, nothing while hidden
+  let polling = false, fails = 0, nextPoll = 0, lastMapAt = 0, imgBusy = false;
   async function poll() {
-    if (polling || document.hidden) return;        // never queue requests on a slow phone
     polling = true;
     try {
-      const s = await (await fetch('/api/state')).json();
-      state = s;
-      if (!s.mission) { $('env').textContent = 'no mission running — start one on the computer'; $('status').textContent = '—'; return; }
-      $('env').textContent = envNames[s.env] || s.env;
-      const lk = s.link, lvl = lk.state === 'lost' ? 'lost' : 'l' + Math.max(1, Math.min(4, Math.round(lk.strength * 4)));
-      $('linkbars').className = 'bars ' + lvl;
-      $('link').textContent = lk.state === 'lost' ? 'no link' : Math.round(lk.strength * 100) + '%';
-      $('latency').textContent = lk.latency ? ` · ${lk.latency.toFixed(1)} s delay` : '';
-      const bf = s.battery.fraction; $('batt').style.width = Math.round(bf * 100) + '%'; $('battpct').textContent = Math.round(bf * 100) + '%';
-      $('battwrap').className = 'batt' + (bf < 0.2 ? ' low' : '');
-      $('status').textContent = s.status + (s.fallback ? ' · rover on its own' : ''); $('status').className = 'status ' + s.status;
-      $('beh').textContent = s.behaviour.toLowerCase();
-      $('vel').textContent = `${s.speed.v.toFixed(2)} m/s`;
-      const front = s.sonar.length ? Math.min(...s.sonar.filter(x => Math.abs(x.a) <= 45).map(x => x.d)) : 0;
-      const fb = $('front'); fb.textContent = front.toFixed(2) + ' m'; fb.className = front < 0.4 ? 'bad' : front < 0.9 ? 'warn' : '';
-      if (!(compact && phone)) {
-        $('cov').textContent = Math.round(s.coverage * 100) + '%';
-        $('dist').textContent = s.distance.toFixed(1) + ' m';
-        $('events').textContent = `${s.bumps} / ${s.cliff_events}`;
-        $('terrain').textContent = s.terrain ? `camera · ground looks like ${s.terrain}` : 'camera';
-      }
-      [...$('modes').children].forEach(b => b.classList.toggle('on', b.dataset.mode === s.mode));
-      [...$('loss').children].forEach(b => b.classList.toggle('on', b.dataset.loss === s.on_link_loss));
-      $('modehint').textContent = hints[s.mode];
-      $('lights').classList.toggle('on', s.headlights);
-      let note = '';
-      if (lk.state === 'lost') note = s.fallback ? `Link lost for ${lk.lost_for} s — the rover took over (${s.on_link_loss}).` : `Link lost — commands are not reaching the rover.`;
-      else if (lk.state === 'weak') note = 'Weak link — some commands are being dropped.';
-      else if (s.bumper.some(Boolean)) note = 'Bumper pressed.';
-      else if (s.cliff.some(Boolean)) note = 'Cliff detected under the rover.';
-      $('notice').textContent = note;
-      const bn = $('banner');
-      if (s.done) {
-        const good = s.status === 'returned' || s.status === 'stopped';
-        bn.className = 'show over' + (good ? ' good' : '');
-        bn.innerHTML = `<span><b>Mission over.</b> ${s.end_reason}</span><button class="btn" id="restart">New mission</button>`;
-        $('restart').onclick = () => post({ type: 'restart' });
-      } else if (lk.state === 'lost' && s.mode !== 'autonomous') {
-        const act = { hold: 'is waiting for the link', explore: 'is exploring on its own', home: 'is coming back towards the base' }[s.on_link_loss];
-        bn.textContent = s.fallback ? `Out of radio range - the rover ${act}. It will listen again once the link is back.` : `Out of radio range - the rover cannot hear you. In ${Math.max(0, 3 - lk.lost_for).toFixed(0)} s it will act on its own.`;
-        bn.className = 'show';
-      } else if (lk.state === 'weak' && s.mode !== 'autonomous') {
-        bn.textContent = 'Weak radio link - some commands are lost. Stay closer to the base or the open.';
-        bn.className = 'show weak';
-      } else { bn.className = ''; }
-      requestDraw();
+      const s = await (await fetch('/api/state', { cache: 'no-store' })).json();
+      const wasDone = state && state.done;
+      state = s; online = true; fails = 0;
+      if (s.mission && wasDone && !s.done && latched) toggleStop();    // a new mission starts unlatched
+      render(true);
+      if (s.mission && performance.now() - lastMapAt >= 1000) refreshImages();
     } catch (e) {
-      $('env').textContent = 'cannot reach the simulator';
-    } finally { polling = false; }
+      if (++fails >= 3 && online) { online = false; render(false); }
+    } finally { polling = false; nextPoll = performance.now() + (online ? 250 : 1500); }
   }
   function refreshImages() {
-    if (document.hidden || (compact && phone)) return;
-    const t = Date.now();
-    $('map').src = '/api/map.png?' + t;
+    if (imgBusy) return;
+    imgBusy = true; lastMapAt = performance.now();
+    const t = Date.now(), im = new Image();
+    im.onload = () => {
+      if (off.width !== im.naturalWidth || off.height !== im.naturalHeight) { off.width = im.naturalWidth; off.height = im.naturalHeight; }
+      octx.drawImage(im, 0, 0); haveMap = true; imgBusy = false; mapDirty = true;
+    };
+    im.onerror = () => { imgBusy = false; };
+    im.src = '/api/map.png?' + t;
     $('cam').src = '/api/camera.png?' + t;
   }
-  setInterval(poll, phone ? 300 : 200);
-  setInterval(refreshImages, phone ? 1500 : 700);
-  poll(); refreshImages(); requestDraw();
+
+  // ================================================================ loops
+  let lastPaint = 0, rafPending = false;
+  function paint() {
+    lastPaint = performance.now();
+    if (mapDirty) { mapDirty = false; timed('map', drawMap); }
+    if (stickDirty) { stickDirty = false; timed('stick', drawStick); }
+  }
+  const schedule = () => { if (!rafPending) { rafPending = true; requestAnimationFrame(() => { rafPending = false; paint(); }); } };
+  setInterval(() => {
+    if (document.hidden) return;                     // a hidden page does nothing at all
+    const now = performance.now();
+    driveTick(now);
+    if (!polling && now >= nextPoll) poll();
+    if (mapDirty || stickDirty) { schedule(); if (rafPending && now - lastPaint > 250) paint(); }   // frames throttled: still keep the picture current
+  }, 40);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { release(); for (const k in keys) keys[k] = false; if (sentType) { post({ type: sentType, x: 0, y: 0 }); sentType = null; } }
+    else { nextPoll = 0; lastMapAt = 0; }
+  });
+  addEventListener('resize', () => requestAnimationFrame(resize));
+  if (window.ResizeObserver) new ResizeObserver(() => resize()).observe($('mapwrap'));
+
+  readColors();
+  for (const b of $('theme').children) b.classList.toggle('on', b.dataset.t === (root.dataset.theme || 'dark'));
+  setView(view);
+  applyLang();
+  resize();
 })();
 </script>
 </body>

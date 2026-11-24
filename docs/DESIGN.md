@@ -46,7 +46,7 @@ drives two thrusters.
 Every sensor carries its course classification (`SensorClass`): local/global,
 internal/external, active/passive, binary/analog/digital. Analog sensors go
 through a 10-bit A/D converter (`ADC`). Any sensor can be set to *stuck*,
-*dead* or *noisy* at run time (click its row in the interface).
+*dead* or *noisy* at run time (the *Inject fault* column of the Sensors tab).
 
 | Sensor | Class | Placement and why |
 |---|---|---|
@@ -137,8 +137,8 @@ operator (shared control), in *manual* mode `ESCAPE`, `CLIFF`, `SLOPE` and
 `AVOID` are switched off and only `STOP` remains. A watchdog zeroes the
 command one second after the last one received.
 
-Commands (from the keyboard, or from the phone/tablet console served by
-`sim/teleop/server.py`) go through `RadioLink` (`sim/comms.py`): a base
+Commands (from the keyboard, a game controller, or the phone/tablet console
+served by `sim/teleop/server.py`) go through `RadioLink` (`sim/comms.py`): a base
 station at the start point, signal strength
 `(1 − 0.65 (d / range)²) · (1 − wall_loss · walls)` smoothed like an RSSI,
 packets dropped with 50 % probability when *weak* and always when *lost*,
@@ -150,10 +150,24 @@ Calibration: cave range 18 m, 5 % loss per wall cell (near half ok, middle
 weak, far corner lost); underwater 16 m, 5 %, 0.4 s; Mars 60 m, 2 %, 2 s.
 
 The console page never drives the robot directly: physical commands (drive,
-lights, stop, return home) only enter this link, and the page shows a toast
+steer, lights, stop, return home) only enter this link, and the page says so
 when one is dropped. Console *settings* (who drives, link-lost action, top
-speed) describe how the operator wants to work and apply at once. The stick
-response is car-like: `v = v_max · y|y|`, `ω = 1.0 · x|x| · (1 − 0.35|y|)`.
+speed) describe how the operator wants to work and apply at once. The car-like
+response (keyboard, triggers, ✕ / △ with the arrows) is `v = v_max · y|y|`,
+`ω = 1.0 · x|x| · (1 − 0.35|y|)`. The joystick and a controller's left stick
+use *point-to-go* instead (`Mission.steer_to_drive`): the stick gives a
+direction on the north-up map, the rover turns towards it with
+`turn = sign(e)·√min(1, |e|/60°)` (e = that direction minus the estimated
+heading) and drives with `|stick| · max(0, (cos e − 0.35)/0.65)`, so it only
+moves once it roughly faces the target and circling the stick spins it.
+
+**Alerts** (`sim/alerts.py`), shared by the desktop status bar and the console
+header: the raw conditions (stuck in mud or sand, weak or lost link, low
+battery, gas, a failed sensor, too dark for the camera, paused, over) are
+debounced 0.8 s, the alert shown is held at least 3 s unless a more serious
+one takes over after 1 s, and every start and end goes to an event log.
+Alerts travel as a key and arguments, so each interface words them in its own
+language (English or Egyptian Arabic).
 The **Radio link** tab draws the base station, the walls on the line of
 sight and the RSSI, and logs every packet with the sender's address; the maps
 draw the line of sight coloured by the link state.

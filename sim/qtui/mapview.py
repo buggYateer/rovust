@@ -9,6 +9,7 @@ from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
 from ..render import belief_rgb, world_rgb
+from .i18n import end_reason, tr
 
 C_TRUE_PATH = QColor(255, 215, 0)
 C_FUSED = QColor(40, 170, 90)
@@ -29,7 +30,7 @@ class MapWidget(QWidget):
     def __init__(self, title: str, parent=None):
         super().__init__(parent)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setToolTip("Click to open a large live view")
+        self.setToolTip(tr("enlargeTip"))
         self.title = title
         self.mission = None
         self.layers = {}
@@ -56,10 +57,11 @@ class MapWidget(QWidget):
     def _geometry(self):
         m = self.mission
         w_m, h_m = m.world.w * m.world.cell, m.world.h * m.world.cell
-        avail_w, avail_h = self.width() - 12, self.height() - 30
+        top = 24 if self.title else 6               # room for a drawn title (the main window shows its own header)
+        avail_w, avail_h = self.width() - 12, self.height() - top - 6
         scale = min(avail_w / w_m, avail_h / h_m)
         pw, ph = w_m * scale, h_m * scale
-        ox, oy = 6 + (avail_w - pw) / 2, 24 + (avail_h - ph) / 2
+        ox, oy = 6 + (avail_w - pw) / 2, top + (avail_h - ph) / 2
         return scale, ox, oy, pw, ph
 
     def to_px(self, x, y):
@@ -74,10 +76,12 @@ class MapWidget(QWidget):
         p.fillRect(self.rect(), pal.base())
         p.setPen(pal.placeholderText().color())
         p.setFont(QFont(self.font().family(), 9, QFont.Weight.Bold))
-        p.drawText(8, 16, self.title)
+        if self.title:
+            p.drawText(8, 16, self.title)
         if self.mission is None:
             p.setPen(pal.placeholderText().color())
-            p.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "No mission running")
+            p.setFont(QFont(self.font().family(), 10))
+            p.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, tr("noMissionMap"))
             return
         m = self.mission
         self._geo = self._geometry()
@@ -114,19 +118,21 @@ class MapWidget(QWidget):
         p.drawRoundedRect(box, 8, 8)
         p.setPen(col)
         p.setFont(QFont(self.font().family(), 12, QFont.Weight.Bold))
-        p.drawText(box.adjusted(10, 6, -10, -32), Qt.AlignmentFlag.AlignCenter, "MISSION OVER")
+        p.drawText(box.adjusted(10, 6, -10, -32), Qt.AlignmentFlag.AlignCenter, tr("missionOver"))
         p.setPen(QColor(230, 237, 243))
         p.setFont(QFont(self.font().family(), 9))
         p.drawText(box.adjusted(10, 30, -10, -6), Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap,
-                   m.end_reason() + "   Start a new mission (Restart, or R).")
+                   end_reason(m) + "   " + tr("startNew"))
 
     def _path(self, p, poses, color, width):
         if len(poses) < 2:
             return
         p.setPen(QPen(color, width))
-        pts = [self.to_px(q.x, q.y) for q in poses]
-        for a, b in zip(pts, pts[1:]):
-            p.drawLine(a, b)
+        step = max(1, len(poses) // 1500)               # never more than ~1500 points per frame
+        pts = [self.to_px(q.x, q.y) for q in poses[::step]]
+        last = poses[-1]
+        pts.append(self.to_px(last.x, last.y))
+        p.drawPolyline(pts)
 
     def _robot(self, p, pose, radius, fill, outline):
         c = self.to_px(pose.x, pose.y)
