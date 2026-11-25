@@ -71,3 +71,25 @@ def test_return_home_when_battery_is_low():
             break
     assert m.returning
     assert m.stats["return_reason"] == "battery"
+
+
+def test_path_follower_survives_a_shorter_new_path():
+    """The follower walked far along one path, then the path was replaced by a
+    shorter one (replanned elsewhere, or after the operator drove): it must
+    start the new path from its beginning, not crash on an old index."""
+    from sim.behaviors import PathFollower
+    from sim.core import Pose
+    grid = OccupancyGrid(10, 10, 0.2)
+    f = PathFollower(grid)
+    long_path = [(i, 5) for i in range(40)]
+    for i in range(31):                       # drive along it
+        x, y = grid.to_world(i, 5)
+        f.control(Pose(x, y, 0.0), long_path)
+    assert f.idx > 20
+    short_path = [(1, 1), (2, 1), (3, 1)]
+    v, w, done = f.control(Pose(x, y, 0.0), short_path)
+    assert f.idx < len(short_path)
+    # the same list object again (a path modified in place) is clamped, too
+    short_path.pop()
+    f.control(Pose(x, y, 0.0), short_path)
+    assert f.idx < len(short_path)

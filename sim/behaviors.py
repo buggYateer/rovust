@@ -210,6 +210,7 @@ class PathFollower:
         self.grid = grid
         self.v_max, self.k_turn, self.lookahead = v_max, k_turn, lookahead
         self.idx = 0
+        self._path = None
 
     def reset(self):
         self.idx = 0
@@ -217,6 +218,11 @@ class PathFollower:
     def control(self, pose, path):
         if not path:
             return 0.0, 0.0, True
+        if path is not self._path:
+            # a new path (replanned elsewhere, or after the operator drove): start at its beginning,
+            # never at an index left over from a longer one
+            self._path, self.idx = path, 0
+        self.idx = min(self.idx, len(path) - 1)
         # advance along the path to the look-ahead point
         while self.idx < len(path) - 1:
             x, y = self.grid.to_world(*path[self.idx])
