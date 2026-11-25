@@ -204,11 +204,11 @@ Our references. The course comes first: Bräunl's Embedded Robotics, which the l
 
 ## 21. Rovust, running
 
-The demo video: three minutes of the application running — a mission exploring the cave, the maps, a sensor fault, the phone and the game controller, the radio failing and the rover coming home.
+The demo video: three minutes of the application running — a cave mission and its two maps, the motor loop, a sensor breaking, the radio failing and the rover coming home, driving from a phone and a game controller, a report, Mars, underwater and the Arabic interface.
 
 <div dir="rtl" align="right">
 
-فيديو الديمو: تلات دقايق للبرنامج وهو شغال — مهمة بتستكشف الكهف، والخرايط، وسنسور بيبوظ، والموبايل والدراع، والراديو بيقطع والروبوت بيرجع لوحده.
+فيديو الديمو: تلات دقايق للبرنامج وهو شغال — مهمة في الكهف وخريطتينها، ولوب الموتور، وسنسور بيبوظ، والراديو بيقطع والروبوت بيرجع لوحده، والسواقة من الموبايل والدراع، والتقرير، والمريخ وتحت المية، والواجهة بالعربي.
 
 </div>
 

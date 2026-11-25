@@ -9,7 +9,7 @@ A Python simulation of an exploration rover, from motor control to mapping and d
 <p align="center">
   <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white">
   <img alt="PySide6" src="https://img.shields.io/badge/desktop%20app-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
-  <img alt="tests" src="https://img.shields.io/badge/tests-59%20passing-2dd4bf">
+  <img alt="tests" src="https://img.shields.io/badge/tests-60%20passing-2dd4bf">
   <img alt="sensors" src="https://img.shields.io/badge/sensors-20%2B%20modelled-f5a524">
 </p>
 
@@ -171,20 +171,22 @@ ground-speed sensor the estimate is 5–16 m off; without the cliff switches one
 rover in four is lost to a crater.
 
 ```bash
-pytest                                              # 59 tests
+pytest                                              # 60 tests
 python -m sim.experiments.pid_demo                  # step responses, calibration curve
 python -m sim.experiments.run_batch --seeds 10      # strategies
 python -m sim.experiments.run_batch --localisation  # fused vs encoders vs perfect
 python -m sim.experiments.run_batch --ablation      # one sensor off at a time
 python tools/make_media.py                          # regenerate every screenshot, the GIF and the report picture
+python tools/make_slide_images.py                   # the maps drawn for the slides
 python tools/build_presentation.py                  # rebuild the presentation (HTML, PDF, PowerPoint)
+python tools/make_video.py                          # record the 3-minute demo video (needs ffmpeg and Edge)
 ```
 
 ## Documents
 
 | | |
 |---|---|
-| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) · [printed cover sheet](docs/cover_sheet.pdf) |
+| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) · [demo video, 3 min](docs/media/rovust_demo.mp4) · [printed cover sheet](docs/cover_sheet.pdf) |
 | Proposal | [docs/Task1_v2.md](docs/Task1_v2.md) |
 | Design notes | [docs/DESIGN.md](docs/DESIGN.md): architecture, sensor placement and its justification, lessons learned |
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |

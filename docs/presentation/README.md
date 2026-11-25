@@ -19,6 +19,14 @@ Arrow keys move between slides. Read the notes from a phone (same link, or
    with the slides as pictures and the notes in presenter view.
 3. `Rovust_presentation.pdf` — works anywhere.
 
+**The demo video** (`docs/media/rovust_demo.mp4`, 3 minutes, no sound) is the
+slide before *Thank you*. Online it plays inside the slide: click it. In the
+PowerPoint and the HTML viewer, click the slide in the show and the video opens
+in the default player; it is a link, not a copy, so the deck stays small: keep
+the `docs/media` folder next to `docs/presentation`. If nothing opens,
+double-click `rovust_demo.mp4` yourself. Upload it to the group's Drive folder
+together with the presentation.
+
 ## Files
 
 | File | What it is |

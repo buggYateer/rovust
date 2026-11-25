@@ -26,6 +26,7 @@ import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRES = os.path.join(ROOT, "docs", "presentation")
+VIDEO_LINK = "../media/rovust_demo.mp4"   # the demo video, linked from the Demo slide (relative to this folder)
 SLIDES = os.path.join(PRES, "slides")
 PNG_DIR = os.path.join(PRES, "png")
 
@@ -182,7 +183,7 @@ def write_viewer(idx, slides, notes_en, notes_ar) -> str:
 <div id="bar"><button id="prev" title="Previous (←)">&#8592;</button><button id="next" title="Next (→)">&#8594;</button>
 <b id="counter"></b><span id="title"></span><span class="sp"></span>
 <button id="bnotes">Notes <kbd>N</kbd></button><button id="blang">EN / مصري <kbd>L</kbd></button><button id="bfull">Fullscreen <kbd>F</kbd></button></div>
-<script>const NOTES_EN={json.dumps(notes_en, ensure_ascii=False)};const NOTES_AR={json.dumps(notes_ar, ensure_ascii=False)};{VIEWER_JS}</script>
+<script>const NOTES_EN={json.dumps(notes_en, ensure_ascii=False)};const NOTES_AR={json.dumps(notes_ar, ensure_ascii=False)};{VIEWER_JS}document.addEventListener('click',e=>{{if(e.target.closest('section#demo-video'))window.open('{VIDEO_LINK}','_blank');}});</script>
 </body></html>"""
     out = os.path.join(PRES, "Rovust_presentation.html")
     open(out, "w", encoding="utf-8", newline="\n").write(page)
@@ -272,7 +273,10 @@ def write_pptx(pngs: list[str], order: list[str], notes: dict[str, str], name: s
     blank = prs.slide_layouts[6]
     for png, sid in zip(pngs, order):
         slide = prs.slides.add_slide(blank)
-        slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
+        pic = slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
+        if sid == "demo-video":
+            # a link, not an embedded copy: the deck stays small; keep docs/media next to it
+            pic.click_action.hyperlink.address = VIDEO_LINK
         tf = slide.notes_slide.notes_text_frame
         tf.text = notes.get(sid, "")
         if lang == "ar":
