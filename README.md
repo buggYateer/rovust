@@ -140,6 +140,9 @@ uploaded to the team's Drive folder when the bridge is configured
 
 ## Course mapping
 
+Lecture by lecture (CSE442, lectures 1–8), with likely discussion questions, in the
+[team guide](docs/team_guide_ar.html#course), section 24.
+
 | Course topic | In Rovust |
 |---|---|
 | Actuators, PWM, H-bridge | `sim/robot/motor.py`: non-linear duty to speed, load, calibration table |
@@ -149,7 +152,7 @@ uploaded to the team's Drive folder when the bridge is configured
 | Robot behaviour, subsumption | `sim/behaviors.py`: prioritised layers, operator in the loop |
 | Navigation, mapping, planning | `sim/estimation.py`, `mapping.py`, `planning.py` |
 | Communication | `sim/comms.py`, `sim/teleop/`: radio link model, operator console |
-| Embedded robotics | `sim/mission.py`: one 20 Hz control loop; the controller analysis in the presentation |
+| Embedded robotics | `sim/mission.py`: one 20 Hz control loop; the controller analysis, flowchart and pseudocode in the presentation |
 
 ## Results
 
@@ -181,13 +184,13 @@ python tools/build_presentation.py                  # rebuild the presentation (
 
 | | |
 |---|---|
-| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) |
+| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) · [printed cover sheet](docs/cover_sheet.pdf) |
 | Proposal | [docs/Task1_v2.md](docs/Task1_v2.md) |
 | Design notes | [docs/DESIGN.md](docs/DESIGN.md): architecture, sensor placement and its justification, lessons learned |
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |
 | Drive reports | [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md): shared Drive folder, numbering by Drive |
 | Trailer | [docs/media/trailer.html](docs/media/trailer.html): 75 s animated page with browser voice-over |
-| بالعربي | [دليل الفريق](docs/team_guide_ar.html): كل جزء في الروبوت وكل زرار في البرنامج، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
+| بالعربي | [دليل الفريق](docs/team_guide_ar.html): كل جزء في الروبوت وكل زرار في البرنامج، وربطه بالمحاضرات، وتحضير المناقشة، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
 
 ## Team
 

@@ -12,6 +12,7 @@
     "actuators",
     "control",
     "controller",
+    "flowchart",
     "sec-design",
     "architecture",
     "localisation",
@@ -30,6 +31,7 @@
     "sec-conclusion",
     "conclusion",
     "future",
+    "references",
     "thanks"
   ],
   "sections": {
@@ -38,7 +40,7 @@
       "start": "cover"
     },
     "s2": {
-      "description": "Analysis: the sensors, the actuators and the on-board controller the rover is built from.",
+      "description": "Analysis: the sensors, the actuators, the on-board controller and the control-loop flowchart and pseudocode.",
       "start": "sec-analysis"
     },
     "s3": {
@@ -50,7 +52,7 @@
       "start": "sec-results"
     },
     "s5": {
-      "description": "Conclusion and future work.",
+      "description": "Conclusion, future work and references.",
       "start": "sec-conclusion"
     }
   },

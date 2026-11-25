@@ -98,6 +98,8 @@
 <div class="wrap">
 <nav class="side" id="nav">
   <div class="brand"><img src="../assets/icon.png" alt=""><div><b>Rovust</b><br><small style="color:var(--muted)">دليل الفريق</small></div></div>
+  <div class="grp">للمناقشة يوم الأحد</div>
+  <a href="#exam">الدرجة والتحضير</a><a href="#course">المشروع والمحاضرات</a><a href="#notused">«ليه لأ؟»</a><a href="#video">فيديو الديمو</a><a href="#study">خطة المذاكرة</a>
   <div class="grp">البداية</div>
   <a href="#idea">الفكرة في دقيقة</a><a href="#journey">رحلة المهمة</a><a href="#layers">طبقات الروبوت</a>
   <div class="grp">جوه الروبوت</div>
@@ -622,6 +624,95 @@ python tools/build_presentation.py   # يبني البرزنتيشن</pre>
 <li>نفس الدراع ممكن يوصل بأرقام زراير مختلفة حسب الدونجل: اعرض اللي البرنامج شايفه على الشاشة (كارت الدراع) علشان تكتشف ده على طول.</li>
 <li>تنبيه بيظهر ويختفي كل ثانية أسوأ من مفيش تنبيه: debounce وhold.</li>
 </ul>
+</div>
+<h2 id="exam">23. المناقشة يوم الأحد — الدرجة بتتقسم إزاي وإحنا مغطيينها فين</h2>
+<div class="card">
+<p>المناقشة 20 دقيقة للتيم (وفي رسالة تانية 25)، والوقت <b>بيتقفل</b> بعدها. الـ 20 درجة متقسمة 4 أجزاء، وكل جزء ليه شرايح في البرزنتيشن:</p>
+<table>
+<tr><th>الجزء (5 درجات)</th><th>المطلوب</th><th>الشرايح عندنا</th></tr>
+<tr><td><b>Abstract</b></td><td>المشروع وفكرته، اتعمل ليه وإزاي + conclusion + future work + references</td><td>Cover، Abstract، Why autonomy، Course map — وفي الآخر Conclusion، Future work، <b>References</b></td></tr>
+<tr><td><b>Analysis</b></td><td>flowchart / pseudocode / algorithms / وصف الهاردوير والدواير</td><td>Sensors (جدول + أماكن + فيزيا)، Actuators (H-bridge + PWM)، Control (PID)، Controller (الواجهات والـ interfaces)، <b>Flowchart &amp; pseudocode</b></td></tr>
+<tr><td><b>Design</b></td><td>implementation + results</td><td>Architecture، Localisation، Behaviour، Exploration، AI، Environments، App، Remote، Reports، وبعدها Results (3 شرايح) وTests</td></tr>
+<tr><td><b>Presentation</b></td><td>العرض نفسه والأسئلة</td><td>الديمو الحي + القسم 24 و25 هنا (أسئلة المحاضرات)</td></tr>
+</table>
+<p><b>توزيع الوقت (32 شريحة):</b> تدرّبوا على 17 دقيقة علشان يفضل وقت للأسئلة.</p>
+<table>
+<tr><th>الجزء</th><th>الشرايح</th><th>الوقت</th></tr>
+<tr><td>البداية والفكرة</td><td>1–4</td><td>2 د</td></tr>
+<tr><td>Analysis</td><td>5–12</td><td>4.5 د</td></tr>
+<tr><td>Design</td><td>13–22</td><td>5 د</td></tr>
+<tr><td>Results + Tests</td><td>23–27</td><td>2.5 د</td></tr>
+<tr><td>Conclusion + Future + References</td><td>28–31</td><td>1.5 د</td></tr>
+<tr><td>ديمو حي (شريحة 32)</td><td>كهف → كسر sonar → الموبايل → قطع الراديو</td><td>2 د</td></tr>
+</table>
+<div class="note"><b>قبل يوم الأحد — حاجات لازم تتعمل:</b>
+<ul class="check" style="list-style:none;padding:0">
+<li><label><input type="checkbox"> ورقة مطبوعة فيها اسم التيم والمشروع وأسامي الناس: <code class="ltr">docs/cover_sheet.pdf</code></label></li>
+<li><label><input type="checkbox"> فيديو ديمو 3–5 دقايق وكلنا فيه (السيناريو في القسم 26)</label></li>
+<li><label><input type="checkbox"> رفع البرزنتيشن (<code class="ltr">Rovust_presentation.pptx</code> و<code class="ltr">.pdf</code>) والفيديو على فولدر المجموعة في الدرايف <b>قبل</b> المناقشة</label></li>
+<li><label><input type="checkbox"> لابتوب عليه البرنامج شغال (<code class="ltr">run.bat</code>) + الشاحن + الدراع</label></li>
+<li><label><input type="checkbox"> نسخة offline: <code class="ltr">Rovust_presentation.html</code> و<code class="ltr">.pdf</code> على فلاشة، لو النت وقع</label></li>
+<li><label><input type="checkbox"> الموبايل: واي فاي الجامعة ساعات بيمنع الأجهزة تشوف بعض → افتح hotspot من الموبايل ووصّل اللابتوب عليه، وبعدين صوّر الـ QR</label></li>
+<li><label><input type="checkbox"> بروفة كاملة بالساعة مرتين</label></li>
+</ul></div>
+</div>
+
+<h2 id="course">24. المشروع والمحاضرات — محاضرة محاضرة</h2>
+<div class="card">
+<p>دي الحاجة اللي الدكتورة هتدوّر عليها: كل محاضرة في المنهج ليها حتة شغالة في الروبوت. ذاكر العمود الأخير كويس: ده السؤال اللي ممكن يتسأل.</p>
+<table>
+<tr><th>المحاضرة</th><th>اللي فيها</th><th>عندنا فين</th><th>سؤال متوقع وإجابته</th></tr>
+<tr><td><b>1. Embedded Robotics</b></td><td>المتحكم على الروبوت (EyeCon)، أنواع العجل: differential / Ackermann / Mecanum، الـ tracked والـ legged، Braitenberg vehicles، الـ interfaces (digital / analog in/out)</td><td>شريحة Controller: متحكم واحد ولوب 50 ms، وجدول بكل سنسور بيدخل على أنهي interface. الروبوت <b>differential drive</b>: موتورين، وكل عجلة سرعتها لوحدها.</td><td><b>ليه differential؟</b> لأنه بيلف في مكانه (مهم في الكهف الضيق)، وبيمشي قدام وبيلف بموتورين بس، والسوفتوير بيحوّل (v, ω) لسرعتين: <code class="ltr">ωL = (v − ωL/2)/r</code>، <code class="ltr">ωR = (v + ωL/2)/r</code> (r = 5 سم، L = 30 سم). <b>Braitenberg:</b> سلوك AVOID شبه العربية اللي السنسور فيها متوصل بموتور نفس الناحية: الحاجة القريبة بتلفّه بعيد عنها.</td></tr>
+<tr><td><b>2. Robot Behavior</b></td><td>أنشطة الروبوت (حركة، ضوء، proximity، contact، communication، navigation)، feedback موجب وسالب، random walk (Monte Carlo)، <b>subsumption</b>، distributed processing</td><td>شريحة Behaviour: 10 طبقات subsumption. AVOID = negative feedback بـ hysteresis. WANDER = الـ random walk. ESCAPE = الـ bumper: يرجع ويلف ناحية عكس اللي خبط (الـ 2 bumpers بيقولوا يلف فين — زي المحاضرة). TELEOP + الراديو = communication.</td><td><b>اشرح الـ subsumption:</b> مثال المحاضرة روبوت رايح للنور، قابل حاجة → التفادي بيقمع الـ homing، ولما الطريق يفضى يرجع. عندنا نفس الفكرة: كل 50 ms كل طبقة بتقول عايزة التحكم ولا لأ، والأعلى بتكسب. <b>feedback سالب عندنا فين؟</b> AVOID وPID. <b>موجب؟</b> لو بدّلنا سلوك الموتور — الروبوت يجري على الحيطة.</td></tr>
+<tr><td><b>3. Sensors 1</b></td><td>Sense-Plan-Act، sensor vs detector، تصنيفات (local/global، internal/external، <b>passive/active</b>)، binary / analog / digital، polling vs interrupt، <b>shaft encoders</b> (incremental، phase لاتجاه الدوران، قبل الـ gearbox)، absolute + Gray code، الـ A/D</td><td>جدول السنسورز في القسم 5 متصنّف بنفس تصنيف المحاضرة (فيه فلتر Active / Passive / Internal / External / Binary). الـ encoder: 16 tick × gearbox 30 = <b>480 tick</b> للفة العجلة، وعلى عمود الموتور قبل الـ gearbox. كل سنسور analog بيعدّي على ADC 10-bit.</td><td><b>احسب:</b> العجلة نص قطرها 5 سم → المحيط 2π×0.05 = 31.4 سم → كل tick = 31.4/480 ≈ <b>0.65 مم</b>. (مثال المحاضرة 16×100 = 1600.) <b>ADC:</b> <code class="ltr">D = Vin/Vref × (2ⁿ − 1)</code>، 10-bit يعني 0–1023. <b>ليه incremental مش absolute؟</b> محتاجين سرعة ومسافة اتمشت، والموضع بيبدأ من البيت كل مهمة؛ والـ incremental أرخص.</td></tr>
+<tr><td><b>4. Sensors 2</b></td><td>Sonar (time of flight، cone، انعكاس مائل، تداخل)، IR PSD (triangulation، lookup table، أقل من 6 سم)، compass، gyro / accelerometer / inclinometer، dead reckoning بيدرفت، IMU (MPU6050)، sensor fusion، الكاميرا</td><td>كل ده متعمل بالفيزيا بتاعته: الـ sonar بيضيع صداه في الزاوية المائلة وفيه crosstalk، الـ IR منحناه غير خطي وبيتقلب تحت 6 سم فهو مغمور 6 سم، الـ gyro فيه bias، والـ compass بيصحّحه (complementary filter). شريحة Localisation: encoders لوحدها 2.4–5.5 م غلط، fused 4–17 سم.</td><td><b>ليه dead reckoning مش كفاية؟</b> المحاضرة: الأخطاء بتتراكم والعجل بيزحلق — وعندنا بالأرقام. <b>إزاي الـ sonar بيحسب المسافة؟</b> d = c·t/2 (رايح جاي). <b>ليه دمج؟</b> الـ gyro سريع بس بيدرفت، والـ compass ثابت بس بطيء ومشوّش → نجمعهم (نفس فكرة inclinometer + gyro في المحاضرة).</td></tr>
+<tr><td><b>5. Actuators 1</b></td><td>أنواع الـ actuators، الـ DC motor (stator، rotor، commutator)، gearbox (السرعة بتقل والعزم بيزيد)، <b>H-bridge</b>، L293D</td><td>شريحة Actuators: موتورين DC، gearbox 30:1، H-bridge لكل موتور (SW1+SW2 قدام، SW3+SW4 ورا). إشارة الـ duty بتختار الاتجاه.</td><td><b>ليه gearbox؟</b> الـ DC بيلف 1000–5000 rpm، سريع جدًا للعجلة، والـ gearbox بيقلل السرعة ويزوّد العزم. <b>الـ H-bridge بيشتغل إزاي؟</b> 4 مفاتيح: اتنين يقفلوا يعدّي التيار في اتجاه، والاتنين التانيين يعكسوه. L293D فيه 2 H-bridge = موتورين، 3 إشارات لكل موتور.</td></tr>
+<tr><td><b>6. Actuators 2</b></td><td><b>PWM</b> و duty cycle، السرعة مش خطية مع الـ duty → calibration table، الحمل بيغيّر السرعة → محتاجين feedback، open loop vs closed loop، الـ servo</td><td><code class="ltr">sim/robot/motor.py</code>: منطقة ميتة تحت 6%، منحنى غير خطي، والسرعة بتقل في الرمل والطين. <code class="ltr">calibration_table()</code> بيطلع جدول المحاضرة.</td><td><b>duty cycle؟</b> T_on / T × 100%. <b>ليه مش open loop؟</b> نفس الـ duty بيدي سرعة مختلفة على الرمل — وده باين في رسمة شريحة Actuators.</td></tr>
+<tr><td><b>7. Actuators 3</b></td><td>Stepper (full / half step، تسلسل 9-A-6-5)، bipolar / unipolar، مميزات وعيوب</td><td>مش مستخدم — شوف القسم 25 «ليه لأ».</td><td>—</td></tr>
+<tr><td><b>8. Control</b></td><td>On-off، hysteresis، P (فيه steady-state error)، PI، PD، <b>PID</b> بالصيغة incremental، ضبط الـ PID، velocity vs position، <b>driving straight</b></td><td>شريحة Control: on-off وhysteresis وP وPI وPID متعملين بالظبط زي المحاضرة، والرسمة بتوضّح الـ steady-state error للـ P. PID لكل عجلة + I-controller على فرق موضع العجلتين للمشي المستقيم. تبويب الموتور في البرنامج بيوريها حيّة.</td><td><b>ليه P لوحده فيه خطأ؟</b> لأن لو الخطأ صفر الخرج صفر، فلازم يفضل خطأ صغير يشغّل الموتور. الـ I بيشيله. <b>المشي المستقيم؟</b> PID لكل عجلة لوحدها مش كفاية (موتور أسرع 4% يلف في دايرة)، فبنزود controller على الفرق بين الـ encoderين.</td></tr>
+</table>
+</div>
+
+<h2 id="notused">25. حاجات في المحاضرات ومش في المشروع — ولو اتسألت «ليه لأ؟»</h2>
+<div class="card qa"><dl>
+<dt>ليه DC مش stepper؟</dt><dd>الـ stepper open loop: لو اتزنق في الرمل يضيّع steps ومحدش يعرف، وبيسحب تيار حتى لو واقف (البطارية مهمة عندنا)، وبيرتعش في السرعات الواطية. الـ DC + encoder + PID بيعرف سرعته الحقيقية ويعوّض الحمل. الـ stepper كويس لـ <i>موضع</i> بحمل ثابت (طابعة، CNC).</dd>
+<dt>ليه مش servo؟</dt><dd>الـ servo العادي للموضع (0–180°، النبضة 0.5–2 ms كل 20 ms بتحدد الزاوية مش السرعة) — كويس لدراع أو لتحريك سنسور، مش لعجلة بتلف على طول.</dd>
+<dt>Absolute encoder وGray code؟</dt><dd>الـ absolute بيدّي كود لكل موضع وبيفتكره لو الكهربا قطعت، والـ Gray code بيغيّر bit واحد بس بين كل قطاع والتاني فمفيش قراءة غلط على الحدود. إحنا مش محتاجين موضع مطلق للعجلة، محتاجين سرعة ومسافة، فالـ incremental أنسب.</dd>
+<dt>Polling ولا interrupt؟</dt><dd>المحاكي بيقرا كل السنسورز كل 50 ms (polling). على هاردوير حقيقي الـ encoders بتتعد بـ pulse-counting registers (زي المحاضرة)، والـ bumper والـ cliff الأحسن يبقوا interrupt لأنهم طوارئ.</dd>
+<dt>Sensor ولا detector؟</dt><dd>الـ sonar sensor (بيدّي رقم)، والـ cliff switch والـ bumper أقرب لـ detector (قرار: فيه حفرة / خبط). كاشف الغاز بيبقى detector لما يدّي تنبيه.</dd>
+<dt>الـ MPU6050؟</dt><dd>الـ gyro والـ accelerometer عندنا متعملين زي IMU من النوع ده على I²C — مكتوب في شريحة Controller.</dd>
+<dt>ضبط الـ PID اتعمل إزاي؟</dt><dd>نفس خطوات المحاضرة: ابدأ بـ P لوحده لحد ما يتذبذب ونصّه، بعدين D، بعدين I لحد ما يبدأ يتذبذب واقسمه على 2–3، وجرّب في الظروف العادية. <code class="ltr">python -m sim.experiments.pid_demo</code> بيرسم الاستجابة.</dd>
+<dt>الـ update rate؟</dt><dd>في المحاضرة الـ EyeBot حوالي 100 Hz. إحنا 20 Hz (كل 50 ms) — كفاية لروبوت بطيء (أقصى سرعة للعجلة 12 rad/s يعني 0.6 م/ث)، والـ AI كل 4 فريمات.</dd>
+<dt>Speed ramp؟</dt><dd>مش متعمل كـ trapezoid صريح؛ الموتور نفسه ليه استجابة first-order (τ = 0.15 ث) فالتسارع ناعم.</dd>
+</dl></div>
+
+<h2 id="video">26. فيديو الديمو (3–5 دقايق، وكلنا فيه)</h2>
+<div class="card">
+<p>اتسجّل الشاشة بـ <b>Win + Alt + R</b> (Xbox Game Bar) أو OBS، والصوت شرح. كل واحد يقول اسمه والجزء بتاعه. السيناريو ده 4 دقايق:</p>
+<table>
+<tr><th>الوقت</th><th>على الشاشة</th><th>بيتقال</th></tr>
+<tr><td>0:00–0:30</td><td>التيم كله قدام الكاميرا</td><td>إحنا مين، Rovust إيه، والمشكلة: استكشاف مكان مجهول من غير خريطة ولا GPS.</td></tr>
+<tr><td>0:30–1:10</td><td>البرنامج: كهف، utility، Start</td><td>الروبوت بيقف 1.5 ث يتعلم الـ gyro، يلف لفة، ويبدأ يرسم الخريطة. الشمال الحقيقة، اليمين اللي الروبوت شايفه.</td></tr>
+<tr><td>1:10–1:40</td><td>تبويب الموتور</td><td>PWM → موتور → encoder → PID، الأخضر المطلوب والأزرق المقاس.</td></tr>
+<tr><td>1:40–2:10</td><td>تبويب السنسورز → اكسر sonar (Dead)</td><td>كاشف الأعطال بيشيله من الخريطة، والروبوت يكمل.</td></tr>
+<tr><td>2:10–2:40</td><td>Localisation: Encoders only ثم Fused</td><td>الخط الأحمر بيبعد أمتار، والـ fused سنتيمترات.</td></tr>
+<tr><td>2:40–3:20</td><td>Assisted → الموبايل بالـ QR والدراع</td><td>السواقة من بعيد، وطبقات الأمان مانعاك تخبط. Manual: تقدر توقعه في حفرة.</td></tr>
+<tr><td>3:20–3:45</td><td>ابعد جوه الكهف لحد ما الراديو يقطع</td><td>الروبوت بيرجع لوحده لحد ما الإشارة ترجع.</td></tr>
+<tr><td>3:45–4:00</td><td>شاشة النتايج / التقرير</td><td>264 تجربة، الـ utility كسب في التلات بيئات، 97%. شكرًا.</td></tr>
+</table>
+<div class="note">علشان الديمو يبقى مضمون: سرعة ×4 في الأجزاء الطويلة، وجرّبوا السيناريو مرة قبل التسجيل. التقرير بيتبعت للدرايف لوحده في آخر المهمة — لو مش عايزينه اقفلوه من إعدادات التقارير.</div>
+</div>
+
+<h2 id="study">27. خطة المذاكرة لحد الأحد</h2>
+<div class="card">
+<table>
+<tr><th>اليوم</th><th>للي هيقدّم</th><th>لباقي التيم</th></tr>
+<tr><td>الأربع</td><td>الأقسام 1–3 و23–25 + افتح البرزنتيشن واقرا الملاحظات المصري (زرار L في نسخة الـ HTML)</td><td>كل واحد ياخد جزء: سنسورز / موتورات وتحكم / سلوك وتخطيط / AI ونتايج / البرنامج والموبايل</td></tr>
+<tr><td>الخميس</td><td>الأقسام 4–11، وراجع على المحاضرات المقابلة (القسم 24)</td><td>تسجيل فيديو الديمو</td></tr>
+<tr><td>الجمعة</td><td>الأقسام 12–17 + الديمو بإيدك على اللابتوب مرتين</td><td>مونتاج الفيديو ورفعه مع البرزنتيشن على الدرايف</td></tr>
+<tr><td>السبت</td><td>بروفة كاملة بالساعة مرتين + الأسئلة (القسم 21 و25) — خلي حد يسألك</td><td>كل واحد يسأل المقدّم من جزئه</td></tr>
+</table>
+<div class="note ok"><b>لو هتذاكر حاجة واحدة:</b> افهم الشريحة بتاعة الـ Flowchart. هي الروبوت كله في صفحة: كل 50 ms → الراديو → السلوك → (v, ω) → سرعتين للعجل → PID → PWM → H-bridge → الموتور → السنسورز → الموقع → الخريطة → كل 4 فريمات الـ AI. أي سؤال هتلاقي مكانه في السلسلة دي.</div>
 </div>
 <p style="color:var(--muted);text-align:center;margin-top:40px">Rovust · Robotics team project · Dr. Elshaimaa Nabil Nada · Faculty of Engineering – Computer and Systems Department</p>
 </main>

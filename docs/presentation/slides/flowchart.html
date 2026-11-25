@@ -1,0 +1,49 @@
+<section id="flowchart" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:22px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">ANALYSIS · FLOWCHART &amp; PSEUDOCODE</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:700;line-height:1.1">What the controller does every 50 ms</h2>
+<div style="display:flex;gap:44px;align-items:flex-start">
+<svg aria-label="Flowchart of the 50 ms control loop" viewBox="0 0 830 740" width="790" height="704" style="flex-shrink:0;font-family:'IBM Plex Sans', Arial, sans-serif">
+<defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#92a1af"/></marker></defs>
+<g fill="none" stroke="#92a1af" stroke-width="2.5" marker-end="url(#fa)">
+<path d="M330 44V62"/><path d="M330 126V138"/><path d="M330 188V204"/><path d="M330 254V270"/><path d="M330 320V336"/><path d="M330 386V402"/><path d="M330 452V468"/><path d="M330 518V534"/><path d="M330 584V598"/><path d="M330 662V678"/>
+<path d="M482 94H636"/><path d="M482 630H636"/><path d="M724 652V704H592"/>
+<path d="M68 704H50V94H176"/>
+</g>
+<g font-size="21" fill="#92a1af"><text x="498" y="86">yes</text><text x="498" y="622">yes</text><text x="342" y="138">no</text><text x="342" y="676">no</text><text x="24" y="400" transform="rotate(-90 24 400)" text-anchor="middle">next tick (50 ms)</text></g>
+<g stroke-width="2">
+<rect x="150" y="0" width="360" height="44" rx="22" fill="#2dd4bf" stroke="#2dd4bf"/>
+<polygon points="330,64 480,94 330,124 180,94" fill="#11161b" stroke="#f5a524"/>
+<rect x="638" y="72" width="180" height="44" rx="10" fill="#11161b" stroke="#f87171"/>
+<rect x="70" y="140" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<rect x="70" y="206" width="520" height="48" rx="10" fill="#11161b" stroke="#2dd4bf"/>
+<rect x="70" y="272" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<rect x="70" y="338" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<rect x="70" y="404" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<rect x="70" y="470" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<rect x="70" y="536" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+<polygon points="330,600 480,630 330,660 180,630" fill="#11161b" stroke="#f5a524"/>
+<rect x="638" y="604" width="180" height="48" rx="10" fill="#11161b" stroke="#a78bfa"/>
+<rect x="70" y="680" width="520" height="48" rx="10" fill="#11161b" stroke="#2f3b46"/>
+</g>
+<g font-size="22" fill="#e6edf3" text-anchor="middle">
+<text x="330" y="29" fill="#0b1114" font-weight="600">Start: SCAN, then explore</text>
+<text x="330" y="101">Mission over?</text>
+<text x="728" y="101" font-size="20">Stop · save report</text>
+<text x="330" y="172">Radio: operator packet? link lost → hold</text>
+<text x="330" y="238">Subsumption: highest active layer → (v, ω)</text>
+<text x="330" y="304">Inverse kinematics → PID per wheel</text>
+<text x="330" y="370">PWM duty → H-bridge → 2 DC motors</text>
+<text x="330" y="436">Read sensors: encoders, ADC, I²C, digital</text>
+<text x="330" y="502">Pose: odometry + gyro/compass/flow fusion</text>
+<text x="330" y="568">Map: log-odds occupancy grid update</text>
+<text x="330" y="637">Every 4th frame?</text>
+<text x="728" y="625" font-size="19">AI: terrain · faults</text>
+<text x="728" y="645" font-size="19">· next target, A*</text>
+<text x="330" y="712">Wait for the next 50 ms tick</text>
+</g>
+</svg>
+<div style="flex:1;background:#11161b;border:1px solid #2f3b46;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.36;color:#bfd0d8;white-space:pre"><span style="color:#2dd4bf">every 50 ms:</span>         <span style="color:#6b7b88"># mission.py step()</span><br>  if mission_over: stop(); report(); end<br>  cmd = radio.receive()  <span style="color:#6b7b88"># may be lost</span><br>  <span style="color:#6b7b88"># subsumption: highest layer wins</span><br>  for layer in [STOP, ESCAPE, CLIFF, SLOPE,<br>      SCAN, AVOID, TELEOP, HOME, EXPLORE, WANDER]:<br>      if layer.active(sensors):<br>          v, ω = layer.act(); break<br>  ωL, ωR = inverse_kinematics(v, ω)<br>  for wheel in (L, R):<br>      speed = Δticks / dt   <span style="color:#6b7b88"># encoder</span><br>      duty = pid[wheel](ω_set − speed)<br>      h_bridge[wheel].pwm(duty)<br>  sensors = read_all()   <span style="color:#6b7b88"># ADC, I²C…</span><br>  pose = fuse(odometry, gyro, compass, flow)<br>  grid.update_log_odds(pose, sonar)<br>  if frame % 4 == 0:   <span style="color:#6b7b88"># AI</span><br>      terrain, faults = forest(camera), detector()<br>      path = a_star(grid, pose, explorer.best(grid))</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:56px;font-size:24px;color:#92a1af">Rovust · Analysis · Flowchart — sim/mission.py, behaviors.py</p>
+<aside>This is the whole robot on one slide, as a flowchart on the left and pseudocode on the right. Every 50 milliseconds the controller first checks whether the mission is over. If not, it looks at the radio link for an operator command. Then the subsumption stack runs: the highest layer that wants control produces a forward speed v and a turn rate omega. Inverse kinematics splits that into two wheel speeds, a PID per wheel compares them with the encoder speed and outputs a PWM duty cycle, and the H-bridge drives the motor. Then the sensors are read, the pose is estimated by fusing odometry with the gyro, compass and optical flow, and the occupancy grid is updated. Every fourth frame the AI runs: the terrain classifier, the fault detector, and the explorer that chooses the next target and plans a path to it with A star.</aside>
+</section>

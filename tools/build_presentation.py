@@ -212,17 +212,40 @@ def render_pngs(viewer: str, order: list[str]) -> list[str]:
         print("no Edge/Chrome found: skipping PNG/PDF/PPTX", file=sys.stderr)
         return []
     os.makedirs(PNG_DIR, exist_ok=True)
-    url = "file:///" + urllib.parse.quote(viewer.replace("\\", "/"))
+    for f in os.listdir(PNG_DIR):  # renumbered slides leave old pictures behind
+        if f.endswith(".png"):
+            os.remove(os.path.join(PNG_DIR, f))
+    url ="file:///" + urllib.parse.quote(viewer.replace("\\", "/"))
     profile = tempfile.mkdtemp(prefix="rovust-render-")
     outs = []
     t0 = time.time()
     for n, sid in enumerate(order, 1):
         out = os.path.join(PNG_DIR, f"{n:02d}-{sid}.png")
         cmd = [browser, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--disable-extensions",
-               f"--user-data-dir={profile}", "--window-size=1920,1080", "--force-device-scale-factor=1",
+               # each slide gets its own profile, so a stuck Edge cannot block the next one
+               f"--user-data-dir={os.path.join(profile, sid)}", "--window-size=1920,1080", "--force-device-scale-factor=1",
                "--virtual-time-budget=6000", "--run-all-compositor-stages-before-draw",
                f"--screenshot={out}", f"{url}?slide={sid}&bare=1"]
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
+        if os.path.exists(out):
+            os.remove(out)
+        for _ in range(3):
+            # headless Edge sometimes writes the screenshot and then never exits:
+            # stop it as soon as the file is there and has stopped growing
+            proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            t1, size = time.time(), -1
+            while proc.poll() is None and time.time() - t1 < 60:
+                time.sleep(0.3)
+                if os.path.exists(out):
+                    s = os.path.getsize(out)
+                    if s > 0 and s == size:
+                        break
+                    size = s
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
+            if os.path.exists(out):
+                break
+            print("  retry", sid, file=sys.stderr)
         if not os.path.exists(out):
             print("render failed:", sid, file=sys.stderr)
             continue
