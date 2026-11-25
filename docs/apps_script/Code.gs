@@ -6,13 +6,15 @@ function doPost(e) {
     const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
     const lock = LockService.getScriptLock();
     lock.waitLock(30000);
-    let n;
+    let n, folder = null;
     try {
-      // a run that already sent a report keeps its number (key = one run of the app)
+      // a run that already sent a report keeps its number and its folder (key = one run of the app)
       const props = PropertiesService.getScriptProperties();
       const known = data.key ? props.getProperty('key_' + data.key) : null;
       if (known) {
-        n = parseInt(known, 10);
+        const k = known.split('|');
+        n = parseInt(k[0], 10);
+        if (k[1]) { try { folder = DriveApp.getFolderById(k[1]); } catch (e) { folder = null; } }
       } else {
         // next mission number = highest "Mission #n" already in the folder + 1
         n = 0;
@@ -22,14 +24,16 @@ function doPost(e) {
           if (m) n = Math.max(n, parseInt(m[1], 10));
         }
         n += 1;
-        if (data.key) props.setProperty('key_' + data.key, String(n));
       }
+      const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
+      if (!folder) folder = root.createFolder('Mission #' + n + ' - ' + suffix);
+      if (data.key) props.setProperty('key_' + data.key, n + '|' + folder.getId());
     } finally {
       lock.releaseLock();
     }
-    const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
-    const name = 'Mission #' + n + ' - ' + suffix;
-    const folder = root.createFolder(name);
+    const name = folder.getName();
+    // each report of the run is its own sub-folder: Report 1 - 20-15-30, Report 2 - ...
+    const target = data.report ? folder.createFolder(data.report) : folder;
     data.files.forEach(f => {
       let bytes = Utilities.base64Decode(f.b64);
       if (f.mime.indexOf('text/') === 0 || f.mime === 'application/json') {
@@ -38,7 +42,7 @@ function doPost(e) {
         txt = txt.split('Mission #new').join('Mission #' + n).split('"mission_number": "new"').join('"mission_number": ' + n);
         bytes = Utilities.newBlob(txt, f.mime).getBytes();
       }
-      folder.createFile(Utilities.newBlob(bytes, f.mime, f.name));
+      target.createFile(Utilities.newBlob(bytes, f.mime, f.name));
     });
     return json({ ok: true, number: n, name: name, url: folder.getUrl() });
   } catch (err) {

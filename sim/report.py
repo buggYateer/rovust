@@ -2,16 +2,17 @@
 and the sensor / link state, saved under reports/ and (optionally) uploaded
 to the team's shared Google Drive folder through a small Apps Script bridge.
 
-Folder name:  Mission #<n> - <title>
-where <title> is a name the operator typed when sending, or by default
+Folders:  Mission #<n> - <title>/Report <k> - <HH-MM-SS>/
+One folder per run of a mission; every report of that run (a snapshot sent
+halfway, the final one) is a numbered sub-folder inside it. <title> is the
+name the operator typed for the first report, or by default
 <YYYY-MM-DD HH-MM-SS> - <environment> (<machine>).
 
 The number is assigned by the Drive bridge when the report is uploaded (it
 looks at the folders already in the shared folder and takes the next one),
 so numbers are unique across the whole team. Until then the local copy is
-called "Mission #new - ...". Every report also carries the run's ``key``:
-reports of the same run (one sent mid-mission, one at the end) get the
-same number from the bridge.
+called "Mission #new - ...". Every report also carries the run's ``key``,
+so the bridge puts all reports of one run in the same numbered folder.
 
 Upload is fire-and-forget with a local queue: a report that cannot be sent
 (no network, bridge not configured) stays in reports/pending.json and is
@@ -82,6 +83,25 @@ def machine_tag() -> str:
 PENDING_NUMBER = "new"
 
 
+MISSION_FILE = "mission.json"     # in each mission folder: the run's key and title
+
+
+def find_mission_folder(key: str) -> str | None:
+    """The local folder of the run with this key, wherever the upload has renamed it."""
+    if not key or not os.path.isdir(REPORTS_DIR):
+        return None
+    for d in os.listdir(REPORTS_DIR):
+        path = os.path.join(REPORTS_DIR, d, MISSION_FILE)
+        if d.startswith("Mission #") and os.path.isfile(path):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    if json.load(f).get("key") == key:
+                        return os.path.join(REPORTS_DIR, d)
+            except (OSError, json.JSONDecodeError):
+                pass
+    return None
+
+
 _BAD_CHARS = re.compile(r'[<>:"/\|?*\x00-\x1f]')
 
 
@@ -100,23 +120,44 @@ def clean_title(title: str | None) -> str:
 
 def build_report(mission, images: dict[str, bytes], extra: dict | None = None, title: str | None = None,
                  key: str = "") -> str:
-    """Write the report folder and return its path. ``images`` maps a file
-    name (true_world.png, robot_map.png, ...) to PNG bytes. ``title`` is the
-    operator's name for the report (default: date, environment, machine).
-    The mission number stays "new" until the Drive bridge assigns one."""
+    """Write one report and return its folder: ``<mission folder>/Report <k> - <time>``.
+    ``images`` maps a file name (true_world.png, robot_map.png, ...) to PNG
+    bytes. ``title`` is the operator's name: for the first report of a run it
+    names the mission folder (default: date, environment, machine), later
+    ones add it to the report's own name. ``key`` identifies the run, so
+    every report of it lands in the same mission folder. The mission number
+    stays "new" until the Drive bridge assigns one."""
     n = PENDING_NUMBER
     stamp = datetime.now()
-    title = clean_title(title) or default_title(mission, stamp)
-    folder = os.path.join(REPORTS_DIR, f"Mission #{n} - {title}")
+    typed = clean_title(title)
+    mission_dir = find_mission_folder(key) if key else None
+    if mission_dir is None:
+        title = typed or default_title(mission, stamp)
+        mission_dir = os.path.join(REPORTS_DIR, f"Mission #{n} - {title}")
+        k = 2
+        while os.path.exists(mission_dir):      # never mix two runs in one folder
+            mission_dir = os.path.join(REPORTS_DIR, f"Mission #{n} - {title} ({k})")
+            k += 1
+        os.makedirs(mission_dir)
+        with open(os.path.join(mission_dir, MISSION_FILE), "w", encoding="utf-8") as f:
+            json.dump({"key": key, "title": title}, f)
+        typed = ""
+    else:
+        with open(os.path.join(mission_dir, MISSION_FILE), encoding="utf-8") as f:
+            title = json.load(f).get("title", "")
+    index = 1 + sum(1 for d in os.listdir(mission_dir)
+                    if d.startswith("Report ") and os.path.isdir(os.path.join(mission_dir, d)))
+    name = f"Report {index} - {stamp.strftime('%H-%M-%S')}" + (f" - {typed}" if typed else "")
+    folder = os.path.join(mission_dir, name)
     k = 2
-    while os.path.exists(folder):       # two reports in the same second: never overwrite one
-        folder = os.path.join(REPORTS_DIR, f"Mission #{n} - {title} ({k})")
+    while os.path.exists(folder):
+        folder = os.path.join(mission_dir, f"{name} ({k})")
         k += 1
-    os.makedirs(folder, exist_ok=True)
+    os.makedirs(folder)
 
     metrics = mission.metrics()
     metrics.update({
-        "mission_number": n, "mission_key": key, "title": title, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
+        "mission_number": n, "mission_key": key, "report": index, "title": title, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
         "localisation": mission.estimator.mode, "mode": mission.mode, "on_link_loss": mission.on_link_loss,
         "link_delivered": mission.link.delivered, "link_dropped": mission.link.dropped,
         "link_losses": mission.stats.get("link_losses", 0), "end_reason": mission.end_reason(),
@@ -171,7 +212,7 @@ def render_html(mission, m: dict, images: dict[str, bytes]) -> str:
     table = "".join(f"<tr><th>{html.escape(str(k))}</th><td>{v}</td></tr>" for k, v in rows)
     team = "".join(f"<li>{html.escape(n)}</li>" for n in T.TEAM)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>{T.ROVER_NAME} - Mission #{m['mission_number']}</title>
+<title>{T.ROVER_NAME} - Mission #{m['mission_number']} - Report {m.get('report', 1)}</title>
 <style>
 body{{font:15px/1.5 "Segoe UI",system-ui,sans-serif;color:#141a1f;background:#eef1f4;margin:0;padding:24px}}
 .card{{background:#fff;border:1px solid #d5dde4;border-radius:14px;padding:20px 24px;max-width:1100px;margin:0 auto 16px}}
@@ -182,7 +223,7 @@ td{{padding:6px 0;border-bottom:1px solid #eef1f4;font-variant-numeric:tabular-n
 figcaption{{color:#5c6b78;font-size:13px;margin-top:6px}} ul{{columns:3;margin:0;padding-left:18px}} .foot{{color:#5c6b78;font-size:13px}}
 @media(max-width:700px){{.maps{{grid-template-columns:1fr}} ul{{columns:1}}}}
 </style></head><body>
-<div class="card"><h1>{T.ROVER_NAME} &mdash; Mission #{m['mission_number']}</h1>
+<div class="card"><h1>{T.ROVER_NAME} &mdash; Mission #{m['mission_number']} &middot; Report {m.get('report', 1)}</h1>
 <p class="sub">{html.escape(m.get('title', ''))} &middot; {m['timestamp'].replace('T', ' ')} &middot; recorded on {html.escape(m['machine'])}</p>
 <table>{table}</table></div>
 <div class="card"><div class="maps">{img('true_world.png', 'True world: terrain, true path (yellow), sonar and IR beams')}{img('robot_map.png', "The rover's own map: occupancy, terrain and hazards; fused estimate (green), encoders only (red)")}</div></div>
@@ -242,7 +283,9 @@ class ReportUploader:
             mime = {"html": "text/html", "png": "image/png", "json": "application/json", "csv": "text/csv"}.get(name.rsplit(".", 1)[-1], "application/octet-stream")
             with open(path, "rb") as f:
                 files.append({"name": name, "mime": mime, "b64": base64.b64encode(f.read()).decode()})
-        base = os.path.basename(folder)
+        parent = os.path.dirname(folder)
+        nested = os.path.isfile(os.path.join(parent, MISSION_FILE))      # mission folder / Report k
+        base = os.path.basename(parent if nested else folder)
         suffix = base.split(" - ", 1)[1] if " - " in base else base      # the title after "Mission #new - "
         key = ""
         try:
@@ -250,23 +293,24 @@ class ReportUploader:
                 key = json.load(f).get("mission_key", "") or ""
         except (OSError, json.JSONDecodeError):
             pass
-        body = json.dumps({"name": base, "suffix": suffix, "key": key, "files": files}).encode()
+        body = json.dumps({"name": base, "suffix": suffix, "key": key, "files": files,
+                           "report": os.path.basename(folder) if nested else ""}).encode()
         req = urllib.request.Request(self.cfg["upload_url"], data=body, headers={"Content-Type": "application/json"})
         try:
             with urllib.request.urlopen(req, timeout=90) as resp:
                 answer = json.loads(resp.read() or b"{}")
             if answer.get("ok"):
                 final = answer.get("name") or base
-                self._apply_number(folder, final, answer.get("number"))
+                self._apply_number(folder, final, answer.get("number"), nested)
                 return True, final
             return False, answer.get("error", "bridge refused the report")
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as e:
             return False, str(e)
 
-    @staticmethod
-    def _apply_number(folder: str, final_name: str, number) -> str:
-        """Rename the local copy to the name the bridge chose and write the
-        number into the report files."""
+    def _apply_number(self, folder: str, final_name: str, number, nested: bool = False) -> str:
+        """Write the number into the report files and rename the local mission
+        folder to the name the bridge chose (reports of the same run still
+        waiting are moved with it)."""
         if number is None:
             return folder
         for fn in ("report.html", "metrics.json"):
@@ -277,11 +321,16 @@ class ReportUploader:
                 txt = txt.replace(f"Mission #{PENDING_NUMBER}", f"Mission #{number}").replace('"mission_number": "new"', f'"mission_number": {number}')
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(txt)
-        new_path = os.path.join(os.path.dirname(folder), final_name)
+        old = os.path.dirname(folder) if nested else folder
+        new_path = os.path.join(os.path.dirname(old), final_name)
         try:
-            if new_path != folder and not os.path.exists(new_path):
-                os.rename(folder, new_path)
-                return new_path
+            if new_path != old and not os.path.exists(new_path):
+                os.rename(old, new_path)
+                with self.lock:
+                    self.pending = [new_path + p[len(old):] if p == old or p.startswith(old + os.sep) else p
+                                    for p in self.pending]
+                    self._save_pending()
+                return os.path.join(new_path, os.path.basename(folder)) if nested else new_path
         except OSError:
             pass
         return folder

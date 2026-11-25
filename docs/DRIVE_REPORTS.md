@@ -2,15 +2,16 @@
 
 Every mission can produce a report (`report.html` with the statistics and
 both maps, `true_world.png`, `robot_map.png`, `metrics.json`). Reports are
-saved locally under `reports/Mission #<n> - <title>/`, where the title is the
+saved locally under `reports/Mission #<n> - <title>/Report <k> - <time>/`, where the title is the
 name typed when sending or, by default, `<date time> - <environment> (<machine>)`.
 **The mission number is given by the Drive folder itself:** the bridge looks
 at the folders already there and uses the next number, so numbers are unique
 for the whole team (a report that has not been uploaded yet is called
 `Mission #new - ...`). A report can be sent at any moment of a mission, not
-only at the end; every report of the same run carries the run's key, so the
-bridge gives them all **the same number** (for example a snapshot halfway and
-the final report are both `Mission #12 - ...`)
+only at the end. **One folder per run:** every report of the same run carries
+the run's key, so the bridge puts them all in the same numbered folder, each as
+its own sub-folder (for example `Mission #12 - .../Report 1 - 14-05-10/` for a
+snapshot halfway and `Mission #12 - .../Report 2 - 14-09-42/` at the end)
 and, once the bridge below is set up, uploaded into **one shared Drive
 folder** for the whole team — from any teammate's computer, with no Google
 login in the program. If the computer is offline, the report waits in
@@ -36,13 +37,15 @@ function doPost(e) {
     const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
     const lock = LockService.getScriptLock();
     lock.waitLock(30000);
-    let n;
+    let n, folder = null;
     try {
-      // a run that already sent a report keeps its number (key = one run of the app)
+      // a run that already sent a report keeps its number and its folder (key = one run of the app)
       const props = PropertiesService.getScriptProperties();
       const known = data.key ? props.getProperty('key_' + data.key) : null;
       if (known) {
-        n = parseInt(known, 10);
+        const k = known.split('|');
+        n = parseInt(k[0], 10);
+        if (k[1]) { try { folder = DriveApp.getFolderById(k[1]); } catch (e) { folder = null; } }
       } else {
         // next mission number = highest "Mission #n" already in the folder + 1
         n = 0;
@@ -52,14 +55,16 @@ function doPost(e) {
           if (m) n = Math.max(n, parseInt(m[1], 10));
         }
         n += 1;
-        if (data.key) props.setProperty('key_' + data.key, String(n));
       }
+      const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
+      if (!folder) folder = root.createFolder('Mission #' + n + ' - ' + suffix);
+      if (data.key) props.setProperty('key_' + data.key, n + '|' + folder.getId());
     } finally {
       lock.releaseLock();
     }
-    const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
-    const name = 'Mission #' + n + ' - ' + suffix;
-    const folder = root.createFolder(name);
+    const name = folder.getName();
+    // each report of the run is its own sub-folder: Report 1 - 20-15-30, Report 2 - ...
+    const target = data.report ? folder.createFolder(data.report) : folder;
     data.files.forEach(f => {
       let bytes = Utilities.base64Decode(f.b64);
       if (f.mime.indexOf('text/') === 0 || f.mime === 'application/json') {
@@ -68,7 +73,7 @@ function doPost(e) {
         txt = txt.split('Mission #new').join('Mission #' + n).split('"mission_number": "new"').join('"mission_number": ' + n);
         bytes = Utilities.newBlob(txt, f.mime).getBytes();
       }
-      folder.createFile(Utilities.newBlob(bytes, f.mime, f.name));
+      target.createFile(Utilities.newBlob(bytes, f.mime, f.name));
     });
     return json({ ok: true, number: n, name: name, url: folder.getUrl() });
   } catch (err) {

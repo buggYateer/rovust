@@ -130,10 +130,11 @@ or cancel.</p>
 
 <h3>9. Reports</h3>
 <p><b>Send report</b> (Ctrl+S) asks for a name, or uses the automatic one (date, environment, computer), and saves
-<i>reports/Mission #n - name</i>: an HTML page with all the statistics and both maps, the map pictures and the raw numbers.
+<i>reports/Mission #n - name/Report k - time</i>: an HTML page with all the statistics and both maps, the map pictures and the raw numbers.
 With the Drive bridge configured (File &gt; Report settings) the folder is also uploaded to the team's shared Drive folder,
 which gives it its number. Without internet the report waits and is sent later; the status bar shows how many are waiting.
-You can send one at any moment while the mission runs: every report of the same run gets the same mission number.
+You can send one at any moment while the mission runs: all reports of one run go into the same mission folder,
+numbered Report 1, Report 2, ...
 With <i>auto-send</i> on, a report is made by itself when a mission ends on its own. File &gt; Open reports folder shows them.</p>
 
 <h3>10. Things to try in a demonstration</h3>
@@ -261,10 +262,10 @@ QR</b> في البانل: صوّر الكود بكاميرا الموبايل أ
 
 <h3>9. التقارير</h3>
 <p><b>ابعت التقرير</b> (Ctrl+S) بيسألك على اسم أو ياخد الاسم التلقائي (التاريخ، المكان، الجهاز)، وبيحفظ
-<i>reports/Mission #n - الاسم</i>: صفحة HTML فيها كل الأرقام والخريطتين، صور الخرايط، والأرقام الخام. لو لينك الدرايف
+<i>reports/Mission #n - الاسم/Report k - الوقت</i>: صفحة HTML فيها كل الأرقام والخريطتين، صور الخرايط، والأرقام الخام. لو لينك الدرايف
 متظبط (ملف &gt; إعدادات التقارير) الفولدر بيترفع على فولدر الدرايف بتاع التيم، وهو اللي بيدّيه رقمه. من غير نت التقرير
 بيستنى ويترفع بعدين، والشريط اللي تحت بيقول فيه كام مستني. وتقدر تبعت تقرير في أي وقت والمهمة شغالة، وكل
-تقارير نفس المهمة بتاخد نفس الرقم. ولو <i>الإرسال التلقائي</i> شغال بيتعمل تقرير لوحده لما المهمة تخلص لوحدها. ملف &gt; افتح فولدر التقارير بيوريهم.</p>
+تقارير نفس المهمة بتتحط في فولدر المهمة نفسه، متمرّقمة Report 1 وReport 2 وهكذا. ولو <i>الإرسال التلقائي</i> شغال بيتعمل تقرير لوحده لما المهمة تخلص لوحدها. ملف &gt; افتح فولدر التقارير بيوريهم.</p>
 
 <h3>10. تجارب حلوة في العرض</h3>
 <ul>

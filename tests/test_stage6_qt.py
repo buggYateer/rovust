@@ -120,8 +120,11 @@ def test_stop_and_restart_ask_about_the_report(tmp_path, monkeypatch):
     answers = []
     monkeypatch.setattr(w, "_ask_report", lambda kind: answers.pop(0))
 
-    def reports():
+    def missions():
         return sorted(p for p in tmp_path.iterdir() if p.is_dir())
+
+    def reports():
+        return sorted(r for p in missions() for r in p.iterdir() if r.is_dir())
 
     w.start_mission()
     for _ in range(3):
@@ -138,6 +141,9 @@ def test_stop_and_restart_ask_about_the_report(tmp_path, monkeypatch):
     assert w.mission.done and len(reports()) == 2 and w._report_sent_for is w.mission
     keys = {json.load(open(p / "metrics.json", encoding="utf-8"))["mission_key"] for p in reports()}
     assert keys == {key}
+    # one folder for the run, the reports numbered inside it
+    assert len(missions()) == 1
+    assert [r.name.split(" - ")[0] for r in reports()] == ["Report 1", "Report 2"]
 
     old = w.mission
     w.restart_mission()                  # already over: restarts without asking
@@ -167,5 +173,13 @@ def test_stop_and_restart_ask_about_the_report(tmp_path, monkeypatch):
     monkeypatch.setattr(R.urllib.request, "urlopen", fake_urlopen)
     up = R.ReportUploader.__new__(R.ReportUploader)
     up.cfg = {"upload_url": "https://example.invalid/exec"}
-    ok, _ = up.send_folder(str(reports()[0]))
-    assert ok and sent["key"] == key
+    up.pending = [str(r) for r in reports()]
+    up.lock = __import__("threading").Lock()
+    first, second = reports()
+    ok, _ = up.send_folder(str(first))
+    assert ok and sent["key"] == key and sent["report"] == first.name
+    assert sent["name"].startswith("Mission #new - ")
+    # the bridge named the run "x": the local folder follows, and the report still waiting moves with it
+    assert (tmp_path / "x" / second.name).is_dir()
+    assert str(tmp_path / "x" / second.name) in up.pending
+    assert "Mission #7" in (tmp_path / "x" / first.name / "report.html").read_text(encoding="utf-8")

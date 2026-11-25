@@ -838,7 +838,7 @@ class MainWindow(QMainWindow):
             self._set_report_text(tr("reportSaved"))
             self.uploader.flush(self._report_status)
         else:
-            self._set_report_text(tr("reportLocal", os.path.basename(folder)))
+            self._set_report_text(tr("reportLocal", os.path.join(os.path.basename(os.path.dirname(folder)), os.path.basename(folder))))
 
     def _set_report_text(self, text):
         self.st_report.setText(text)
