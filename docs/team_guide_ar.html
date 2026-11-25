@@ -115,7 +115,7 @@
   <div>
     <h1>Rovust — دليل الفريق الكامل</h1>
     <div class="sub">روبوت استكشاف واحد بيشتغل في كهف وعلى المريخ وتحت المية — محاكى من الموتور لحد الخريطة. الدليل ده بيشرح كل حتة اتعملت، ليه اتعملت كده، وبتربط بإيه في المنهج.</div>
-    <div class="pills"><span class="pill"><b>3</b> بيئات</span><span class="pill"><b>20+</b> سنسور</span><span class="pill"><b>9</b> طبقات سلوك</span><span class="pill"><b>3</b> استراتيجيات استكشاف</span><span class="pill"><b>59</b> اختبار</span><span class="pill"><b>264</b> تجربة مقاسة</span><span class="pill">تحكم من الموبايل</span><span class="pill">دراع ألعاب</span><span class="pill">عربي / English</span><span class="pill">تقارير على Drive</span></div>
+    <div class="pills"><span class="pill"><b>3</b> بيئات</span><span class="pill"><b>20+</b> سنسور</span><span class="pill"><b>9</b> طبقات سلوك</span><span class="pill"><b>3</b> استراتيجيات استكشاف</span><span class="pill"><b>60</b> اختبار</span><span class="pill"><b>264</b> تجربة مقاسة</span><span class="pill">تحكم من الموبايل</span><span class="pill">دراع ألعاب</span><span class="pill">عربي / English</span><span class="pill">تقارير على Drive</span></div>
   </div>
   <img src="../assets/icon.png" alt="Rovust">
 </div>
@@ -492,6 +492,8 @@ forward = |stick| * max(0, (cos(err) - 0.35) / 0.65)    # يمشي بس لما �
 <div class="f"><span>assets/icon.png, icon.ico</span><span>الأيقونة (بتتولّد من <code>paint_icon</code>)</span></div>
 <div class="f"><span>assets/fonts/</span><span>خطوط Inter وIBM Plex Sans Arabic وChakra Petch + رخصها (OFL، مسموح نوزّعها)</span></div>
 <div class="f"><span>tools/make_media.py</span><span>بيعيد تصوير كل صور الدوكيومنتيشن (البرنامج، الموبايل، التقرير، الـ GIF) من غير ما يبعت تقارير</span></div>
+<div class="f"><span>tools/make_slide_images.py</span><span>بيرسم خرايط البيئات للشرايح (الغلاف وشريحة التلات بيئات)</span></div>
+<div class="f"><span>tools/make_video.py</span><span>بيسجّل فيديو الديمو: بيشغّل البرنامج لوحده وكاميرا بتعمل زوم، والموبايل الحقيقي جنبه، ومن غير ما يبعت تقارير</span></div>
 <div class="f"><span>tools/build_presentation.py</span><span>بيبني البرزنتيشن (HTML/PDF/PowerPoint) من <code>docs/presentation/slides</code></span></div>
 </div></details>
 <details><summary>sim/ — جوهر المحاكاة</summary><div class="tree">
@@ -543,7 +545,7 @@ forward = |stick| * max(0, (cos(err) - 0.35) / 0.65)    # يمشي بس لما �
 <div class="f"><span>run_batch.py</span><span>التجارب بدون واجهة (strategies / --localisation / --ablation)</span></div>
 <div class="f"><span>plots.py / pid_demo.py</span><span>الرسومات + استجابة الخطوة للـ PID</span></div>
 </div></details>
-<details><summary>tests/ — 58 اختبار</summary><div class="tree">
+<details><summary>tests/ — 60 اختبار</summary><div class="tree">
 <div class="f"><span>test_stage1.py</span><span>موتور، encoder، PID (خطأ ثابت لـ P، صفر لـ PI)، مشي مستقيم، توليد العوالم، تصادم</span></div>
 <div class="f"><span>test_stage2_sensors.py</span><span>ADC، lookup table الـ IR، تركيب السنسورز لكل بيئة، الأعطال، انحراف gyro، cliff، bumper، كاميرا</span></div>
 <div class="f"><span>test_stage3_estimation_mapping.py</span><span>dead reckoning، fused أحسن من odometry، دقة الخريطة</span></div>
@@ -573,10 +575,11 @@ cd robotics-project
 python -m venv .venv &amp;&amp; .venv\Scripts\activate
 pip install -r requirements.txt
 python main.py                       # البرنامج
-pytest                               # 58 اختبار
+pytest                               # 60 اختبار
 python -m sim.experiments.pid_demo   # رسمة PID
 python -m sim.experiments.run_batch --seeds 10   # تجارب الاستراتيجيات</pre>
 <pre class="ltr">python tools/make_media.py           # يعيد كل صور الدوكيومنتيشن (أو: app / console / report / gif / about)
+python tools/make_video.py           # يسجّل فيديو الديمو من جديد (محتاج ffmpeg وEdge)
 python tools/build_presentation.py   # يبني البرزنتيشن</pre>
 <p>أو بضغطة واحدة على ويندوز: من صفحة الريبو <b>Code → Download ZIP</b>، فك الضغط في مكان قصير زي <code class="ltr">C:\Rovust</code> ودبل كليك على <code>setup.bat</code> جوه الفولدر (الريبو خاص، فلازم تقبل الدعوة الأول). بينزّل Python لو مش موجود، ويعمل البيئة، وينزّل كل المكتبات ومعاهم pygame-ce للدراع وsegno لكود الـ QR، ويعمل shortcut ويشغّل. بعدها <code>run.bat</code> أو الـ shortcut. ملحوظة: Windows 11 مع Smart App Control شغال ممكن يمنع الحزم المترجمة — اقفله أو استخدم Python 3.12.</p>
 </div>
@@ -623,6 +626,7 @@ python tools/build_presentation.py   # يبني البرزنتيشن</pre>
 <li>مكتبة تبان سريعة (scikit-learn) ممكن تكون أبطأ حاجة في البرنامج لما تتنادى 20 مرة في الثانية: قيس قبل ما تخمّن.</li>
 <li>نفس الدراع ممكن يوصل بأرقام زراير مختلفة حسب الدونجل: اعرض اللي البرنامج شايفه على الشاشة (كارت الدراع) علشان تكتشف ده على طول.</li>
 <li>تنبيه بيظهر ويختفي كل ثانية أسوأ من مفيش تنبيه: debounce وhold.</li>
+<li>وإحنا بنسجل الفيديو البرنامج وقع لما الروبوت رجع Auto بعد ما حد ساقه بإيده: متتبع الطريق كان فاكر مكانه على الطريق القديم الأطول. أي حاجة فيها «index» لازم تتصفّر لما الحاجة اللي بتشاور عليها تتغير — واتعمل له اختبار.</li>
 </ul>
 </div>
 <h2 id="exam">23. المناقشة يوم الأحد — الدرجة بتتقسم إزاي وإحنا مغطيينها فين</h2>
