@@ -4,14 +4,29 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
-    // next mission number = highest "Mission #n" already in the folder + 1
-    let n = 0;
-    const it = root.getFolders();
-    while (it.hasNext()) {
-      const m = it.next().getName().match(/^Mission #(\d+)/);
-      if (m) n = Math.max(n, parseInt(m[1], 10));
+    const lock = LockService.getScriptLock();
+    lock.waitLock(30000);
+    let n;
+    try {
+      // a run that already sent a report keeps its number (key = one run of the app)
+      const props = PropertiesService.getScriptProperties();
+      const known = data.key ? props.getProperty('key_' + data.key) : null;
+      if (known) {
+        n = parseInt(known, 10);
+      } else {
+        // next mission number = highest "Mission #n" already in the folder + 1
+        n = 0;
+        const it = root.getFolders();
+        while (it.hasNext()) {
+          const m = it.next().getName().match(/^Mission #(\d+)/);
+          if (m) n = Math.max(n, parseInt(m[1], 10));
+        }
+        n += 1;
+        if (data.key) props.setProperty('key_' + data.key, String(n));
+      }
+    } finally {
+      lock.releaseLock();
     }
-    n += 1;
     const suffix = data.suffix || data.name.replace(/^Mission #\S+ - /, '');
     const name = 'Mission #' + n + ' - ' + suffix;
     const folder = root.createFolder(name);

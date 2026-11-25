@@ -9,7 +9,7 @@ A Python simulation of an exploration rover, from motor control to mapping and d
 <p align="center">
   <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white">
   <img alt="PySide6" src="https://img.shields.io/badge/desktop%20app-PySide6%20%2F%20Qt-41CD52?logo=qt&logoColor=white">
-  <img alt="tests" src="https://img.shields.io/badge/tests-58%20passing-2dd4bf">
+  <img alt="tests" src="https://img.shields.io/badge/tests-59%20passing-2dd4bf">
   <img alt="sensors" src="https://img.shields.io/badge/sensors-20%2B%20modelled-f5a524">
 </p>
 
@@ -171,7 +171,7 @@ ground-speed sensor the estimate is 5–16 m off; without the cliff switches one
 rover in four is lost to a crater.
 
 ```bash
-pytest                                              # 58 tests
+pytest                                              # 59 tests
 python -m sim.experiments.pid_demo                  # step responses, calibration curve
 python -m sim.experiments.run_batch --seeds 10      # strategies
 python -m sim.experiments.run_batch --localisation  # fused vs encoders vs perfect

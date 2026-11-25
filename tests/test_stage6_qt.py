@@ -99,3 +99,73 @@ def test_console_address_has_a_qr_code():
     app = QApplication.instance() or QApplication([])
     pm = qr_pixmap("http://192.168.1.4:8080", 132)
     assert pm is not None and pm.width() == pm.height() and pm.width() >= 100
+
+
+def test_stop_and_restart_ask_about_the_report(tmp_path, monkeypatch):
+    """Stop / Restart ask first; a report sent mid-mission keeps the run's key
+    (same number on Drive) and does not replace the final report."""
+    import json
+
+    from PySide6.QtWidgets import QApplication
+    import sim.report as R
+    from sim.qtui.main_window import MainWindow
+
+    monkeypatch.setattr(R, "REPORTS_DIR", str(tmp_path))
+    monkeypatch.setattr(R, "INDEX_CSV", str(tmp_path / "missions.csv"))
+    monkeypatch.setattr(R, "PENDING_PATH", str(tmp_path / "pending.json"))
+    app = QApplication.instance() or QApplication([])
+    w = MainWindow()
+    w.uploader.cfg = {"upload_url": "", "auto_send": False}     # never upload from a test
+    w.uploader.pending = []
+    answers = []
+    monkeypatch.setattr(w, "_ask_report", lambda kind: answers.pop(0))
+
+    def reports():
+        return sorted(p for p in tmp_path.iterdir() if p.is_dir())
+
+    w.start_mission()
+    for _ in range(3):
+        w._on_tick()
+    key = w._mission_key
+    answers.append(None)                 # cancel: nothing happens
+    w.stop_mission()
+    assert not w.mission.done and reports() == []
+
+    w.send_report()                      # mid-mission snapshot
+    assert len(reports()) == 1 and w._report_sent_for is not w.mission
+    answers.append("send")               # stop and send report
+    w.stop_mission()
+    assert w.mission.done and len(reports()) == 2 and w._report_sent_for is w.mission
+    keys = {json.load(open(p / "metrics.json", encoding="utf-8"))["mission_key"] for p in reports()}
+    assert keys == {key}
+
+    old = w.mission
+    w.restart_mission()                  # already over: restarts without asking
+    assert w.mission is not old and w._mission_key != key
+    answers.append("plain")              # restart a running mission without a report
+    old = w.mission
+    w.restart_mission()
+    assert old.done and w.mission is not old and len(reports()) == 2
+    w.close()
+
+    sent = {}
+
+    class Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"ok": true, "number": 7, "name": "x"}'
+
+    def fake_urlopen(req, timeout=0):
+        sent.update(json.loads(req.data))
+        return Resp()
+
+    monkeypatch.setattr(R.urllib.request, "urlopen", fake_urlopen)
+    up = R.ReportUploader.__new__(R.ReportUploader)
+    up.cfg = {"upload_url": "https://example.invalid/exec"}
+    ok, _ = up.send_folder(str(reports()[0]))
+    assert ok and sent["key"] == key

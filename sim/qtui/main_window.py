@@ -4,6 +4,7 @@ that shows one calm alert at a time. English or Egyptian Arabic."""
 from __future__ import annotations
 
 import os
+import uuid
 import time
 
 from PySide6.QtCore import QBuffer, QIODevice, QSettings, QSize, Qt, QTimer, QUrl
@@ -71,6 +72,44 @@ class ReportNameDialog(QDialog):
 
     def title(self) -> str | None:
         return None if self._auto else (self.edit.text().strip() or None)
+
+
+class ConfirmDialog(QDialog):
+    """A small phone-style question before Stop / Restart: do it and send a
+    report, do it without one, or cancel. ``choice`` is "send", "plain" or None."""
+
+    def __init__(self, title: str, message: str, send_text: str, plain_text: str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setMinimumWidth(380)
+        self.choice = None
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(22, 20, 22, 18)
+        lay.setSpacing(8)
+        head = QLabel(title)
+        f = head.font()
+        f.setPointSizeF(f.pointSizeF() * 1.25)
+        f.setBold(True)
+        head.setFont(f)
+        lay.addWidget(head)
+        msg = QLabel(message)
+        msg.setObjectName("muted")
+        msg.setWordWrap(True)
+        lay.addWidget(msg)
+        lay.addSpacing(8)
+        for text, choice, name in ((send_text, "send", "primary"), (plain_text, "plain", "tbx"), (tr("cfCancel"), None, "tb")):
+            b = QPushButton(text)
+            b.setObjectName(name)
+            b.setMinimumHeight(36)
+            b.clicked.connect(lambda _=False, c=choice: self._pick(c))
+            lay.addWidget(b)
+            if choice == "send":
+                b.setDefault(True)
+                b.setFocus()
+
+    def _pick(self, choice):
+        self.choice = choice
+        (self.accept if choice else self.reject)()
 
 
 def hbox(margins=(0, 0, 0, 0), spacing=6):
@@ -155,6 +194,7 @@ class MainWindow(QMainWindow):
         self.server: ConsoleServer | None = None
         self._keys = set()
         self.uploader = ReportUploader()
+        self._mission_key = ""
         self._report_sent_for = None       # mission object that already got its automatic report
         self._report_text = ""
         self.alerts = AlertTracker()
@@ -655,6 +695,7 @@ class MainWindow(QMainWindow):
         if ai is not None:
             ai.attach(self.mission)
         self.mission_no += 1
+        self._mission_key = uuid.uuid4().hex[:12]   # every report of this run gets the same mission number on Drive
         self.paused = False
         self.act_pause.setChecked(False)
         self._toggle_pause(False)
@@ -677,9 +718,26 @@ class MainWindow(QMainWindow):
         self._recolor()
         self._update_enabled()
 
+    def _ask_report(self, kind: str) -> str | None:
+        """Stop / Restart while a mission runs: ask whether to send a report
+        too. Returns "send", "plain" or None (cancelled)."""
+        dlg = ConfirmDialog(tr(f"cf{kind}Title"), tr(f"cf{kind}Msg"), tr(f"cf{kind}Send"), tr(f"cf{kind}Plain"), self)
+        dlg.exec()
+        return dlg.choice
+
     def restart_mission(self):
-        if self.mission is not None:
-            self.start_mission()
+        m = self.mission
+        if m is None:
+            return
+        if not m.done:
+            choice = self._ask_report("Restart")
+            if choice is None:
+                return
+            m.stop()
+            if choice == "send":
+                self.send_report()
+            self._report_sent_for = m      # decided: no automatic report for the old run
+        self.start_mission()
 
     def _toggle_pause(self, checked):
         self.paused = checked
@@ -690,8 +748,15 @@ class MainWindow(QMainWindow):
             self.b_pause.setIcon(icon("play" if checked else "pause", color("text")))
 
     def stop_mission(self):
-        if self.mission is not None and not self.mission.done:
-            self.mission.stop()
+        m = self.mission
+        if m is not None and not m.done:
+            choice = self._ask_report("Stop")
+            if choice is None:
+                return
+            m.stop()
+            if choice == "send":
+                self.send_report()
+            self._report_sent_for = m      # the operator chose: no second, automatic report
             self.paused = False
             self.act_pause.setChecked(False)
             self._toggle_pause(False)
@@ -765,8 +830,9 @@ class MainWindow(QMainWindow):
                 return
             title = dlg.title()
         images = {"true_world.png": self._grab_png(self.map_world), "robot_map.png": self._grab_png(self.map_belief)}
-        folder = build_report(m, images, title=title)
-        self._report_sent_for = m
+        folder = build_report(m, images, title=title, key=self._mission_key)
+        if m.done:
+            self._report_sent_for = m      # a report sent mid-mission does not replace the final one
         if self.uploader.configured:
             self.uploader.queue(folder)
             self._set_report_text(tr("reportSaved"))

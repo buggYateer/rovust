@@ -125,14 +125,16 @@ and after 3 s the rover acts on the <i>If the link drops</i> setting.</p>
 <h3>8. When a mission ends</h3>
 <p>The rover is back at base, the battery is empty, it fell into a pit (only possible in Manual), or you pressed
 <b>Stop</b>. A banner on the maps says why, and everything stays on screen. Start again with <b>New mission</b>, or
-<b>Restart</b> (R) for the same settings.</p>
+<b>Restart</b> (R) for the same settings. While a mission runs, Stop and Restart first ask: with a report, without one,
+or cancel.</p>
 
 <h3>9. Reports</h3>
 <p><b>Send report</b> (Ctrl+S) asks for a name, or uses the automatic one (date, environment, computer), and saves
 <i>reports/Mission #n - name</i>: an HTML page with all the statistics and both maps, the map pictures and the raw numbers.
 With the Drive bridge configured (File &gt; Report settings) the folder is also uploaded to the team's shared Drive folder,
 which gives it its number. Without internet the report waits and is sent later; the status bar shows how many are waiting.
-With <i>auto-send</i> on, a report is made by itself when a mission ends. File &gt; Open reports folder shows them.</p>
+You can send one at any moment while the mission runs: every report of the same run gets the same mission number.
+With <i>auto-send</i> on, a report is made by itself when a mission ends on its own. File &gt; Open reports folder shows them.</p>
 
 <h3>10. Things to try in a demonstration</h3>
 <ul>
@@ -255,14 +257,14 @@ QR</b> في البانل: صوّر الكود بكاميرا الموبايل أ
 <h3>8. لما المهمة تخلص</h3>
 <p>الروبوت رجع مكان ما بدأ، أو البطارية خلصت، أو وقع في حفرة (ده بيحصل في "إنت اللي سايق" بس)، أو إنت دوست <b>خلّص
 المهمة</b>. بيظهر على الخرايط السبب، وكل حاجة بتفضل على الشاشة. ابدأ تاني بـ <b>مهمة جديدة</b>، أو <b>عيدها</b> (R)
-بنفس الإعدادات.</p>
+بنفس الإعدادات. ولو المهمة لسه شغالة، «خلّص المهمة» و«عيدها» بيسألوك الأول: بتقرير، من غير تقرير، ولا إلغاء.</p>
 
 <h3>9. التقارير</h3>
 <p><b>ابعت التقرير</b> (Ctrl+S) بيسألك على اسم أو ياخد الاسم التلقائي (التاريخ، المكان، الجهاز)، وبيحفظ
 <i>reports/Mission #n - الاسم</i>: صفحة HTML فيها كل الأرقام والخريطتين، صور الخرايط، والأرقام الخام. لو لينك الدرايف
 متظبط (ملف &gt; إعدادات التقارير) الفولدر بيترفع على فولدر الدرايف بتاع التيم، وهو اللي بيدّيه رقمه. من غير نت التقرير
-بيستنى ويترفع بعدين، والشريط اللي تحت بيقول فيه كام مستني. ولو <i>الإرسال التلقائي</i> شغال بيتعمل تقرير لوحده لما
-المهمة تخلص. ملف &gt; افتح فولدر التقارير بيوريهم.</p>
+بيستنى ويترفع بعدين، والشريط اللي تحت بيقول فيه كام مستني. وتقدر تبعت تقرير في أي وقت والمهمة شغالة، وكل
+تقارير نفس المهمة بتاخد نفس الرقم. ولو <i>الإرسال التلقائي</i> شغال بيتعمل تقرير لوحده لما المهمة تخلص لوحدها. ملف &gt; افتح فولدر التقارير بيوريهم.</p>
 
 <h3>10. تجارب حلوة في العرض</h3>
 <ul>

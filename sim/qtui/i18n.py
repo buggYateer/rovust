@@ -306,3 +306,20 @@ STR["ar"].update({
     "rsHint": "اللينك بييجي من سكريبت Google Apps Script المشروح في docs/DRIVE_REPORTS.md. "
               "التقارير بتتحفظ برضه في فولدر reports على الجهاز.",
 })
+
+
+# stop / restart confirmation
+STR["en"].update({
+    "cfStopTitle": "Stop the mission?", "cfStopMsg": "The rover stops where it is and everything stays on screen.",
+    "cfStopSend": "Stop and send report", "cfStopPlain": "Stop without a report",
+    "cfRestartTitle": "Restart the mission?", "cfRestartMsg": "This run ends and a new one starts with the same settings.",
+    "cfRestartSend": "Send report, then restart", "cfRestartPlain": "Restart without a report",
+    "cfCancel": "Cancel",
+})
+STR["ar"].update({
+    "cfStopTitle": "توقّف المهمة؟", "cfStopMsg": "الروبوت هيقف مكانه وكل حاجة هتفضل على الشاشة.",
+    "cfStopSend": "وقّف وابعت تقرير", "cfStopPlain": "وقّف من غير تقرير",
+    "cfRestartTitle": "تعيد المهمة؟", "cfRestartMsg": "المهمة دي هتخلص وتبدأ واحدة جديدة بنفس الإعدادات.",
+    "cfRestartSend": "ابعت تقرير وبعدين عيدها", "cfRestartPlain": "عيدها من غير تقرير",
+    "cfCancel": "إلغاء",
+})

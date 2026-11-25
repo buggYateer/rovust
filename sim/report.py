@@ -9,7 +9,9 @@ where <title> is a name the operator typed when sending, or by default
 The number is assigned by the Drive bridge when the report is uploaded (it
 looks at the folders already in the shared folder and takes the next one),
 so numbers are unique across the whole team. Until then the local copy is
-called "Mission #new - ...".
+called "Mission #new - ...". Every report also carries the run's ``key``:
+reports of the same run (one sent mid-mission, one at the end) get the
+same number from the bridge.
 
 Upload is fire-and-forget with a local queue: a report that cannot be sent
 (no network, bridge not configured) stays in reports/pending.json and is
@@ -96,7 +98,8 @@ def clean_title(title: str | None) -> str:
     return " ".join(t.split())[:80]
 
 
-def build_report(mission, images: dict[str, bytes], extra: dict | None = None, title: str | None = None) -> str:
+def build_report(mission, images: dict[str, bytes], extra: dict | None = None, title: str | None = None,
+                 key: str = "") -> str:
     """Write the report folder and return its path. ``images`` maps a file
     name (true_world.png, robot_map.png, ...) to PNG bytes. ``title`` is the
     operator's name for the report (default: date, environment, machine).
@@ -104,13 +107,16 @@ def build_report(mission, images: dict[str, bytes], extra: dict | None = None, t
     n = PENDING_NUMBER
     stamp = datetime.now()
     title = clean_title(title) or default_title(mission, stamp)
-    folder_name = f"Mission #{n} - {title}"
-    folder = os.path.join(REPORTS_DIR, folder_name)
+    folder = os.path.join(REPORTS_DIR, f"Mission #{n} - {title}")
+    k = 2
+    while os.path.exists(folder):       # two reports in the same second: never overwrite one
+        folder = os.path.join(REPORTS_DIR, f"Mission #{n} - {title} ({k})")
+        k += 1
     os.makedirs(folder, exist_ok=True)
 
     metrics = mission.metrics()
     metrics.update({
-        "mission_number": n, "title": title, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
+        "mission_number": n, "mission_key": key, "title": title, "timestamp": stamp.isoformat(timespec="seconds"), "machine": machine_tag(),
         "localisation": mission.estimator.mode, "mode": mission.mode, "on_link_loss": mission.on_link_loss,
         "link_delivered": mission.link.delivered, "link_dropped": mission.link.dropped,
         "link_losses": mission.stats.get("link_losses", 0), "end_reason": mission.end_reason(),
@@ -238,7 +244,13 @@ class ReportUploader:
                 files.append({"name": name, "mime": mime, "b64": base64.b64encode(f.read()).decode()})
         base = os.path.basename(folder)
         suffix = base.split(" - ", 1)[1] if " - " in base else base      # the title after "Mission #new - "
-        body = json.dumps({"name": base, "suffix": suffix, "files": files}).encode()
+        key = ""
+        try:
+            with open(os.path.join(folder, "metrics.json"), encoding="utf-8") as f:
+                key = json.load(f).get("mission_key", "") or ""
+        except (OSError, json.JSONDecodeError):
+            pass
+        body = json.dumps({"name": base, "suffix": suffix, "key": key, "files": files}).encode()
         req = urllib.request.Request(self.cfg["upload_url"], data=body, headers={"Content-Type": "application/json"})
         try:
             with urllib.request.urlopen(req, timeout=90) as resp:
