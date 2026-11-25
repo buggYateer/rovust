@@ -22,7 +22,7 @@ In one sentence: Rovust is a software rover that is dropped into an unknown plac
 
 </div>
 
-## 3. Every lecture is a working part of the rover
+## 3. Built from the motors up — the course, layer by layer
 
 This table is our map of the course. Each row is a lecture — actuators, encoders, control, sensors, behaviour, navigation, communication — and each is implemented as a module that the others depend on. We will go through them in that order: first the analysis of the hardware we simulate, then the design of the software on top, then the measurements.
 
@@ -202,7 +202,7 @@ Our references. The course comes first: Bräunl's Embedded Robotics, which the l
 
 </div>
 
-## 21. Rovust, running
+## 21. demo-video
 
 The demo video: three minutes of the application running — a cave mission and its two maps, the motor loop, a sensor breaking, the radio failing and the rover coming home, driving from a phone and a game controller, a report, Mars, underwater and the Arabic interface.
 
