@@ -25,7 +25,7 @@ Arrow keys move between slides. Read the notes from a phone (same link, or
 |---|---|
 | `slides/*.html`, `deck.json`, `notes_ar.json` | the slide sources (same as Claude Slides) |
 | `Rovust_presentation.html` | standalone web viewer, both note languages |
-| `Rovust_presentation.pdf` | 32 pages |
+| `Rovust_presentation.pdf` | 22 pages |
 | `Rovust_presentation.pptx` | PowerPoint, English notes |
 | `Rovust_presentation_ar_notes.pptx` | PowerPoint, Egyptian-Arabic notes |
 | `SPEAKER_NOTES.md` | all notes, both languages |

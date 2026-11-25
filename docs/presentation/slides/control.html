@@ -1,17 +1,20 @@
-<section id="control" data-transition="fade" style="background:#11161b;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2dd4bf;letter-spacing:2px">ANALYSIS · CONTROL</p>
-<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.1">Encoder → PID → PWM, 20 times a second</h2>
-<div style="display:flex;gap:36px;align-items:start">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px">
-<p style="font-size:27px;line-height:1.5;color:#bfd0d8">Each wheel has a two-phase incremental encoder on the motor shaft (16 ticks × 30 gearbox = 480 ticks per wheel turn). The tick delta per control step is the only speed feedback the PID gets — quantised, like a pulse-counting register.</p>
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1b232a;border:1px solid #2f3b46;border-radius:12px;padding:18px 22px;color:#2dd4bf">R<sub>n</sub> = R<sub>n−1</sub> + K<sub>p</sub>(e<sub>n</sub> − e<sub>n−1</sub>) + K<sub>i</sub>(e<sub>n</sub> + e<sub>n−1</sub>)/2 + K<sub>d</sub>(e<sub>n</sub> − 2e<sub>n−1</sub> + e<sub>n−2</sub>)</p>
-<p style="font-size:26px;line-height:1.5;color:#bfd0d8">The lecture’s incremental form: only the last output and two errors are stored, and clamping the output doubles as anti-windup. <b>Driving straight</b> adds an I-controller on the difference of the two encoder <i>positions</i>, fed back to both set-points (Fig. 5.16).</p>
+<section id="control" data-transition="fade" style="background:#1b232a;color:#e6edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:96px 120px 88px;display:flex;flex-direction:column;gap:30px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2dd4bf;letter-spacing:3px">ANALYSIS · CONTROL</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1.08;margin-top:-14px">Encoder → PID → PWM, 20 times a second</h2>
+<div style="flex:1;display:flex;gap:44px;align-items:center">
+<img src="img/pid_step.png" alt="Wheel speed step response of on-off, hysteresis, P, PI and PID, with a load applied at 3 s" style="width:760px;height:650px;object-fit:contain;border-radius:14px;border:1px solid #2f3b46;background:#ffffff">
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:18px;padding:24px 30px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:27px;color:#2dd4bf;line-height:1.5">R<sub>n</sub> = R<sub>n−1</sub> + K<sub>p</sub>(e<sub>n</sub> − e<sub>n−1</sub>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ K<sub>i</sub>(e<sub>n</sub> + e<sub>n−1</sub>)/2 + K<sub>d</sub>(e<sub>n</sub> − 2e<sub>n−1</sub> + e<sub>n−2</sub>)</p>
+<p style="font-size:26px;color:#92a1af;margin-top:6px">The lecture's incremental PID, one per wheel; the encoder is the only speed feedback.</p>
 </div>
-<div style="width:820px;display:flex;flex-direction:column;gap:10px">
-<img src="../figures/pid_step_response.png" alt="Step response of on-off, hysteresis, P, PI and PID controllers with a load step at three seconds" style="width:820px;height:300px;object-fit:cover;object-position:left;border-radius:14px;border:1px solid #2f3b46">
-<p style="font-size:24px;color:#92a1af;line-height:1.4">On-off chatters, hysteresis widens the swing, P settles 2 rad/s short of the 6 rad/s target, PI and PID remove the error and recover from a 50 % load step at t = 3 s in under a second.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:31px;color:#f5a524">On-off · hysteresis</h3><p style="font-size:27px;line-height:1.4;color:#c9d6dd">Chatters around the target.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:31px;color:#f87171">P only</h3><p style="font-size:27px;line-height:1.4;color:#c9d6dd">Stops 4 rad/s short: the steady-state error.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:31px;color:#2dd4bf">PI · PID</h3><p style="font-size:27px;line-height:1.4;color:#c9d6dd">No error; beats a 50 % load in under 1 s.</p></div>
+<div style="background:#11161b;border:1px solid #2f3b46;border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:31px;color:#22c55e">Driving straight</h3><p style="font-size:27px;line-height:1.4;color:#c9d6dd">An I-controller on the encoder difference.</p></div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#92a1af">Rovust · Analysis · Control — sim/robot/control.py, drive.py, experiments/pid_demo.py</p>
+</div>
 <aside>This is the Control lecture running. We implemented on-off, on-off with hysteresis, and the incremental PID exactly as derived in class, and the plot shows the textbook behaviour: the P controller keeps a steady-state error because its output goes to zero when the error does, and the integral term removes it. The straight-driving controller is the structure from figure 5.16: integrate the position difference of the two wheels and feed it back. In the application you can watch this loop live in the Motor control tab.</aside>
 </section>

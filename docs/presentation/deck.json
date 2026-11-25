@@ -3,18 +3,13 @@
   "order": [
     "cover",
     "abstract",
-    "intro-why",
     "intro-course",
-    "sec-analysis",
     "sensors-table",
     "sensors-placement",
-    "sensors-physics",
     "actuators",
     "control",
-    "controller",
+    "hardware",
     "flowchart",
-    "sec-design",
-    "architecture",
     "localisation",
     "behaviour",
     "exploration",
@@ -22,38 +17,33 @@
     "environments",
     "app",
     "remote",
-    "reports",
-    "sec-results",
     "res-strategies",
-    "res-localisation",
     "res-ablation",
-    "tests",
-    "sec-conclusion",
     "conclusion",
-    "future",
     "references",
+    "demo-video",
     "thanks"
   ],
   "sections": {
     "s1": {
-      "description": "Abstract and introduction: the problem of exploring unknown places without a map or GPS, and one rover for three worlds.",
+      "description": "Abstract and introduction: exploring unknown places without a map or GPS, and how every lecture became a part of the rover.",
       "start": "cover"
     },
     "s2": {
-      "description": "Analysis: the sensors, the actuators, the on-board controller and the control-loop flowchart and pseudocode.",
-      "start": "sec-analysis"
+      "description": "Analysis: sensors, actuators, control, the hardware wiring and the control-loop flowchart and pseudocode.",
+      "start": "sensors-table"
     },
     "s3": {
-      "description": "Design and implementation: architecture, localisation, behaviours, planning, AI, environments, the application and remote control.",
-      "start": "sec-design"
+      "description": "Design and implementation: localisation, behaviour, exploration, AI, the three worlds, the application and remote control.",
+      "start": "localisation"
     },
     "s4": {
-      "description": "Results and tests: 264 measured runs comparing strategies, localisation and sensor ablations, plus 58 unit tests.",
-      "start": "sec-results"
+      "description": "Results: measured runs comparing exploration strategies and sensor ablations.",
+      "start": "res-strategies"
     },
     "s5": {
-      "description": "Conclusion, future work and references.",
-      "start": "sec-conclusion"
+      "description": "Conclusion, future work, references and the demo video.",
+      "start": "conclusion"
     }
   },
   "faces": {
