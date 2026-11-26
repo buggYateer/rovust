@@ -4,11 +4,11 @@ English notes first, then the same note in Egyptian Arabic. One entry per slide,
 
 ## 1. Rovust
 
-Good morning. We are the Rovust team. Rovust is an exploration rover that we built as a Python simulation — not from the map downwards, but from the motors upwards: DC motors, encoders, PID, a full sensor suite, and only then mapping and decision making. The same robot explores a cave, the surface of Mars and an underwater site. In the next twenty minutes we will show what we built, why every sensor sits where it sits, and what we measured.
+Good morning. We are team Rovust — the name is Rover plus Robust: a rover built to keep going on its own. We built it as a Python simulation from the motors up: DC motors, encoders, PID, a full sensor suite, and only then the map and the decisions. The same robot explores a cave, the surface of Mars and an underwater site. Behind me, the real cave, and in front of it the map the rover built by itself.
 
 <div dir="rtl" align="right">
 
-صباح الخير. إحنا فريق Rovust. ‏Rovust روفر استكشاف بنيناه كمحاكاة بالبايثون، بس مش من الخريطة ونازلين، لأ، من المواتير وطالعين: مواتير DC، إنكودرز، PID، طقم حساسات كامل، وبعد كده بس ييجي رسم الخريطة واتخاذ القرار. نفس الروبوت بيستكشف كهف، وسطح المريخ، وموقع تحت الميّه. في العشرين دقيقة الجايين هنوريكم بنينا إيه، وليه كل حساس متركّب في مكانه بالذات، وقيسنا إيه.
+صباح الخير، إحنا فريق Rovust — والاسم جاي من Rover وRobust: روبوت مستكشف يقدر يكمّل لوحده. بنيناه كمحاكاة بالبايثون من الموتورات لفوق: موتورات DC، وencoders، وPID، وطقم سنسورز كامل، وبعدين بس الخريطة والقرار. نفس الروبوت بيستكشف كهف، وسطح المريخ، وتحت المية. وورايا الكهف الحقيقي، وقدامه الخريطة اللي الروبوت رسمها لوحده.
 
 </div>
 
