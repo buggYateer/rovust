@@ -4,12 +4,14 @@
     "cover",
     "abstract",
     "intro-course",
+    "sec-analysis",
     "sensors-table",
     "sensors-placement",
     "actuators",
     "control",
     "hardware",
     "flowchart",
+    "sec-design",
     "localisation",
     "behaviour",
     "exploration",
@@ -17,8 +19,10 @@
     "environments",
     "app",
     "remote",
+    "sec-results",
     "res-strategies",
     "res-ablation",
+    "sec-conclusion",
     "conclusion",
     "references",
     "demo-video",
@@ -31,19 +35,19 @@
     },
     "s2": {
       "description": "Analysis: sensors, actuators, control, the hardware wiring and the control-loop flowchart and pseudocode.",
-      "start": "sensors-table"
+      "start": "sec-analysis"
     },
     "s3": {
       "description": "Design and implementation: localisation, behaviour, exploration, AI, the three worlds, the application and remote control.",
-      "start": "localisation"
+      "start": "sec-design"
     },
     "s4": {
       "description": "Results: measured runs comparing exploration strategies and sensor ablations.",
-      "start": "res-strategies"
+      "start": "sec-results"
     },
     "s5": {
       "description": "Conclusion, future work, references and the demo video.",
-      "start": "conclusion"
+      "start": "sec-conclusion"
     }
   },
   "faces": {

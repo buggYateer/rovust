@@ -214,8 +214,8 @@ class Film:
                                     "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium",
                                     "-crf", "21", "-threads", "4", "-pix_fmt", "yuv420p", "-movflags", "+faststart", OUT],
                                    stdin=subprocess.PIPE)
-        self.font_cap = QFont("Inter", 26)
-        self.font_cap.setWeight(QFont.Weight.DemiBold)
+        self.font_cap = QFont("Inter", 27)
+        self.font_cap.setWeight(QFont.Weight.Bold)
 
     # ---- direction
     def rect_of(self, *widgets, pad=24) -> QRectF:
@@ -245,6 +245,9 @@ class Film:
         self.cam_from, self.cam_to, self.cam_t, self.cam_n = QRectF(self.cam), t, 0, frames
 
     def say(self, text):
+        if text and text != self.cap_target:
+            t = self.frames / FPS
+            print(f"CUE {int(t // 60)}:{t % 60:04.1f}  {text}".encode("ascii", "replace").decode(), flush=True)
         self.cap_target = text
 
     def click(self, widget):
@@ -349,13 +352,22 @@ class Film:
             tw = fm.horizontalAdvance(self.caption)
             k = ease(min(1.0, max(0.0, self.split)))          # beside the phone: under the desktop
             cx = W / 2 * (1 - k) + (56 + 1290 / 2) * k
-            r = QRectF(cx - tw / 2 - 30, H - 118 + 10 * k, tw + 60, 64)
-            bg = QColor(13, 18, 22)
-            bg.setAlphaF(0.86 * self.cap_alpha)
+            r = QRectF(cx - tw / 2 - 34, H - 124 + 10 * k, tw + 68, 72)
+            # a light card on the dark app: readable from the back of the room
             p.setPen(Qt.PenStyle.NoPen)
+            sh = QColor(0, 0, 0)
+            sh.setAlphaF(0.45 * self.cap_alpha)
+            p.setBrush(sh)
+            p.drawRoundedRect(r.translated(0, 5).adjusted(-3, -3, 3, 3), 20, 20)
+            bg = QColor("#f7fafc")
+            bg.setAlphaF(0.97 * self.cap_alpha)
             p.setBrush(bg)
-            p.drawRoundedRect(r, 32, 32)
-            col = QColor("#e6edf3")
+            p.drawRoundedRect(r, 18, 18)
+            bar = QColor("#0d9483")
+            bar.setAlphaF(self.cap_alpha)
+            p.setBrush(bar)
+            p.drawRoundedRect(QRectF(r.x() + 10, r.y() + 14, 7, r.height() - 28), 3.5, 3.5)
+            col = QColor("#0b1418")
             col.setAlphaF(self.cap_alpha)
             p.setPen(col)
             p.drawText(r, Qt.AlignmentFlag.AlignCenter, self.caption)

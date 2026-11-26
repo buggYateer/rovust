@@ -20,11 +20,10 @@ Arrow keys move between slides. Read the notes from a phone (same link, or
 3. `Rovust_presentation.pdf` — works anywhere.
 
 **The demo video** (`docs/media/rovust_demo.mp4`, 3 minutes, no sound) is the
-slide before *Thank you*. Online it plays inside the slide: click it. In the
-PowerPoint and the HTML viewer, click the slide in the show and the video opens
-in the default player; it is a link, not a copy, so the deck stays small: keep
-the `docs/media` folder next to `docs/presentation`. If nothing opens,
-double-click `rovust_demo.mp4` yourself. Upload it to the group's Drive folder
+slide before *Thank you*. Online and in the PowerPoint it plays inside the
+slide: click it (the video is inside the .pptx, so the file works on its own).
+In the HTML viewer a click opens it in the default player; that one is a link,
+so keep the `docs/media` folder next to `docs/presentation`. Upload it to the group's Drive folder
 together with the presentation.
 
 ## Files
@@ -33,7 +32,7 @@ together with the presentation.
 |---|---|
 | `slides/*.html`, `deck.json`, `notes_ar.json` | the slide sources (same as Claude Slides) |
 | `Rovust_presentation.html` | standalone web viewer, both note languages |
-| `Rovust_presentation.pdf` | 22 pages |
+| `Rovust_presentation.pdf` | 26 pages |
 | `Rovust_presentation.pptx` | PowerPoint, slides only (no notes) |
 | `SPEAKER_NOTES.md` | all notes, both languages |
 

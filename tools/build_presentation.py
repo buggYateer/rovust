@@ -3,7 +3,7 @@
 Outputs (in docs/presentation/):
     Rovust_presentation.html            standalone viewer: arrow keys, N = notes, L = notes language (EN / مصري), F = fullscreen
     Rovust_presentation.pdf             the 30 slides as pages
-    Rovust_presentation.pptx            PowerPoint with the slides as pictures and a fade between them (no notes in it: they show
+    Rovust_presentation.pptx            PowerPoint with the slides as pictures and a push between them (no notes in it: they show
                                         when the file is opened; the notes are in speaker_notes.md)
     SPEAKER_NOTES.md                   both languages, slide by slide
     png/<nn>-<id>.png                  one 1920x1080 picture per slide (rendered with headless Edge / Chrome)
@@ -274,16 +274,22 @@ def write_pptx(pngs: list[str], order: list[str], name: str):
     blank = prs.slide_layouts[6]
     for png, sid in zip(pngs, order):
         slide = prs.slides.add_slide(blank)
-        pic = slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
-        if sid == "demo-video":
-            # a link, not an embedded copy: the deck stays small; keep docs/media next to it
-            pic.click_action.hyperlink.address = VIDEO_LINK
-        # a soft fade between slides (python-pptx has no API for it: add the element by hand,
-        # where the schema wants it: after clrMapOvr, before timing)
-        tr = etree.SubElement(slide._element, "{http://schemas.openxmlformats.org/presentationml/2006/main}transition")
+        video = os.path.normpath(os.path.join(PRES, VIDEO_LINK))
+        if sid == "demo-video" and os.path.exists(video):
+            # the video itself, inside the file: it plays in the slide on a click, wherever the
+            # .pptx is copied to (the slide picture is its poster)
+            slide.shapes.add_movie(video, 0, 0, prs.slide_width, prs.slide_height,
+                                   poster_frame_image=png, mime_type="video/mp4")
+        else:
+            slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
+        # the next slide pushes the old one out; a part-opening slide comes up from below
+        # (python-pptx has no API for transitions: add the element by hand, where the schema
+        # wants it: after clrMapOvr, before timing)
+        pml = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
+        tr = etree.SubElement(slide._element, pml + "transition")
         tr.set("spd", "med")
-        etree.SubElement(tr, "{http://schemas.openxmlformats.org/presentationml/2006/main}fade")
-        timing = slide._element.find("{http://schemas.openxmlformats.org/presentationml/2006/main}timing")
+        etree.SubElement(tr, pml + "push").set("dir", "u" if sid.startswith("sec-") else "l")
+        timing = slide._element.find(pml + "timing")
         if timing is not None:
             timing.addprevious(tr)
     out = os.path.join(PRES, name)
