@@ -3,8 +3,8 @@ with nothing next to it (send it on WhatsApp, open it from Drive).
 
     python tools/build_guide.py      -> docs/Rovust_team_guide.html
 
-The source stays docs/team_guide_ar.html (edit that one); its pictures are
-read from docs/, shrunk to the size they are shown at, and embedded.
+The source is docs/source/team_guide_ar.html (edit that one); its picture
+paths are relative to docs/, shrunk to the size they are shown at, and embedded.
 """
 import base64
 import io
@@ -15,7 +15,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = os.path.join(ROOT, "docs")
-SRC = os.path.join(DOCS, "team_guide_ar.html")
+SRC = os.path.join(DOCS, "source", "team_guide_ar.html")
 OUT = os.path.join(DOCS, "Rovust_team_guide.html")
 
 
@@ -52,7 +52,7 @@ def main():
         return f'{attr}="{cache[rel]}"'
     html = re.sub(r'\b(src|href)="([^"]+\.(?:png|jpg|jpeg|gif))"', swap, html)
     html = html.replace("<title>Rovust — دليل الفريق</title>",
-                        "<title>Rovust — دليل الفريق</title>\n<!-- built by tools/build_guide.py from docs/team_guide_ar.html: edit that file, not this one -->", 1)
+                        "<title>Rovust — دليل الفريق</title>\n<!-- built by tools/build_guide.py from docs/source/team_guide_ar.html: edit that file, not this one -->", 1)
     open(OUT, "w", encoding="utf-8", newline="\n").write(html)
     print(f"{os.path.relpath(OUT, ROOT)}  {len(cache)} pictures  {os.path.getsize(OUT) / 1e6:.1f} MB")
 

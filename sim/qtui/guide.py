@@ -2,7 +2,7 @@
 (Help > Controls), in English and Egyptian Arabic.
 
 Kept in one place so the guide always describes the interface as it is. The
-team guide (docs/team_guide_ar.html) explains the same things in more depth.
+team guide (docs/Rovust_team_guide.html) explains the same things in more depth.
 """
 from __future__ import annotations
 

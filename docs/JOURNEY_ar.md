@@ -106,7 +106,6 @@
 
 **10. التثبيت لزمايلك**
 - `setup.bat` بضغطة واحدة: يلاقي/يثبّت Python، ينزّل المشروع، venv، dependencies، shortcut، ويشغّل. اتجرّب فعليًا وطلع فيه 3 bugs اتصلحوا (PowerShell بيعتبر stderr بتاع git خطأ، مسار طويل، فحص الـ import).
-- `SETUP_WITH_CLAUDE.md` لمن بيستخدم Claude.
 
 ---
 

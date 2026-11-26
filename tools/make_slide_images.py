@@ -57,7 +57,6 @@ def main():
     for env, secs in (("cave", 330), ("mars", 330), ("underwater", 330)):
         m = cave if env == "cave" else run(env, secs)
         grab(m, "world", 900, 700, f"world_{env}.png")
-        grab(m, "belief", 900, 700, f"map_{env}.png")
 
 
 if __name__ == "__main__":

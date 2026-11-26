@@ -135,13 +135,12 @@ uploaded to the team's Drive folder when the bridge is configured
 ([docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md)).
 
 > Requires Python 3.12 or newer. Windows 11 with *Smart App Control* on may
-> block compiled packages. Teammates using Claude Code can paste the prompt in
-> [docs/SETUP_WITH_CLAUDE.md](docs/SETUP_WITH_CLAUDE.md).
+> block compiled packages.
 
 ## Course mapping
 
 Lecture by lecture (CSE442, lectures 1–8), with likely discussion questions, in the
-[team guide](docs/team_guide_ar.html#course), section 24.
+[team guide](docs/Rovust_team_guide.html), section 24.
 
 | Course topic | In Rovust |
 |---|---|
@@ -192,7 +191,6 @@ python tools/build_guide.py                          # the team guide as one fil
 | Design notes | [docs/DESIGN.md](docs/DESIGN.md): architecture, sensor placement and its justification, lessons learned |
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |
 | Drive reports | [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md): shared Drive folder, numbering by Drive |
-| Trailer | [docs/media/trailer.html](docs/media/trailer.html): 75 s animated page with browser voice-over |
 | بالعربي | [دليل الفريق](docs/Rovust_team_guide.html) (ملف واحد والصور جواه: يتفتح على الموبايل أو الكمبيوتر، ويتبعت على واتساب): كل جزء في الروبوت وكل زرار في البرنامج، وربطه بالمحاضرات، وتحضير المناقشة، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
 
 ## Team
