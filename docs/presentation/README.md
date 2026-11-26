@@ -15,8 +15,8 @@ Arrow keys move between slides. Read the notes from a phone (same link, or
 
 1. `Rovust_presentation.html` — double-click, press **F** for full screen
    (N = notes, L = English / Egyptian notes). The map GIF moves; no transitions.
-2. `Rovust_presentation.pptx` / `Rovust_presentation_ar_notes.pptx` — PowerPoint
-   with the slides as pictures and the notes in presenter view.
+2. `Rovust_presentation.pptx` — PowerPoint with the slides as pictures. No
+   notes inside it; read them from `SPEAKER_NOTES.md`.
 3. `Rovust_presentation.pdf` — works anywhere.
 
 **The demo video** (`docs/media/rovust_demo.mp4`, 3 minutes, no sound) is the
@@ -34,8 +34,7 @@ together with the presentation.
 | `slides/*.html`, `deck.json`, `notes_ar.json` | the slide sources (same as Claude Slides) |
 | `Rovust_presentation.html` | standalone web viewer, both note languages |
 | `Rovust_presentation.pdf` | 22 pages |
-| `Rovust_presentation.pptx` | PowerPoint, English notes |
-| `Rovust_presentation_ar_notes.pptx` | PowerPoint, Egyptian-Arabic notes |
+| `Rovust_presentation.pptx` | PowerPoint, slides only (no notes) |
 | `SPEAKER_NOTES.md` | all notes, both languages |
 
 Rebuild everything after editing a slide: `python tools/build_presentation.py`

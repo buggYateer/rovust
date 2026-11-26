@@ -3,8 +3,8 @@
 Outputs (in docs/presentation/):
     Rovust_presentation.html            standalone viewer: arrow keys, N = notes, L = notes language (EN / مصري), F = fullscreen
     Rovust_presentation.pdf             the 30 slides as pages
-    Rovust_presentation.pptx            PowerPoint with the slides as pictures + English speaker notes
-    Rovust_presentation_ar_notes.pptx   same, speaker notes in Egyptian Arabic
+    Rovust_presentation.pptx            PowerPoint with the slides as pictures and a fade between them (no notes in it: they show
+                                        when the file is opened; the notes are in speaker_notes.md)
     SPEAKER_NOTES.md                   both languages, slide by slide
     png/<nn>-<id>.png                  one 1920x1080 picture per slide (rendered with headless Edge / Chrome)
 
@@ -265,7 +265,8 @@ def write_pdf(pngs: list[str]):
     print("pdf:", os.path.relpath(out, ROOT), f"{os.path.getsize(out) / 1e6:.1f} MB")
 
 
-def write_pptx(pngs: list[str], order: list[str], notes: dict[str, str], name: str, lang: str):
+def write_pptx(pngs: list[str], order: list[str], name: str):
+    from lxml import etree
     from pptx import Presentation
     from pptx.util import Inches
     prs = Presentation()
@@ -277,11 +278,14 @@ def write_pptx(pngs: list[str], order: list[str], notes: dict[str, str], name: s
         if sid == "demo-video":
             # a link, not an embedded copy: the deck stays small; keep docs/media next to it
             pic.click_action.hyperlink.address = VIDEO_LINK
-        tf = slide.notes_slide.notes_text_frame
-        tf.text = notes.get(sid, "")
-        if lang == "ar":
-            for p in tf.paragraphs:
-                p._p.get_or_add_pPr().set("rtl", "1")
+        # a soft fade between slides (python-pptx has no API for it: add the element by hand,
+        # where the schema wants it: after clrMapOvr, before timing)
+        tr = etree.SubElement(slide._element, "{http://schemas.openxmlformats.org/presentationml/2006/main}transition")
+        tr.set("spd", "med")
+        etree.SubElement(tr, "{http://schemas.openxmlformats.org/presentationml/2006/main}fade")
+        timing = slide._element.find("{http://schemas.openxmlformats.org/presentationml/2006/main}timing")
+        if timing is not None:
+            timing.addprevious(tr)
     out = os.path.join(PRES, name)
     prs.save(out)
     print("pptx:", os.path.relpath(out, ROOT), f"{os.path.getsize(out) / 1e6:.1f} MB")
@@ -299,8 +303,7 @@ def main():
         print("not every slide rendered; PDF/PPTX skipped", file=sys.stderr)
         return 1
     write_pdf(pngs)
-    write_pptx(pngs, idx["order"], notes_en, "Rovust_presentation.pptx", "en")
-    write_pptx(pngs, idx["order"], notes_ar, "Rovust_presentation_ar_notes.pptx", "ar")
+    write_pptx(pngs, idx["order"], "Rovust_presentation.pptx")
     return 0
 
 
