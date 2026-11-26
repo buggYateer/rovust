@@ -1,35 +1,65 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<title>Rovust team</title>
+<title>Rovust — أعضاء الفريق</title>
 <style>
-  @page { size: A4; margin: 25mm 22mm; }
-  body { font-family: "Segoe UI", Arial, sans-serif; color: #111; margin: 0; }
-  h1 { font-size: 30pt; margin: 0 0 2mm; }
-  p { font-size: 13pt; margin: 0 0 10mm; color: #333; }
-  h2 { font-size: 15pt; margin: 0 0 4mm; }
-  table { border-collapse: collapse; width: 100%; font-size: 13pt; }
-  th, td { border: 1px solid #999; padding: 3mm 4mm; text-align: left; }
-  th { background: #f0f0f0; }
-  td.n { width: 12mm; text-align: center; }
+  @font-face { font-family: "Plex Arabic"; src: url("../assets/fonts/IBMPlexSansArabic-Regular.ttf"); font-weight: 400; }
+  @font-face { font-family: "Plex Arabic"; src: url("../assets/fonts/IBMPlexSansArabic-SemiBold.ttf"); font-weight: 600; }
+  @font-face { font-family: "Plex Arabic"; src: url("../assets/fonts/IBMPlexSansArabic-Bold.ttf"); font-weight: 700; }
+  @font-face { font-family: "Inter"; src: url("../assets/fonts/Inter[opsz,wght].ttf"); }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 210mm; height: 297mm; }
+  body { font-family: "Plex Arabic", "Segoe UI", Tahoma, sans-serif; color: #14191e; background: #fff; }
+  .page { height: 297mm; display: flex; flex-direction: column; }
+  .band { background: #11161b; color: #e6edf3; padding: 20mm 20mm 14mm; position: relative; overflow: hidden; }
+  .band::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2.2mm; background: linear-gradient(90deg, #f5a524, #2dd4bf); }
+  .brand { display: flex; align-items: center; gap: 7mm; }
+  .brand img { width: 30mm; height: 30mm; }
+  .name { font-family: "Inter", sans-serif; font-weight: 800; font-size: 40pt; letter-spacing: -1pt; line-height: 1; direction: ltr; }
+  .course { font-size: 11pt; color: #2dd4bf; font-weight: 600; margin-bottom: 3mm; }
+  .title { font-size: 19pt; font-weight: 700; margin-top: 9mm; line-height: 1.4; }
+  .sub { font-size: 12pt; color: #b5c3cd; margin-top: 2mm; line-height: 1.7; }
+  .body { flex: 1; padding: 13mm 20mm 0; display: flex; flex-direction: column; }
+  h2 { font-size: 15pt; font-weight: 700; margin-bottom: 5mm; display: flex; align-items: center; gap: 3mm; }
+  h2::before { content: ""; width: 2mm; height: 7mm; background: #2dd4bf; border-radius: 1mm; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5pt; }
+  th { text-align: right; font-weight: 600; font-size: 10.5pt; color: #5f6b76; padding: 0 4mm 2.5mm; border-bottom: 0.6mm solid #14191e; }
+  td { padding: 3.4mm 4mm; border-bottom: 0.3mm solid #dfe4e8; }
+  tr:nth-child(even) td { background: #f5f8f9; }
+  td.n { width: 13mm; text-align: center; font-family: "Inter", sans-serif; font-weight: 700; color: #0f9e8d; }
+  td.en { direction: ltr; text-align: left; font-family: "Inter", sans-serif; font-size: 10.5pt; color: #5f6b76; }
+  .foot { margin-top: auto; padding: 9mm 0 13mm; display: flex; justify-content: space-between; font-size: 10.5pt; color: #5f6b76; border-top: 0.3mm solid #dfe4e8; margin-top: 10mm; }
 </style>
 </head>
 <body>
-<h1>Rovust</h1>
-<p>Multi-Environment Autonomous Exploration Rover</p>
-<h2>Team members</h2>
-<table>
-  <tr><th>#</th><th>Name</th></tr>
-  <tr><td class="n">1</td><td>Ahmed Hamed Mohamed</td></tr>
-  <tr><td class="n">2</td><td>Aml Hesham Hosny</td></tr>
-  <tr><td class="n">3</td><td>Tassneem Amin Gamil</td></tr>
-  <tr><td class="n">4</td><td>Kholoud Waleed Attia</td></tr>
-  <tr><td class="n">5</td><td>Donia Essam Fathy</td></tr>
-  <tr><td class="n">6</td><td>Mazen Mohamed Hussien</td></tr>
-  <tr><td class="n">7</td><td>Mohamed Osama Salah</td></tr>
-  <tr><td class="n">8</td><td>Mohamed Elsayed Mohamed</td></tr>
-  <tr><td class="n">9</td><td>Mahmoud Ahmed Abdelghani</td></tr>
-</table>
+<div class="page">
+  <div class="band">
+    <p class="course">CSE442 · الروبوتات · مشروع الفريق</p>
+    <div class="brand">
+      <img src="../assets/icon@2x.png" alt="">
+      <div class="name">Rovust</div>
+    </div>
+    <p class="title">روبوت استكشاف ذاتي متعدد البيئات</p>
+    <p class="sub">روبوت واحد يستكشف كهفًا وسطح المريخ وقاع البحر بنفسه — محاكاة من المحرك حتى الخريطة.</p>
+  </div>
+  <div class="body">
+    <h2>أعضاء الفريق</h2>
+    <table>
+      <tr><th>#</th><th>الاسم</th><th style="text-align:left">Name</th></tr>
+      <tr><td class="n">1</td><td>أحمد حامد محمد</td><td class="en">Ahmed Hamed Mohamed</td></tr>
+      <tr><td class="n">2</td><td>أمل هشام حسني</td><td class="en">Aml Hesham Hosny</td></tr>
+      <tr><td class="n">3</td><td>تسنيم أمين جميل</td><td class="en">Tassneem Amin Gamil</td></tr>
+      <tr><td class="n">4</td><td>خلود وليد عطية</td><td class="en">Kholoud Waleed Attia</td></tr>
+      <tr><td class="n">5</td><td>دنيا عصام فتحي</td><td class="en">Donia Essam Fathy</td></tr>
+      <tr><td class="n">6</td><td>مازن محمد حسين</td><td class="en">Mazen Mohamed Hussien</td></tr>
+      <tr><td class="n">7</td><td>محمد أسامة صلاح</td><td class="en">Mohamed Osama Salah</td></tr>
+      <tr><td class="n">8</td><td>محمد السيد محمد</td><td class="en">Mohamed Elsayed Mohamed</td></tr>
+      <tr><td class="n">9</td><td>محمود أحمد عبد الغني</td><td class="en">Mahmoud Ahmed Abdelghani</td></tr>
+    </table>
+    <div class="foot"><span>كلية الهندسة — قسم هندسة الحاسبات والنظم</span><span>إشراف: د. الشيماء نبيل ندا</span></div>
+  </div>
+</div>
 </body>
 </html>
