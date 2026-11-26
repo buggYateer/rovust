@@ -90,13 +90,27 @@
   .check label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line);cursor:pointer}
   .check input{margin-top:8px;accent-color:var(--teal)}
   .mbar,.scrim,.navclose{display:none}
+  .pagehead{display:flex;align-items:baseline;gap:12px;margin:22px 0 6px;color:var(--muted);font-size:.9rem}
+  .pagehead b{font-size:1.5rem;font-weight:800;color:var(--text)}
+  .pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:34px 0 10px}
+  .pager button{font:inherit;text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;cursor:pointer;color:var(--text);box-shadow:var(--shadow)}
+  .pager button small{display:block;color:var(--muted);font-size:.8rem}
+  .pager button b{font-weight:800}
+  .pager button.next{text-align:left}
+  .pager button:disabled{visibility:hidden}
+  .pager .count{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85rem}
+  nav.side .grp.cur{color:var(--teal)}
   h2,h3{scroll-margin-top:12px}
   @media (max-width:1000px){
     body{font-size:15.5px;line-height:1.85}
     .mbar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
     .mbar img{width:30px;height:30px;border-radius:7px}
     .mbar .t{flex:1;font-weight:800;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mbar{transition:transform .25s ease}
+    .mbar.away{transform:translateY(-110%)}
     .mbar button{font:inherit;font-weight:700;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:6px 12px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:6px}
+    .mbar .menu{width:44px;height:40px;padding:0;flex-direction:column;justify-content:center;gap:5px}
+    .mbar .menu span{display:block;width:20px;height:2.5px;border-radius:2px;background:#fff}
     .mbar .menu{background:var(--teal);color:#fff;border-color:var(--teal)}
     .topbar{display:none}
     h2,h3{scroll-margin-top:64px}
@@ -127,13 +141,15 @@
     main table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:.9rem}
     main table th,main table td{min-width:110px}
     main table td.n,main table th:first-child{min-width:0}
+    #stab td:nth-child(4),#stab th:nth-child(4){min-width:270px}
+    #stab td:nth-child(3),#stab th:nth-child(3){min-width:150px}
     pre{font-size:.8rem}
   }
   @media print{nav.side,.topbar,.mbar{display:none}.wrap{display:block}}
 </style>
 </head>
 <body>
-<header class="mbar"><button class="menu" id="menuBtn" aria-label="الأقسام">☰ الأقسام</button><span class="t">Rovust — دليل الفريق</span><button id="theme2" aria-label="فاتح / داكن">◐</button><img src="../assets/icon.png" alt=""></header>
+<header class="mbar"><button class="menu" id="menuBtn" aria-label="الأقسام"><span></span><span></span><span></span></button><span class="t">Rovust — دليل الفريق</span><button id="theme2" aria-label="فاتح / داكن">◐</button><img src="../assets/icon.png" alt=""></header>
 <div class="scrim" id="scrim"></div>
 <div class="topbar"><button id="theme">◐ فاتح / داكن</button><button onclick="window.print()">🖨 طباعة</button></div>
 <div class="wrap">
@@ -765,10 +781,74 @@ python tools/build_presentation.py   # يبني البرزنتيشن</pre>
 </table>
 <div class="note ok"><b>لو هتذاكر حاجة واحدة:</b> افهم الشريحة بتاعة الـ Flowchart. هي الروبوت كله في صفحة: كل 50 ms → الراديو → السلوك → (v, ω) → سرعتين للعجل → PID → PWM → H-bridge → الموتور → السنسورز → الموقع → الخريطة → كل 4 فريمات الـ AI. أي سؤال هتلاقي مكانه في السلسلة دي.</div>
 </div>
-<p style="color:var(--muted);text-align:center;margin-top:40px">Rovust · Robotics team project · Dr. Elshaimaa Nabil Nada · Faculty of Engineering – Computer and Systems Department</p>
+<p class="foot" style="color:var(--muted);text-align:center;margin-top:40px">Rovust · Robotics team project · Dr. Elshaimaa Nabil Nada · Faculty of Engineering – Computer and Systems Department</p>
 </main>
 </div>
 <script>
+  // ---- pages: one page per menu group (للمناقشة، البداية، جوه الروبوت، التشغيل، للفريق)
+  const navEl=document.getElementById('nav'), mainEl=document.querySelector('main');
+  const pages=[]; let grp=null;
+  [...navEl.children].forEach(el=>{
+    if(el.classList.contains('grp')){grp={title:el.textContent.trim(),ids:[],head:el};pages.push(grp);}
+    else if(el.tagName==='A'&&grp){grp.ids.push(el.getAttribute('href').slice(1));}
+  });
+  const blocks={}, intro=[]; let cur=null;
+  [...mainEl.children].forEach(n=>{
+    if(n.classList.contains('foot'))return;
+    if(n.tagName==='H2'&&n.id){cur=n.id;blocks[cur]=[n];}
+    else if(cur){blocks[cur].push(n);} else intro.push(n);
+  });
+  const pageOf={}; pages.forEach((pg,i)=>pg.ids.forEach(id=>pageOf[id]=i));
+  const head=document.createElement('div'); head.className='pagehead';
+  const pager=document.createElement('div'); pager.className='pager';
+  pager.innerHTML='<button class="prev"><small>الصفحة اللي قبل</small><b></b></button><button class="next"><small>الصفحة اللي بعد</small><b></b></button><div class="count"></div>';
+  const foot=mainEl.querySelector('.foot');
+  mainEl.insertBefore(pager, foot);
+  let page=-1;
+  function showPage(i){
+    page=i;
+    intro.forEach(n=>n.style.display=i===0?'':'none');
+    Object.entries(blocks).forEach(([id,ns])=>ns.forEach(n=>n.style.display=pageOf[id]===i?'':'none'));
+    head.innerHTML='<b>'+pages[i].title+'</b><span>صفحة '+(i+1)+' من '+pages.length+'</span>';
+    const first=blocks[pages[i].ids[0]]; if(first) mainEl.insertBefore(head, first[0]);
+    const pv=pager.querySelector('.prev'), nx=pager.querySelector('.next');
+    pv.disabled=i===0; nx.disabled=i===pages.length-1;
+    if(i>0) pv.querySelector('b').textContent='→ '+pages[i-1].title;
+    if(i<pages.length-1) nx.querySelector('b').textContent=pages[i+1].title+' ←';
+    pager.querySelector('.count').textContent='صفحة '+(i+1)+' من '+pages.length;
+    pages.forEach((pg,j)=>pg.head.classList.toggle('cur',j===i));
+  }
+  function go(id, smooth){
+    const i=pageOf[id];
+    if(i===undefined) return false;
+    if(i!==page) showPage(i);
+    const el=document.getElementById(id);
+    requestAnimationFrame(()=>el.scrollIntoView({behavior:smooth?'smooth':'auto',block:'start'}));
+    try{history.replaceState(null,'','#'+id);}catch(e){}
+    return true;
+  }
+  function goPage(i){ showPage(i); scrollTo({top:0}); try{history.replaceState(null,'','#'+pages[i].ids[0]);}catch(e){} }
+  pager.querySelector('.prev').onclick=()=>goPage(page-1);
+  pager.querySelector('.next').onclick=()=>goPage(page+1);
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('a[href^="#"]'); if(!a)return;
+    const id=a.getAttribute('href').slice(1);
+    if(pageOf[id]!==undefined){e.preventDefault(); go(id, pageOf[id]===page);}
+  });
+  const startId=decodeURIComponent(location.hash.slice(1));
+  if(!(startId && go(startId,false))) showPage(0);
+
+  // ---- the phone header: hides while reading down, comes back on the way up
+  const bar=document.querySelector('.mbar'); let lastY=scrollY, run=0;
+  addEventListener('scroll',()=>{
+    const y=scrollY, dy=y-lastY; lastY=y;
+    if(document.body.classList.contains('menu')) return;
+    run=(dy>0)===(run>0)?run+dy:dy;          // distance scrolled in the same direction
+    if(y<80 || run<-24) bar.classList.remove('away');
+    else if(run>24) bar.classList.add('away');
+  },{passive:true});
+  addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1)); if(id) go(id,false);});
+
   // phone menu: open, close, and close after jumping to a section
   const closeMenu=()=>document.body.classList.remove('menu');
   document.getElementById('menuBtn').onclick=()=>document.body.classList.add('menu');
