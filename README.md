@@ -97,8 +97,8 @@ in to GitHub if git asks when cloning.
 **Any platform:**
 
 ```bash
-git clone https://github.com/buggYateer/robotics-project.git
-cd robotics-project
+git clone https://github.com/buggYateer/rovust.git
+cd rovust
 python -m venv .venv && .venv\Scripts\activate     # source .venv/bin/activate on Linux/macOS
 pip install -r requirements.txt
 python main.py

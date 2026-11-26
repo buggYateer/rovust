@@ -7,7 +7,7 @@ program. If you do not use Claude, use `setup.bat` instead — see the README.
 ```
 Set up and run the Rovust project on this computer:
 
-1. Repository: https://github.com/buggYateer/robotics-project
+1. Repository: https://github.com/buggYateer/rovust
    Clone it (or download the main-branch zip if git is missing) into a folder
    named Rovust inside my home directory, unless I say otherwise.
 2. Make sure Python 3.12 or newer is available (install it if it is not).

@@ -16,7 +16,7 @@ param([string]$Dest = "")
 # Native tools (git, pip) write progress to stderr; PowerShell 5.1 would treat that as an
 # error and abort under "Stop", so exit codes are checked by hand instead.
 $ErrorActionPreference = "Continue"
-$Repo = "https://github.com/buggYateer/robotics-project"
+$Repo = "https://github.com/buggYateer/rovust"
 $Zip = "$Repo/archive/refs/heads/main.zip"
 
 function Say($msg) { Write-Host ""; Write-Host "==> $msg" -ForegroundColor Cyan }
