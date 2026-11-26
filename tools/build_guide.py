@@ -6,7 +6,8 @@ with nothing next to it (send it on WhatsApp, open it from Drive).
 Source: docs/source/guide/. ``shell.html`` is the page (styles, menu,
 navigation); every other ``*.html`` there is one chapter (a ``<section
 class="ch">`` of ``<article>`` lessons), joined in file-name order. Picture
-paths are relative to docs/; they are shrunk and embedded.
+paths are relative to docs/; they are shrunk and embedded. The fonts in
+``fonts/`` are embedded too.
 """
 import base64
 import io
@@ -41,6 +42,18 @@ def data_uri(rel: str) -> str:
     return f"data:{mime};base64," + base64.b64encode(raw).decode()
 
 
+def fonts_css() -> str:
+    """The three fonts (fonts/fonts.css + its .woff2 files) as one <style>, so
+    the guide looks the same with no internet."""
+    folder = os.path.join(SRC, "fonts")
+    css = open(os.path.join(folder, "fonts.css"), encoding="utf-8").read()
+
+    def swap(m):
+        raw = open(os.path.join(folder, m.group(1)), "rb").read()
+        return "url(data:font/woff2;base64," + base64.b64encode(raw).decode() + ")"
+    return "<style>\n" + re.sub(r"url\(([\w.-]+\.woff2)\)", swap, css) + "</style>"
+
+
 def main():
     shell = open(os.path.join(SRC, "shell.html"), encoding="utf-8").read()
     parts = sorted(f for f in os.listdir(SRC) if f.endswith(".html") and f != "shell.html")
@@ -51,6 +64,8 @@ def main():
         assert target in ids, f"link to a lesson that does not exist: #{target}"
     assert shell.count("<!--CHAPTERS-->") == 1
     html = shell.replace("<!--CHAPTERS-->", chapters)
+    assert html.count("<!--FONTS-->") == 1
+    html = html.replace("<!--FONTS-->", fonts_css())
     cache = {}
 
     def swap(m):
