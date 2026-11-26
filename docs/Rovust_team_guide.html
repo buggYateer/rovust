@@ -196,16 +196,26 @@
   :root[data-theme="dark"] .pager a.next,:root[data-theme="dark"] .pager a.next small{color:#06211e}
   .pager a.none{visibility:hidden}
   .count{text-align:center;color:var(--muted);font-size:.85rem;margin-top:12px}
-  /* full-screen menu: its own scroll, the page behind does not move */
-  #menu{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column}
+  /* the index. Phone: a sheet that drops down from the top, over a dimmed page that does not move.
+     Wide screen: a panel on the side; the page makes room for it and stays usable. */
+  #menu{position:fixed;top:0;left:0;right:0;z-index:50;max-height:82vh;max-height:82dvh;background:var(--bg);display:flex;flex-direction:column;visibility:hidden;transform:translateY(-103%);transition:transform .3s ease,visibility 0s .3s;border-radius:0 0 18px 18px;box-shadow:0 14px 40px rgba(0,0,0,.28);overflow:hidden}
+  body.menu #menu{visibility:visible;transform:none;transition:transform .3s ease}
+  #shade{position:fixed;inset:0;z-index:49;background:rgba(6,12,16,.5);opacity:0;pointer-events:none;transition:opacity .3s ease}
+  body.menu #shade{opacity:1;pointer-events:auto}
   body.menu{overflow:hidden}
-  body.menu #menu{display:flex}
+  @media (min-width:900px){
+    body{transition:padding .3s ease}
+    #menu{left:auto;bottom:0;width:340px;max-height:none;transform:translateX(103%);border-radius:0;border-left:1px solid var(--line);box-shadow:none}
+    #shade{display:none}
+    body.menu{overflow:visible;padding-right:340px}
+    #menu .ml{padding:4px 10px 40px}
+  }
   #menu .mh{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line)}
   #menu .mh b{flex:1;font-size:1.05rem}
-  #menu .ml{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 14px 40px}
+  #menu .ml{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 14px 40px}
   #menu .ml>div{max-width:780px;margin:0 auto}
   @media (min-width:700px){body{font-size:18px}main{padding-top:24px}.nums{grid-template-columns:repeat(4,1fr)}}
-  @media print{.bar,.pager,#menu{display:none}article{display:block!important;page-break-after:always}}
+  @media print{.bar,.pager,#menu,#shade{display:none}body{padding:0!important}article{display:block!important;page-break-after:always}}
 
   /* ---- type: 3 voices ----
      body  = IBM Plex Sans Arabic (reading)
@@ -246,6 +256,7 @@
   <button class="ib" id="themeBtn" aria-label="فاتح / غامق">◐</button>
 </header>
 
+<div id="shade"></div>
 <div id="menu" role="dialog" aria-label="الفهرس">
   <div class="mh"><b>الفهرس</b><button class="ib" id="menuClose" aria-label="قفل">✕</button></div>
   <div class="ml"><div id="menuList"></div></div>
@@ -955,14 +966,19 @@ pytest                # 60 اختبار</pre>
     }
     marks(l?id:null); bar.classList.remove('away'); window.scrollTo(0,0);
   }
-  function route(){document.body.classList.remove('menu');show(decodeURIComponent(location.hash.slice(1)))}
+  var wide=window.matchMedia('(min-width:900px)');
+  function menuScroll(){var c=document.querySelector('#menuList a.cur');document.querySelector('#menu .ml').scrollTop=c?Math.max(0,c.offsetTop-160):0}
+  function setMenu(on){document.body.classList.toggle('menu',on);if(on)menuScroll();if(wide.matches){try{localStorage.setItem('rg-menu',on?'1':'0')}catch(e){}}}
+  function route(){if(!wide.matches)document.body.classList.remove('menu');show(decodeURIComponent(location.hash.slice(1)))}
   window.addEventListener('hashchange',route); route();
 
   document.getElementById('homeBtn').onclick=function(){location.hash=''; if(!location.hash)route();};
-  document.getElementById('menuBtn').onclick=function(){document.body.classList.add('menu');var c=document.querySelector('#menuList a.cur');document.querySelector('#menu .ml').scrollTop=c?Math.max(0,c.offsetTop-160):0};
-  document.getElementById('menuClose').onclick=function(){document.body.classList.remove('menu')};
-  document.getElementById('menuList').addEventListener('click',function(e){var a=e.target.closest('a');if(a&&a.getAttribute('href')===location.hash)document.body.classList.remove('menu')});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.body.classList.remove('menu');unzoom()}});
+  document.getElementById('menuBtn').onclick=function(){setMenu(!document.body.classList.contains('menu'))};
+  document.getElementById('menuClose').onclick=function(){setMenu(false)};
+  document.getElementById('shade').onclick=function(){setMenu(false)};
+  document.getElementById('menuList').addEventListener('click',function(e){var a=e.target.closest('a');if(a&&!wide.matches&&a.getAttribute('href')===location.hash)setMenu(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(!wide.matches)setMenu(false);unzoom()}});
+  try{if(wide.matches&&localStorage.getItem('rg-menu')==='1')setMenu(true)}catch(e){}
 
   // the bar hides while reading down and comes back on the way up
   var lastY=0, run=0;
