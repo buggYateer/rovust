@@ -180,6 +180,7 @@ python tools/make_media.py                          # regenerate every screensho
 python tools/make_slide_images.py                   # the maps drawn for the slides
 python tools/build_presentation.py                  # rebuild the presentation (HTML, PDF, PowerPoint)
 python tools/make_video.py                          # record the 3-minute demo video (needs ffmpeg and Edge)
+python tools/build_guide.py                          # the team guide as one file with its pictures, for phones
 ```
 
 ## Documents
@@ -192,7 +193,7 @@ python tools/make_video.py                          # record the 3-minute demo v
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |
 | Drive reports | [docs/DRIVE_REPORTS.md](docs/DRIVE_REPORTS.md): shared Drive folder, numbering by Drive |
 | Trailer | [docs/media/trailer.html](docs/media/trailer.html): 75 s animated page with browser voice-over |
-| بالعربي | [دليل الفريق](docs/team_guide_ar.html): كل جزء في الروبوت وكل زرار في البرنامج، وربطه بالمحاضرات، وتحضير المناقشة، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
+| بالعربي | [دليل الفريق](docs/Rovust_team_guide.html) (ملف واحد والصور جواه: يتفتح على الموبايل أو الكمبيوتر، ويتبعت على واتساب): كل جزء في الروبوت وكل زرار في البرنامج، وربطه بالمحاضرات، وتحضير المناقشة، للمذاكرة · [رحلة بناء المشروع](docs/JOURNEY_ar.md) |
 
 ## Team
 
