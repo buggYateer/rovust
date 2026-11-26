@@ -1,0 +1,40 @@
+<section class="ch" data-t="النتايج" data-d="اللي قسناه بالأرقام في 264 تجربة. درس واحد.">
+
+<article id="results" data-t="النتايج بالأرقام">
+<h2>النتايج بالأرقام</h2>
+<div class="box sum"><b>الخلاصة</b><p>264 تجربة من غير شاشة، كل تجربة بخريطة مختلفة. طلعنا منها 3 نتايج: الذكاء الاصطناعي كسب في كل البيئات، الدمج بيخلي الغلط سنتيمترات، وعرفنا أنهي سنسورز مينفعش نستغنى عنها.</p></div>
+
+<h3>1. أنهي استراتيجية أحسن؟ (90 تجربة)</h3>
+<p>نسبة المكان اللي اتكشف في 400 ثانية:</p>
+<table>
+<tr><th></th><th>الكهف</th><th>المريخ</th><th>تحت المية</th></tr>
+<tr><td>Utility (AI)</td><td class="win">96%</td><td class="win">84%</td><td class="win">97%</td></tr>
+<tr><td>DFS</td><td>92%</td><td>72%</td><td>92%</td></tr>
+<tr><td>Nearest frontier</td><td>69%</td><td>47%</td><td>65%</td></tr>
+</table>
+<div class="it teal"><b>اللي اتأكد</b><p>الـ DFS قوي في الكهف (ممرات)، زي ما توقعنا.</p></div>
+<div class="it red"><b>اللي طلع غلط</b><p>توقعنا الـ nearest frontier يكسب في الأرض المفتوحة، وطلع الأضعف في كل مكان: بيجري ورا حتت صغيرة قريبة.</p></div>
+<div class="it amber"><b>اللي اكتشفناه</b><p>الـ Utility كسب في التلات بيئات. ومفيش روبوت وقع في حفرة في الـ 90 تجربة.</p></div>
+<figure><img src="figures/strategies_coverage.png" alt=""><figcaption>اللي اتكشف مع الوقت في التلات بيئات. الأخضر (Utility) فوق دايمًا.</figcaption></figure>
+
+<h3>2. الروبوت عارف مكانه؟ (54 تجربة)</h3>
+<table>
+<tr><th>الغلط في المكان</th><th>الكهف</th><th>المريخ</th><th>تحت المية</th></tr>
+<tr><td>العجل بس</td><td>2.4 m</td><td>3.7 m</td><td>5.5 m</td></tr>
+<tr><td>Fused</td><td class="win">17 cm</td><td class="win">9 cm</td><td class="win">4 cm</td></tr>
+</table>
+<p>والروبوت بالـ fused بيستكشف بنفس كفاءة روبوت عارف مكانه بالظبط. يعني الغلط اللي فاضل مبيأثرش.</p>
+<figure><img src="figures/localisation_summary.png" alt=""><figcaption>مقارنة الـ fused والعجل بس والمكان المثالي.</figcaption></figure>
+
+<h3>3. نشيل سنسور سنسور (120 تجربة)</h3>
+<p>شلنا كل مرة سنسور واحد وشفنا إيه اللي بيحصل:</p>
+<div class="it red"><b>من غير الـ Sonar</b><p>بيكشف من 5% لـ 25% بس. مبيعرفش يرسم.</p></div>
+<div class="it red"><b>من غير الـ Optical flow / DVL</b><p>بيتوه من 5 لـ 16 متر.</p></div>
+<div class="it red"><b>من غير الـ Compass / Sun sensor</b><p>بيتوه من 8 لـ 10 متر، والخريطة بتلف.</p></div>
+<div class="it red"><b>من غير الـ Cliff switches</b><p>روبوت من كل 4 وقع في حفرة.</p></div>
+<div class="it teal"><b>من غير الـ IR أو الـ Bumpers</b><p>تقريبًا مفيش فرق. دول احتياطي: خط الدفاع الأخير، وده الدور اللي حطيناهم فيه.</p></div>
+<figure><img src="figures/ablation_summary.png" alt=""><figcaption>تأثير شيل كل سنسور.</figcaption></figure>
+<div class="box say"><b>الجملة اللي تقولها</b><p>«كل رقم عندنا جاي من تجربة. حتى الفرضية بتاعتنا طلع نصها غلط، وقلنا كده.»</p></div>
+</article>
+
+</section>

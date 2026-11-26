@@ -1,0 +1,79 @@
+<section class="ch" data-t="للي عايز يشغّل أو يعدّل" data-d="تشغيل البرنامج على جهازك، وكل ملف في المشروع بيعمل إيه. 3 دروس.">
+
+<article id="run" data-t="تشغيل البرنامج">
+<h2>تشغيل البرنامج</h2>
+<div class="box sum"><b>الخلاصة</b><p>على ويندوز: تنزّل المشروع، دبل كليك على <code>setup.bat</code> مرة واحدة، وبعد كده <code>run.bat</code>.</p></div>
+<ol class="steps">
+<li><b>نزّل المشروع</b>من صفحة GitHub: <span class="ltr">Code → Download ZIP</span>، وفك الضغط في مكان اسمه قصير زي <code>C:\Rovust</code>.</li>
+<li><b>دبل كليك على setup.bat</b>مرة واحدة بس. بينزّل Python لو مش موجود، وكل المكتبات، ويعمل shortcut، ويفتح البرنامج.</li>
+<li><b>بعد كده run.bat</b>أو الـ shortcut، كل مرة.</li>
+</ol>
+<div class="box warn"><b>لو مشتغلش</b><p>ويندوز 11 ساعات بيمنع المكتبات لو Smart App Control شغال. اقفله وجرّب تاني.</p></div>
+<h3>لو بتستخدم الـ terminal</h3>
+<pre>pip install -r requirements.txt
+python main.py        # البرنامج
+pytest                # 60 اختبار</pre>
+<h3>أدوات بتعيد عمل الحاجات</h3>
+<dl class="kv">
+<dt><code>tools/build_guide.py</code></dt><dd>يعمل الدليل ده من ملفات <code>docs/source/guide</code>.</dd>
+<dt><code>tools/build_presentation.py</code></dt><dd>يعمل البرزنتيشن (PDF و PowerPoint).</dd>
+<dt><code>tools/make_video.py</code></dt><dd>يسجّل فيديو الديمو من جديد.</dd>
+<dt><code>tools/make_media.py</code></dt><dd>يعيد تصوير صور البرنامج.</dd>
+</dl>
+</article>
+
+<article id="files" data-t="ملفات المشروع">
+<h2>ملفات المشروع</h2>
+<div class="box sum"><b>الخلاصة</b><p>الكود كله في فولدر <code>sim</code>. كل جزء في الروبوت ليه ملف باسمه، فلو اتسألت «ده فين في الكود؟» هتلاقيه هنا.</p></div>
+<h3>الروبوت نفسه</h3>
+<dl class="kv">
+<dt><code>sim/robot/motor.py</code></dt><dd>الموتور والـ H-bridge.</dd>
+<dt><code>sim/robot/encoder.py</code></dt><dd>الـ encoder.</dd>
+<dt><code>sim/robot/control.py</code></dt><dd>on-off و hysteresis و PID.</dd>
+<dt><code>sim/robot/drive.py</code></dt><dd>العجلتين مع بعض، والمشي المستقيم، والزحلقة.</dd>
+<dt><code>sim/sensors/</code></dt><dd>كل السنسورز، وملف <code>suite.py</code> بيركّبهم حسب البيئة.</dd>
+</dl>
+<h3>العقل</h3>
+<dl class="kv">
+<dt><code>sim/estimation.py</code></dt><dd>هو فين (العجل بس / fused / perfect).</dd>
+<dt><code>sim/mapping.py</code></dt><dd>الخريطة.</dd>
+<dt><code>sim/behaviors.py</code></dt><dd>طبقات الـ subsumption.</dd>
+<dt><code>sim/planning.py</code></dt><dd>الـ A* والـ frontiers والـ DFS.</dd>
+<dt><code>sim/ai/</code></dt><dd>مصنّف الأرض، كاشف الأعطال، والـ Utility.</dd>
+<dt><code>sim/mission.py</code></dt><dd>بيجمّع كل حاجة: اللوب بتاع الـ 50 ms هنا.</dd>
+</dl>
+<h3>الباقي</h3>
+<dl class="kv">
+<dt><code>sim/config.py</code></dt><dd>إعدادات التلات بيئات. ده الملف الوحيد اللي بيفرّق بينهم.</dd>
+<dt><code>sim/world.py</code></dt><dd>العالم الحقيقي: بيولّد الكهف والمريخ وتحت المية.</dd>
+<dt><code>sim/comms.py</code></dt><dd>الراديو.</dd>
+<dt><code>sim/alerts.py</code></dt><dd>التنبيهات.</dd>
+<dt><code>sim/report.py</code></dt><dd>التقارير والرفع على الدرايف.</dd>
+<dt><code>sim/qtui/</code></dt><dd>البرنامج (الشاشة، البانلات، اللغتين، الدراع).</dd>
+<dt><code>sim/teleop/</code></dt><dd>صفحة الموبايل والسيرفر بتاعها.</dd>
+<dt><code>sim/experiments/</code></dt><dd>التجارب الـ 264.</dd>
+<dt><code>tests/</code></dt><dd>60 اختبار.</dd>
+</dl>
+<h3>الدوكيومنتيشن (فولدر docs)</h3>
+<dl class="kv">
+<dt><code>Rovust_team_guide.html</code></dt><dd>الدليل ده.</dd>
+<dt><code>presentation/</code></dt><dd>البرزنتيشن: PDF و PowerPoint وملاحظات المتحدث.</dd>
+<dt><code>media/rovust_demo.mp4</code></dt><dd>فيديو الديمو.</dd>
+<dt><code>cover_sheet.pdf</code></dt><dd>الورقة المطبوعة.</dd>
+<dt><code>RESULTS.md</code> · <code>DESIGN.md</code></dt><dd>النتايج بالتفصيل، وأسباب كل قرار في التصميم.</dd>
+</dl>
+</article>
+
+<article id="lessons" data-t="دروس اتعلمناها">
+<h2>دروس اتعلمناها</h2>
+<div class="box sum"><b>الخلاصة</b><p>مشاكل حقيقية قابلتنا وإحنا بنبني. تنفع تتقال في المناقشة كدليل إن الشغل اتجرّب بجد.</p></div>
+<div class="it"><b>روبوت وقع وهو راجع لورا</b><p>مكانش فيه cliff sensors ورا. ضفنا زوج ورا وزوج على الجنب.</p></div>
+<div class="it"><b>الحيطان كانت بتتمسح من الخريطة</b><p>كنا بنعتبر «مفيش صدى» معناها فاضي. دلوقتي مفيش صدى مبيغيّرش حاجة.</p></div>
+<div class="it"><b>الـ IR كان بيشوف عوائق مش موجودة</b><p>قراءاته قرب أقصى المدى ضوضاء. بنستخدم أول 70% بس.</p></div>
+<div class="it"><b>الـ gyro لوحده بيلف الخريطة</b><p>20 درجة في الدقيقة. لازم يتعاير وهو واقف، ومعاه compass.</p></div>
+<div class="it"><b>«الموبايل مش بيرد»</b><p>غالبًا الإشارة مقطوعة أو المهمة خلصت. علشان كده عملنا التنبيهات.</p></div>
+<div class="it"><b>البرنامج كان بيتقل مع الوقت</b><p>مكتبة بتتنادى 20 مرة في الثانية كانت أبطأ حاجة. القياس هو اللي لقاها مش التخمين.</p></div>
+<div class="it"><b>البرنامج وقع وإحنا بنسجّل الفيديو</b><p>لما الروبوت رجع يمشي لوحده بعد ما حد ساقه. اتصلّح واتعمل له اختبار.</p></div>
+</article>
+
+</section>

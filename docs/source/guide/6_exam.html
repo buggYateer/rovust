@@ -1,0 +1,95 @@
+<section class="ch" data-t="المناقشة" data-d="الدرجة بتتقسم إزاي، ربط المشروع بالمحاضرات، والأسئلة المتوقعة بإجاباتها. 5 دروس.">
+
+<article id="exam" data-t="الدرجة والوقت">
+<h2>الدرجة والوقت</h2>
+<div class="box sum"><b>الخلاصة</b><p>20 دقيقة و20 درجة، متقسمين 4 أجزاء كل واحد بـ 5. البرزنتيشن 22 شريحة متقسمة بنفس الأجزاء، وفيها فيديو ديمو 3 دقايق.</p></div>
+<h3>الأربع أجزاء وفين عندنا</h3>
+<div class="it"><b>Abstract · 5 درجات</b><p><b>المطلوب:</b> الفكرة، ليه وإزاي، + conclusion + future work + references.</p><p><b>الشرايح:</b> 1 الغلاف · 2 Abstract · 3 المنهج طبقات · 19 Conclusion &amp; Future · 20 References.</p></div>
+<div class="it"><b>Analysis · 5 درجات</b><p><b>المطلوب:</b> flowchart أو pseudocode أو algorithms أو وصف الهاردوير والدواير.</p><p><b>الشرايح:</b> 4 السنسورز · 5 أماكنها · 6 الموتورات · 7 الـ PID · 8 الهاردوير (رسمة التوصيل) · 9 Flowchart &amp; Pseudocode.</p></div>
+<div class="it"><b>Design · 5 درجات</b><p><b>المطلوب:</b> implementation + results.</p><p><b>الشرايح:</b> 10 المكان · 11 السلوك · 12 الاستكشاف · 13 الذكاء الاصطناعي · 14 البيئات · 15 البرنامج · 16 الموبايل والدراع · 17 و18 النتايج.</p></div>
+<div class="it"><b>Presentation · 5 درجات</b><p>العرض نفسه والرد على الأسئلة. شريحة 21 الفيديو و22 الشكر.</p></div>
+<h3>توزيع الوقت (اتمرّن على 17 دقيقة)</h3>
+<table>
+<tr><th>الجزء</th><th>الشرايح</th><th>الوقت</th></tr>
+<tr><td>الفكرة</td><td>1–3</td><td>1.5 د</td></tr>
+<tr><td>Analysis</td><td>4–9</td><td>4 د</td></tr>
+<tr><td>Design</td><td>10–16</td><td>4.5 د</td></tr>
+<tr><td>النتايج</td><td>17–18</td><td>1.5 د</td></tr>
+<tr><td>الخلاصة والمراجع</td><td>19–20</td><td>1 د</td></tr>
+<tr><td>الفيديو</td><td>21</td><td>3 د</td></tr>
+</table>
+<div class="box warn"><b>خلي بالك</b><p>الوقت بيتقفل عند 20 دقيقة ومفيش تكملة. الـ 3 دقايق الباقية للأسئلة.</p></div>
+</article>
+
+<article id="lectures" data-t="المشروع والمحاضرات">
+<h2>المشروع والمحاضرات</h2>
+<div class="box sum"><b>الخلاصة</b><p>كل محاضرة ليها حتة شغالة في الروبوت. لكل محاضرة هنا: عندنا فين، والسؤال اللي ممكن ييجي منها.</p></div>
+<div class="it"><b>1. Embedded Robotics</b><p><b>عندنا:</b> متحكم واحد بيلف لوب كل 50 ms. والروبوت differential drive: موتورين، كل عجلة بسرعتها.</p><p><b>سؤال:</b> ليه differential؟ علشان بيلف في مكانه (مهم في الممرات الضيقة) وبموتورين بس.</p></div>
+<div class="it"><b>2. Robot Behavior</b><p><b>عندنا:</b> Subsumption بـ 10 طبقات. الـ random walk هو طبقة WANDER. والـ bumper بيرجّعه ويلفّه.</p><p><b>سؤال:</b> اشرح الـ subsumption. الطبقة الأعلى بتاخد التحكم من اللي تحتها. وفين الـ negative feedback؟ في الـ PID وفي تفادي الحيطان.</p></div>
+<div class="it"><b>3. Sensors 1</b><p><b>عندنا:</b> كل السنسورز متصنّفة بتصنيف المحاضرة. الـ encoder قبل الـ gearbox. وكل analog على ADC 10-bit.</p><p><b>احسب:</b> 16 نبضة × 30 = 480 للفة. محيط العجلة 31.4 سم، يعني كل نبضة ≈ 0.65 مم. والـ ADC: <span class="ltr">D = Vin/Vref × 1023</span>.</p></div>
+<div class="it"><b>4. Sensors 2</b><p><b>عندنا:</b> الـ sonar بعيوبه، الـ IR بالـ lookup table، والـ gyro متصحّح بالـ compass.</p><p><b>سؤال:</b> ليه dead reckoning مش كفاية؟ الغلط بيتراكم والعجل بيزحلق. وعندنا الرقم: 2.4 لـ 5.5 متر في 5 دقايق.</p></div>
+<div class="it"><b>5. Actuators 1</b><p><b>عندنا:</b> موتورين DC، gearbox 30:1، وH-bridge لكل موتور.</p><p><b>سؤال:</b> الـ H-bridge بيشتغل إزاي؟ 4 مفاتيح، كل اتنين بيعدّوا التيار في اتجاه. والـ L293D فيه 2.</p></div>
+<div class="it"><b>6. Actuators 2</b><p><b>عندنا:</b> PWM، ومنحنى مش خطي، ومنطقة ميتة تحت 6%.</p><p><b>سؤال:</b> ليه مش open loop؟ نفس الـ duty بيدّي سرعة مختلفة على الرمل، فلازم feedback.</p></div>
+<div class="it"><b>7. Actuators 3 (Stepper)</b><p><b>عندنا:</b> مش مستخدم. السبب في درس <a href="#whynot">ليه لأ؟</a>.</p></div>
+<div class="it"><b>8. Control</b><p><b>عندنا:</b> on-off و hysteresis و P و PI و PID، كلهم متنفذين. والمشي المستقيم.</p><p><b>سؤال:</b> ليه الـ P لوحده فيه خطأ؟ لو الخطأ صفر القوة صفر، فلازم يفضل خطأ صغير. الـ I بيشيله.</p></div>
+</article>
+
+<article id="whynot" data-t="ليه لأ؟">
+<h2>ليه لأ؟</h2>
+<div class="box sum"><b>الخلاصة</b><p>حاجات في المحاضرات ومستخدمنهاش. لو الدكتورة سألت «ليه؟» دي الإجابات.</p></div>
+<details class="q" open><summary>ليه DC مش stepper؟</summary><p>الـ stepper شغال open loop: لو اتزنق في الرمل بيضيّع خطوات ومحدش يعرف. وبيسحب تيار حتى وهو واقف. الـ DC مع encoder وPID بيعرف سرعته الحقيقية ويعوّض الحمل.</p></details>
+<details class="q"><summary>ليه مش servo؟</summary><p>الـ servo بيتحكم في زاوية (0 لـ 180 درجة)، مش سرعة. كويس لدراع أو لتحريك سنسور، مش لعجلة بتلف على طول.</p></details>
+<details class="q"><summary>ليه incremental encoder مش absolute؟</summary><p>الـ absolute بيدّي الموضع بالظبط حتى لو الكهربا قطعت (وبيستخدم Gray code). إحنا محتاجين سرعة ومسافة بس، فالـ incremental كفاية وأرخص.</p></details>
+<details class="q"><summary>Polling ولا interrupt؟</summary><p>في المحاكاة بنقرا كل السنسورز كل 50 ms (polling). في هاردوير حقيقي الـ encoders على pulse counters، والـ bumper والـ cliff الأحسن يبقوا interrupt لأنهم طوارئ.</p></details>
+<details class="q"><summary>Sensor ولا detector؟</summary><p>الـ sonar sensor: بيدّي رقم. الـ cliff والـ bumper أقرب لـ detector: بيدّوا قرار (فيه حفرة / خبط).</p></details>
+<details class="q"><summary>ظبطتوا الـ PID إزاي؟</summary><p>بخطوات المحاضرة: P لوحده لحد ما يتهز وننصّه، بعدين D، بعدين I لحد ما يبدأ يتهز ونقسمه على 2 أو 3.</p></details>
+<details class="q"><summary>ليه 20 مرة في الثانية بس؟</summary><p>الـ EyeBot في المحاضرة حوالي 100. إحنا 20 وده كفاية لروبوت بطيء (أقصى سرعته حوالي 0.6 م/ث).</p></details>
+</article>
+
+<article id="qa" data-t="أسئلة متوقعة">
+<h2>أسئلة متوقعة</h2>
+<div class="box sum"><b>الخلاصة</b><p>أكتر أسئلة ممكن تتسأل، وكل واحد بإجابة قصيرة. دوس على السؤال يفتح.</p></div>
+<h3>عن الفكرة</h3>
+<details class="q" open><summary>ليه محاكاة مش روبوت حقيقي؟</summary><p>علشان نجرب في كهف ومريخ وتحت المية، ونعيد نفس التجربة مئات المرات ونقيس. ده مستحيل بروبوت حقيقي في الوقت والتكلفة دي. والكود مكتوب بحيث يتنقل على هاردوير.</p></details>
+<details class="q"><summary>ليه الروبوت لازم يبقى مستقل لو فيه تحكم من بعيد؟</summary><p>الراديو مش مضمون: الصخر بياكله، والمريخ فيه تأخير ثانيتين. لما يقطع، الروبوت اللي مبيعرفش يقرر بيضيع.</p></details>
+<details class="q"><summary>إيه الفرق بين البيئات في الكود؟</summary><p>ملف الإعدادات بس. كود التحكم والخريطة والقرار واحد.</p></details>
+<h3>عن الروبوت</h3>
+<details class="q"><summary>ليه 6 cliff sensors مش 2؟</summary><p>الروبوت لما بيهرب بيرجع لورا، وجسمه بيحك في الحفرة وهو بيلف. في التجارب من غيرهم وقع روبوت من كل 4.</p></details>
+<details class="q"><summary>الـ sonar بيتصرف إزاي مع الحيطة المايلة؟</summary><p>الصدى بيضيع والقراءة بترجع أقصى مدى. وفي الخريطة «مفيش صدى» مبيمسحش حيطان.</p></details>
+<details class="q"><summary>لو سنسور باظ؟</summary><p>الكاشف بيشيله من الخريطة ومن التفادي، والروبوت يكمّل. والـ IR والـ bumpers خط دفاع أخير.</p></details>
+<details class="q"><summary>الـ AI ده إيه بالظبط؟</summary><p>Random Forest بيعرف نوع الأرض من الكاميرا (دقة 86%) ونتيجته بتدخل في تكلفة الطريق. وكاشف أعطال إحصائي. ودالة Utility لاختيار الهدف. كله على الجهاز.</p></details>
+<h3>عن النتايج</h3>
+<details class="q"><summary>ليه الـ nearest frontier طلع الأضعف؟</summary><p>بيبص على المسافة بس، فبيجري ورا حتت صغيرة قريبة ويرجع لنفس المنطقة. الـ Utility بيحسب المعلومات اللي هيكسبها.</p></details>
+<details class="q"><summary>الـ fused طلع أحسن من المكان المثالي في الكهف؟</summary><p>لأ، الفرق جوه هامش التجارب. المعنى إن الغلط اللي فاضل (سنتيمترات) مبيأثرش على المهمة.</p></details>
+<h3>عن البرنامج</h3>
+<details class="q"><summary>البرنامج معمول بإيه؟</summary><p>Python. الواجهة PySide6 (Qt)، والحسابات NumPy وSciPy، والـ AI بـ scikit-learn. حوالي 8000 سطر و60 اختبار.</p></details>
+<details class="q"><summary>ليه الجويستيك «شاور يروح فين» مش «قدام وورا»؟</summary><p>الخريطة قدامك ثابتة، فأسهل تشاور على المكان. ولو عايز سواقة عربية: ✕ و△ في الدراع، أو الكيبورد.</p></details>
+<details class="q"><summary>البرنامج كان تقيل وعملتوا إيه؟</summary><p>قسنا كل خطوة: مصنّف الأرض كان واخد 28 ms من كل فريم. بقينا نحسبه من الشجر مباشرة فبقى حوالي 1 ms بنفس النتيجة.</p></details>
+</article>
+
+<article id="check" data-t="قبل المناقشة">
+<h2>قبل المناقشة</h2>
+<div class="box sum"><b>الخلاصة</b><p>قايمة بكل اللي لازم يبقى جاهز. دوس على كل حاجة لما تخلّصها، والعلامة بتتحفظ.</p></div>
+<label class="ck"><input type="checkbox"><span>الورقة مطبوعة: اسم المشروع وأسامي التيم (<code>docs/cover_sheet.pdf</code>)</span></label>
+<label class="ck"><input type="checkbox"><span>البرزنتيشن والفيديو مرفوعين على فولدر المجموعة في الدرايف</span></label>
+<label class="ck"><input type="checkbox"><span>اللابتوب عليه البرنامج شغال (<code>run.bat</code>) + الشاحن</span></label>
+<label class="ck"><input type="checkbox"><span>البرزنتيشن على فلاشة كمان (PDF و PowerPoint)، لو النت وقع</span></label>
+<label class="ck"><input type="checkbox"><span>الفيديو بيفتح من شريحة 21 على اللابتوب اللي هنعرض منه</span></label>
+<label class="ck"><input type="checkbox"><span>بروفة كاملة بالساعة مرتين (17 دقيقة)</span></label>
+<label class="ck"><input type="checkbox"><span>حد سألني الأسئلة المتوقعة وجاوبت</span></label>
+<h3>الفيديو (3 دقايق)</h3>
+<p>شريحة 21. من غير صوت، فتقدر تشرح عليه وهو شغال. بيوري بالترتيب:</p>
+<ol class="steps">
+<li><b>البداية</b>اختيار الكهف والذكاء الاصطناعي، والروبوت يقف ويلف.</li>
+<li><b>الاستكشاف</b>الكهف الحقيقي والخريطة بتتبني، وطبقات الخريطة.</li>
+<li><b>الموتور</b>الـ PID لحظة بلحظة.</li>
+<li><b>سنسور بيبوظ</b>الكاشف يشيله والروبوت يكمّل.</li>
+<li><b>الراديو</b>الإشارة تقطع والروبوت يرجع لوحده.</li>
+<li><b>الموبايل والدراع</b>الموبايل جنب البرنامج والاتنين شغالين.</li>
+<li><b>التقرير</b>«وقّف وابعت تقرير» وصفحة التقرير.</li>
+<li><b>الباقي</b>المريخ، تحت المية، والعربي.</li>
+</ol>
+<div class="box warn"><b>لو الفيديو مفتحش من الشريحة</b><p>افتح <code>docs/media/rovust_demo.mp4</code> بنفسك وكمّل. فولدر <code>media</code> لازم يفضل جنب فولدر <code>presentation</code>.</p></div>
+</article>
+
+</section>
