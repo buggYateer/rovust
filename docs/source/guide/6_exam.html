@@ -57,7 +57,7 @@
 <details class="q"><summary>ليه 6 cliff sensors مش 2؟</summary><p>الروبوت لما بيهرب بيرجع لورا، وجسمه بيحك في الحفرة وهو بيلف. في التجارب من غيرهم وقع روبوت من كل 4.</p></details>
 <details class="q"><summary>الـ sonar بيتصرف إزاي مع الحيطة المايلة؟</summary><p>الصدى بيضيع والقراءة بترجع أقصى مدى. وفي الخريطة «مفيش صدى» مبيمسحش حيطان.</p></details>
 <details class="q"><summary>لو سنسور باظ؟</summary><p>الكاشف بيشيله من الخريطة ومن التفادي، والروبوت يكمّل. والـ IR والـ bumpers خط دفاع أخير.</p></details>
-<details class="q"><summary>الـ AI ده إيه بالظبط؟</summary><p>Random Forest بيعرف نوع الأرض من الكاميرا (دقة 86%) ونتيجته بتدخل في تكلفة الطريق. وكاشف أعطال إحصائي. ودالة Utility لاختيار الهدف. كله على الجهاز.</p></details>
+<details class="q"><summary>الـ AI ده إيه بالظبط؟</summary><p>Random Forest بيعرف نوع الأرض من الكاميرا (دقة حوالي 88%، والإثبات في <span class="ltr">tools/eval_terrain.py</span>) ونتيجته بتدخل في تكلفة الطريق. وكاشف أعطال إحصائي. ودالة Utility لاختيار الهدف. كله على الجهاز.</p></details>
 <h3>عن النتايج</h3>
 <details class="q"><summary>ليه الـ nearest frontier طلع الأضعف؟</summary><p>بيبص على المسافة بس، فبيجري ورا حتت صغيرة قريبة ويرجع لنفس المنطقة. الـ Utility بيحسب المعلومات اللي هيكسبها.</p></details>
 <details class="q"><summary>الـ fused طلع أحسن من المكان المثالي في الكهف؟</summary><p>لأ، الفرق جوه هامش التجارب. المعنى إن الغلط اللي فاضل (سنتيمترات) مبيأثرش على المهمة.</p></details>

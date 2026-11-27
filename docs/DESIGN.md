@@ -119,7 +119,8 @@ Highest active layer wins:
 * **Terrain classifier**: Random Forest on 18 texture features (mean, std,
   gradients, edge fraction, ripple spectra, lag-1 autocorrelation, crack
   fraction, skewness, kurtosis, 8-bin histogram) of the camera patch. Trained
-  on 3 500 synthetic patches, ≈ 86 % accuracy on held-out patches, ~70–90 %
+  on 3 500 synthetic patches, ≈ 88 % accuracy on held-out patches
+  (`python tools/eval_terrain.py` re-tests it and prints the confusion matrix), ~70–100 %
   live (darker scenes are harder). Predicted class → planner cost
   (sand 2.5, mud 4, bedrock 0.8, rock 6, pit 8).
 * **Fault detector**: per ranging sensor, over a 60-sample window: *stuck*
