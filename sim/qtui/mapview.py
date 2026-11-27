@@ -38,7 +38,7 @@ class MapWidget(QWidget):
         self._img = None
         self._arr = None
         self.banner_enabled = True      # the report grabs the maps without the mission-over banner
-        self.setMinimumSize(360, 260)
+        self.setMinimumSize(240, 160)
         self.setAutoFillBackground(True)
 
     def set_mission(self, mission, kind: str, layers: dict):

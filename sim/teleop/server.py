@@ -117,7 +117,22 @@ class ConsoleServer:
                 except Exception as e:
                     self._send(400, str(e).encode(), "text/plain")
 
-        self.httpd = ThreadingHTTPServer(("0.0.0.0", self.port), Handler)
+        # 8080 is often taken (another dev server, Skype, a proxy...): try the
+        # next few ports. On Windows SO_REUSEADDR would let us "share" a busy
+        # port and the phone would reach the other program, so bind exclusively.
+        class Server(ThreadingHTTPServer):
+            allow_reuse_address = os.name != "nt"
+
+        err = None
+        for port in range(self.port, self.port + 10):
+            try:
+                self.httpd = Server(("0.0.0.0", port), Handler)
+                self.port = port
+                break
+            except OSError as e:
+                err = e
+        else:
+            raise err
         self.httpd.daemon_threads = True
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
         self.thread.start()

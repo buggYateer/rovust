@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowIcon(ensure_icon())
         self.resize(1500, 950)
-        self.setMinimumSize(1180, 720)
+        self.setMinimumSize(760, 480)          # small laptops / 150% scaling: the panels scroll instead
         self.mission: Mission | None = None
         self.mission_no = 0
         self.paused = False
@@ -200,6 +200,7 @@ class MainWindow(QMainWindow):
         self.alerts = AlertTracker()
         self._pad_sent = (0.0, None)       # (when, last value) of the controller's last drive packet
         self.popups = {}
+        self._compact = False              # narrow screen: header buttons show icons only
         LANG.code = saved_language() if saved_language() in ("en", "ar") else "en"
 
         self.setup = SetupPanel()
@@ -344,6 +345,28 @@ class MainWindow(QMainWindow):
         if self.settings.value("sideCollapsed", False, type=bool):
             QTimer.singleShot(0, lambda: self._collapse_side(True))
 
+    def fit_to_screen(self):
+        """Small screens (a 1366x768 laptop, or 1080p at 150% scaling, i.e.
+        1280x720 for Qt): start with the side panel folded and a shorter
+        telemetry strip, so both maps get the room."""
+        scr = self.screen() or QApplication.primaryScreen()
+        if scr is None:
+            return
+        g = scr.availableGeometry()
+        if g.width() < 1500:
+            self._compact = True
+            self.retranslate()
+        if g.width() < 1300:
+            self._collapse_side(True)
+        if g.height() < 900:
+            h = max(150, int(g.height() * 0.26))
+            self._tele_h = h
+            # after the window is shown, or the dock layout ignores the size
+            QTimer.singleShot(0, lambda: self.resizeDocks([self.telemetry_dock], [h], Qt.Orientation.Vertical))
+        if g.height() < 800:
+            # really short (1080p at 150%): only the tab names; one click opens it
+            QTimer.singleShot(0, lambda: self._collapse_tele(True))
+
     def _collapse_side(self, collapse: bool):
         self.side_stack.setCurrentIndex(1 if collapse else 0)
         if collapse:
@@ -366,7 +389,13 @@ class MainWindow(QMainWindow):
         self.radio_tab = RadioTab()
         self.events_tab = EventsTab()
         for w in (self.sensors_tab, self.motor_tab, self.stats_tab, self.radio_tab, self.events_tab):
-            self.tabs.addTab(w, "")
+            # each page scrolls, so a short screen squeezes the page instead of
+            # pushing the window (and the maps) off the bottom of the screen
+            sa = QScrollArea()
+            sa.setWidgetResizable(True)
+            sa.setFrameShape(QScrollArea.Shape.NoFrame)
+            sa.setWidget(w)
+            self.tabs.addTab(sa, "")
         self.tele_btn = QToolButton()
         self.tele_btn.setObjectName("iconbtn")
         self.tele_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -488,6 +517,7 @@ class MainWindow(QMainWindow):
         lay.setSpacing(12)
         brand = QLabel(T.ROVER_NAME.upper())
         brand.setObjectName("brand")
+        self.brand = brand
         lay.addWidget(brand)
         # mission chip: number, environment, clock, status
         chip = QFrame()
@@ -667,6 +697,15 @@ class MainWindow(QMainWindow):
         self.side_open_btn.setIcon(icon("panel", mut, 18))
         self.side_start_btn.setIcon(icon("play", color("accent"), 18))
         self.tele_btn.setIcon(icon("up" if self._tele_collapsed else "down", mut, 18))
+        for w in (self.b_pause, self.b_restart, self.b_lights, self.b_console):
+            if w.text():
+                w.setToolTip(w.text())
+        if self._compact:
+            # narrow screen: icons only (the words stay as tooltips), so the
+            # header fits instead of pushing the last buttons off the window
+            for w in (self.b_pause, self.b_stop, self.b_restart, self.b_lights, self.b_console, self.b_report):
+                w.setText("")
+        self.brand.setVisible(not self._compact)
         for w in (self.b_new, self.b_pause, self.b_stop, self.b_restart, self.b_lights, self.b_console, self.b_report, self.b_lang):
             w.setIconSize(QSize(15, 15))
             # reserve room for the widest look of the button (bold / checked), so no letter is ever cut
@@ -744,7 +783,8 @@ class MainWindow(QMainWindow):
         txt = tr("resume") if checked else tr("pause")
         self.act_pause.setText(txt)
         if hasattr(self, "b_pause"):
-            self.b_pause.setText(txt)
+            self.b_pause.setText("" if self._compact else txt)
+            self.b_pause.setToolTip(txt)
             self.b_pause.setIcon(icon("play" if checked else "pause", color("text")))
 
     def stop_mission(self):
@@ -927,12 +967,14 @@ class MainWindow(QMainWindow):
                 self.server = ConsoleServer(lambda: self.mission, port=8080)
                 self.server.start()
                 self.setup.show_console_url(self.server.url)
-                self.tabs.setCurrentWidget(self.radio_tab)
+                self.tabs.setCurrentIndex(3)
                 if self.side_stack.currentIndex() == 1:
                     self._collapse_side(False)          # the QR code lives in the panel: show it
                 # bring the QR code into view so the phone can scan it straight away
                 QTimer.singleShot(50, lambda: self.side_scroll.ensureWidgetVisible(self.setup.qr, 0, 16))
-            except OSError as e:
+            except Exception as e:                      # never leave the button "on" with nothing behind it
+                if self.server is not None and self.server.httpd is not None:
+                    self.server.stop()
                 self.server = None
                 self.setup.show_console_url(None, str(e))
                 self.setup.server_btn.setChecked(False)
@@ -1052,7 +1094,7 @@ class MainWindow(QMainWindow):
         if self._tele_collapsed:
             self._collapse_tele(False)
         self.telemetry_dock.show()
-        self.tabs.setCurrentWidget(self.events_tab)
+        self.tabs.setCurrentIndex(4)
 
     def _show_alert_text(self, a, more: int = 0):
         if a is None:
@@ -1083,7 +1125,7 @@ class MainWindow(QMainWindow):
         label = tr("tEvents") + (f"  ({n})" if n else "")
         if self.tabs.tabText(4) != label:
             self.tabs.setTabText(4, label)
-        if self.tabs.currentWidget() is self.events_tab:
+        if self.tabs.currentIndex() == 4:
             self.events_tab.show_log(self.alerts.log)
         return shown
 
@@ -1212,5 +1254,6 @@ def run():
     app.setWindowIcon(icon_)
     w = MainWindow()
     w.setWindowIcon(icon_)
+    w.fit_to_screen()
     w.showMaximized()
     return app.exec()
