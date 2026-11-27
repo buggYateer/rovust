@@ -1,75 +1,65 @@
-<section class="ch" data-t="جوه الروبوت" data-d="بنبني الروبوت حتة حتة: يتحرك، يشوف، يعرف هو فين، يرسم، يحمي نفسه، يختار، يفكر. 8 دروس.">
+<section class="ch" data-t="جوه الروبوت" data-d="كل جزء في الروبوت بالتفصيل، من الموتور لفوق. 8 دروس.">
 
-<article id="motors" data-t="يتحرك إزاي؟ (العجل والـ PID)">
-<h2>يتحرك إزاي؟</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="on">العجل</span><span class="">السنسورز</span><span class="">هو فين</span><span class="">الخريطة</span><span class="">الأمان والسلوك</span><span class="">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
-<div class="box sum"><b>الخلاصة</b><p>4 عجل وموتورين، موتور لكل جنب. المتحكم بيبعت PWM للموتور، بس الموتور مش بيسمع الكلام بالظبط. فبنقيس سرعته بالـ encoder، والـ PID بيصحّح لحد ما السرعة تبقى المطلوبة.</p></div>
-<p class="lead">نبدأ من تحت خالص: روبوت كل اللي بيعرفه إنه يتحرك. ولسه حتى ده مش سهل زي ما شكله.</p>
+<article id="motors" data-t="الحركة: العجل والـ PID">
+<h2>الحركة: العجل والـ PID</h2>
+<div class="box sum"><b>الخلاصة</b><p>4 عجل وموتورين DC، موتور لكل جنب. المتحكم بيبعت PWM للموتور، الـ encoder بيقيس السرعة الحقيقية، والـ PID بيصحّح لحد ما السرعة تبقى المطلوبة.</p></div>
 
-<h3>1. الجسم والعجل</h3>
-<p>صندوق عليه 4 عجل. العجلتين اللي على الشمال مربوطين بموتور واحد وبيلفوا مع بعض، واليمين كذلك. يعني موتورين بس، والمتحكم شايف حاجتين: <b>سرعة الجنب الشمال</b> و<b>سرعة الجنب اليمين</b>. ده اسمه <b>skid-steer</b>، وحسابه هو هو حساب الـ differential drive اللي في المحاضرة.</p>
+<h3>المكونات</h3>
+<dl class="kv">
+<dt>4 عجل</dt><dd>نص القطر 5 سم، والمسافة بين الجنبين 30 سم.</dd>
+<dt>موتورين DC <kbd>12 V</kbd></dt><dd>موتور لكل جنب، بيلف العجلتين اللي في جنبه مع بعض.</dd>
+<dt>Gearbox <kbd>30:1</kbd></dt><dd>بيقلل سرعة الموتور ويزوّد العزم.</dd>
+<dt>H-bridge <kbd>L293D</kbd></dt><dd>بيحدد اتجاه الموتور. الشريحة فيها 2، واحد لكل جنب.</dd>
+<dt>Encoder × 2</dt><dd>على عمود كل موتور: 16 نبضة × 30 = 480 نبضة لكل لفة عجلة.</dd>
+</dl>
 
-<h3>2. بيلف إزاي من غير دركسيون؟</h3>
-<p>مفيش ولا عجلة بتتوجّه. الروبوت بيلف بفرق السرعة بين الجنبين: الجنبين زي بعض يمشي مستقيم، وجنب أسرع يلف ناحية الجنب الأبطأ، وجنب لقدام وجنب لورا بنفس السرعة يلف في مكانه. ودي اللفة اللي بيعملها أول المهمة علشان الـ sonar يمسح 360°.</p>
-<div class="wheels" dir="ltr"><svg viewBox="0 0 520 170" role="img" aria-label="الروبوت من فوق: مستقيم، ملف، ولفة في مكانه" style="width:100%;max-width:560px;height:auto;display:block;margin:10px auto;color:var(--ink)"><rect x="64" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="90" cy="50" r="6" fill="#11161b"/><rect x="47" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="47" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="119" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="119" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M34 100.0V44.0M28 52.0L34 44.0L40 52.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M146 100.0V44.0M140 52.0L146 44.0L152 52.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="90" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">مستقيم</text><text x="90" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">الجنبين نفس السرعة</text><rect x="234" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="260" cy="50" r="6" fill="#11161b"/><rect x="217" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="217" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="289" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="289" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M204 85.0V59.0M198 67.0L204 59.0L210 67.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M316 102.0V42.0M310 50.0L316 42.0L322 50.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="260" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">ملف شمال</text><text x="260" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">اليمين أسرع</text><rect x="404" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="430" cy="50" r="6" fill="#11161b"/><rect x="387" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="387" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="459" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="459" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M374 47.0V97.0M368 89.0L374 97.0L380 89.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M486 97.0V47.0M480 55.0L486 47.0L492 55.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="430" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">لفة في مكانه</text><text x="430" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">جنب لقدام وجنب لورا</text></svg></div>
-<div class="it"><b>المعادلة</b><p>المخ بيطلّع سرعة لقدام <span dir="ltr">v</span> وسرعة دوران <span dir="ltr">ω</span>. بنقسمهم على الجنبين:</p><p dir="ltr" style="text-align:center;font-weight:600">left = (v − ω·L/2) / r<br>right = (v + ω·L/2) / r</p><p>الـ L هي المسافة بين الجنبين (30 سم) والـ r نص قطر العجلة (5 سم). لو <span dir="ltr">v = 0</span> الرقمين بيطلعوا عكس بعض، فيلف في مكانه.</p></div>
-<div class="box say"><b>لو حد سأل</b><p>وهو بيلف، العجل الأربعة بتتزحلق شوية بالجنب (علشان كده اسمه skid). ده سبب إننا مبناخدش الاتجاه من العجل، وبناخده من الـ gyro والـ compass.</p></div>
-
-<h3>3. المتحكم بيكلّم الموتور إزاي؟</h3>
-<p>المتحكم مش بيقول للموتور «لف بسرعة كذا». بيبعتله رقم من −1 لـ +1 اسمه <b>duty</b> (ده الـ PWM): بيفتح الكهربا ويقفلها بسرعة جدًا، وكل ما يسيبها مفتوحة وقت أطول، الموتور ياخد جهد أكتر ويلف أسرع.</p>
-<p>والإشارة (سالب أو موجب) بتحدد الاتجاه، وده شغل الـ <b>H-bridge</b>: 4 مفاتيح، اتنين يقفلوا يلف لقدام، والتانيين يلف لورا. على الروبوت ده شريحة L293D فيها 2 H-bridge: واحد لكل جنب.</p>
-<p>وبين الموتور والعجلة <b>gearbox</b> نسبته 30:1، لأن موتور الـ DC سريع جدًا (آلاف اللفات في الدقيقة) وضعيف، والـ gearbox بيقلل السرعة ويزوّد العزم.</p>
-
-<h3>4. المشكلة: الموتور مش بيسمع الكلام</h3>
-<p>كنا نتمنى إن 50% تبقى نص السرعة. بس اللي بيحصل:</p>
+<h3>بيمشي ويلف إزاي</h3>
+<p>مفيش عجلة بتتوجّه. المتحكم بيتحكم في حاجتين بس: سرعة الجنب الشمال وسرعة الجنب اليمين. ده اسمه <b>skid-steer</b>، وحسابه هو حساب الـ differential drive اللي في المحاضرة:</p>
 <ul>
-<li>تحت 6% الموتور مبيتحركش خالص (الاحتكاك).</li>
-<li>السرعة مش ماشية بخط مستقيم مع الـ duty.</li>
-<li>لو دخل رمل أو طين، نفس الـ duty يدّي سرعة أقل.</li>
-<li>والموتورين مش زي بعض: واحد أسرع من التاني 4%، زي الموتورات الحقيقية.</li>
+<li>الجنبين نفس السرعة: يمشي مستقيم.</li>
+<li>جنب أسرع: يلف ناحية الجنب الأبطأ.</li>
+<li>جنب لقدام وجنب لورا: يلف في مكانه (اللفة اللي بيعملها أول المهمة).</li>
 </ul>
-<p>يعني لو بعتنا رقم وسكتنا (open loop)، عمرنا ما هنعرف الروبوت ماشي بكام. لازم نقيس.</p>
+<div class="wheels" dir="ltr"><svg viewBox="0 0 520 170" role="img" aria-label="الروبوت من فوق: مستقيم، ملف، ولفة في مكانه" style="width:100%;max-width:560px;height:auto;display:block;margin:10px auto;color:var(--ink)"><rect x="64" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="90" cy="50" r="6" fill="#11161b"/><rect x="47" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="47" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="119" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="119" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M34 100.0V44.0M28 52.0L34 44.0L40 52.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M146 100.0V44.0M140 52.0L146 44.0L152 52.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="90" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">مستقيم</text><text x="90" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">الجنبين نفس السرعة</text><rect x="234" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="260" cy="50" r="6" fill="#11161b"/><rect x="217" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="217" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="289" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="289" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M204 85.0V59.0M198 67.0L204 59.0L210 67.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M316 102.0V42.0M310 50.0L316 42.0L322 50.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="260" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">ملف شمال</text><text x="260" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">اليمين أسرع</text><rect x="404" y="34" width="52" height="76" rx="10" fill="#f5a524"/><circle cx="430" cy="50" r="6" fill="#11161b"/><rect x="387" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="387" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="459" y="40" width="14" height="26" rx="4" fill="#8a99a8"/><rect x="459" y="80" width="14" height="26" rx="4" fill="#8a99a8"/><path d="M374 47.0V97.0M368 89.0L374 97.0L380 89.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M486 97.0V47.0M480 55.0L486 47.0L492 55.0" fill="none" stroke="#0d9483" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><text x="430" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">لفة في مكانه</text><text x="430" y="160" text-anchor="middle" font-size="12.5" fill="currentColor" opacity=".75">جنب لقدام وجنب لورا</text></svg></div>
+<div class="it"><b>المعادلة</b><p>المتحكم بيطلّع سرعة لقدام <span dir="ltr">v</span> وسرعة دوران <span dir="ltr">ω</span>، وبتتقسم على الجنبين:</p><p dir="ltr" style="text-align:center;font-weight:600">left = (v − ω·L/2) / r<br>right = (v + ω·L/2) / r</p><p>L = 30 سم، r = 5 سم. لو <span dir="ltr">v = 0</span> الرقمين عكس بعض، فيلف في مكانه.</p></div>
+<div class="box say"><b>لو حد سأل</b><p>وهو بيلف، العجل بيتزحلق شوية بالجنب (علشان كده اسمه skid). علشان كده الاتجاه بيتاخد من الـ gyro والـ compass مش من العجل.</p></div>
 
-<h3>5. نقيس: الـ Encoder</h3>
-<p>على عمود كل موتور encoder بيطلّع 16 نبضة في اللفة. وبعد الـ gearbox يبقوا 16 × 30 = <b>480 نبضة</b> لكل لفة عجلة. بنعدّ النبضات فنعرف العجلة لفّت قد إيه وبسرعة كام. ده الحاجة الوحيدة اللي الـ PID بيشوفها.</p>
+<h3>الموتور بيتشغّل إزاي</h3>
+<div class="it"><b>PWM و duty</b><p>المتحكم بيبعت رقم من −1 لـ +1 اسمه duty: بيفتح الكهربا ويقفلها بسرعة، وكل ما تفضل مفتوحة وقت أطول الموتور ياخد جهد أكتر. الإشارة بتحدد الاتجاه.</p></div>
+<div class="it"><b>H-bridge</b><p>4 مفاتيح. اتنين يقفلوا: الموتور يلف لقدام. التانيين: يلف لورا.</p></div>
+<div class="it"><b>ليه محتاجين تحكم؟</b><p>تحت 6% الموتور مبيتحركش (الاحتكاك). السرعة مش بتمشي بخط مستقيم مع الـ duty، وبتقل في الرمل والطين. والموتورين مختلفين 4%. يعني نفس الـ duty مش بيدّي نفس السرعة، فلازم نقيس ونصحّح.</p></div>
 
-<h3>6. نصحّح: من on-off لحد الـ PID</h3>
-<p>دلوقتي عندنا السرعة المطلوبة والسرعة المقاسة. محتاجين حاجة تزوّد وتقلل الـ duty لحد ما يتساووا. جرّبنا اللي في المحاضرة بالترتيب:</p>
-<ol class="steps">
-<li><b>On-off</b>أقل من المطلوب: شغّل. أكتر: اطفي. بيفضل يتهز حوالين الهدف.</li>
-<li><b>P لوحده</b>القوة = ثابت × الخطأ. أهدى، بس بيقف تحت الهدف بشوية (steady-state error)، لأن لما الخطأ يقرّب من صفر القوة تقرّب من صفر.</li>
-<li><b>PI و PID (اللي بنستخدمه)</b>الـ I بيجمع الخطأ مع الوقت فبيشيل الفرق الأخير. بيوصل للهدف بالظبط، ولو حطينا حمل فجأة بيرجع في أقل من ثانية.</li>
-</ol>
+<h3>التحكم في السرعة</h3>
+<p>الـ encoder بيقيس السرعة الحقيقية، والمتحكم بيقارنها بالمطلوبة. جرّبنا 3 طرق من المحاضرة:</p>
+<div class="it"><b>On-off</b><p>أقل من المطلوب: شغّل. أكتر: اطفي. بيفضل يتهز حوالين الهدف.</p></div>
+<div class="it"><b>P لوحده</b><p>القوة = ثابت × الخطأ. بيقف تحت الهدف بشوية (steady-state error)، لأن لما الخطأ يصغر القوة تصغر.</p></div>
+<div class="it teal"><b>PI و PID (اللي بنستخدمه)</b><p>الـ I بيجمع الخطأ مع الوقت فبيشيل الفرق. بيوصل للهدف بالظبط، ولو حطينا حمل فجأة بيرجع في أقل من ثانية.</p></div>
 <pre>R_n = R_{n-1} + Kp(e_n − e_{n−1})
       + Ki(e_n + e_{n−1})/2
       + Kd(e_n − 2e_{n−1} + e_{n−2})</pre>
-<p>دي صيغة الـ PID اللي في المحاضرة (incremental)، ومتنفذة زي ما هي، 20 مرة في الثانية.</p>
+<p>صيغة الـ PID اللي في المحاضرة (incremental)، متنفذة زي ما هي، 20 مرة في الثانية.</p>
 <figure><img src="figures/pid_step_response.png" alt=""><figcaption>الشمال: الـ on-off بيتهز، الـ P (الأخضر) واقف تحت الهدف، والـ PI والـ PID على الهدف. اليمين: منحنى الموتور مش خطي وبيقل مع الحمل.</figcaption></figure>
-
-<h3>7. آخر مشكلة: يمشي مستقيم</h3>
-<p>PID لكل جنب لوحده مش كفاية. كل جنب بيوصل لسرعته تقريبًا، بس الفرق الصغير بيتجمع، فالروبوت يلف في دايرة كبيرة بدل ما يمشي مستقيم. فيه controller تاني (I) بيقارن عدّاد الـ encoderين ويصحّح الفرق. ده شكل 5.16 في محاضرة الـ Control.</p>
+<div class="it"><b>المشي المستقيم</b><p>PID لكل جنب لوحده مش كفاية: الفرق الصغير بين الجنبين بيتجمع والروبوت يلف في دايرة. فيه controller تاني (I) بيقارن عدّاد الـ encoderين ويصحّح الفرق. ده شكل 5.16 في محاضرة الـ Control.</p></div>
 <div class="box try"><b>شوفها في البرنامج</b><p>تبويب «الموتور» تحت: بيرسم السرعة المطلوبة والمقاسة والـ duty لحظة بلحظة.</p></div>
-<div class="box warn"><b>ولسه فيه مشكلة</b><p>الـ encoder بيقيس لفّ العجلة، مش حركة الروبوت على الأرض. لو العجلة زحلقت في الرمل، الـ encoder هيفتكر إن الروبوت مشي. يعني الروبوت دلوقتي بيتحرك كويس، بس مش شايف حاجة ومش متأكد هو فين. ده الدرس الجاي.</p></div>
+<div class="box warn"><b>معلومة مهمة</b><p>الـ encoder بيقيس لفّ العجلة، مش حركة الروبوت على الأرض. لو العجلة زحلقت، الـ encoder هيفتكر إن الروبوت مشي. علشان كده الروبوت مبيعتمدش على العجل لوحده في حساب مكانه.</p></div>
 </article>
 
 <article id="sensors" data-t="السنسورز">
 <h2>السنسورز</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="on">السنسورز</span><span class="">هو فين</span><span class="">الخريطة</span><span class="">الأمان والسلوك</span><span class="">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>أكتر من 20 سنسور. كل واحد ليه شغلانة ومكان اتحط فيه لسبب. وكلهم متصنّفين زي المحاضرة: <span class="ltr">active / passive</span> و <span class="ltr">internal / external</span> و <span class="ltr">binary / analog / digital</span>. ومفيش GPS خالص.</p></div>
-<p class="lead">الروبوت بقى بيتحرك بالسرعة اللي إحنا عايزينها. بس هو أعمى: ميعرفش قدامه حيطة ولا حفرة، وميعرفش حتى هو فين، لأن العجل بيكدب لما يزحلق. فركّبنا سنسورز، وكل سنسور جه علشان يجاوب سؤال. علشان كده قسمناهم على حسب السؤال.</p>
-<h3>إيه اللي حواليّا؟</h3>
+<h3>بيشوفوا اللي حواليه</h3>
 <div class="it"><b>Sonar × 8</b><i>active · external · digital</i><p><b>شغلته:</b> هو اللي بيرسم الخريطة. بيبعت صوت ويستنى الصدى، والمسافة = السرعة × الوقت ÷ 2.</p><p><b>مكانه:</b> 8 حوالين الجسم، كل 45 درجة (12 تحت المية).</p><p><b>عيبه:</b> لو الحيطة مايلة الصدى بيضيع والحيطة تبان أبعد، وبيتلخبط مع الـ sonar اللي جنبه.</p></div>
 <div class="it"><b>IR × 3</b><i>active · external · analog</i><p><b>شغلته:</b> يشوف أي حاجة الجسم هيخبط فيها من قدام.</p><p><b>مكانه:</b> قدام على عرض الجسم، وداخل لجوه 6 سم.</p><p><b>عيبه:</b> قراءته مش خطية، فبنستخدم lookup table. وتحت 6 سم القراءة بتتقلب وتبقى غلط، علشان كده هو داخل لجوه. مش موجود تحت المية.</p></div>
 <div class="it"><b>Cliff switches × 6</b><i>active · external · binary</i><p><b>شغلته:</b> يشوف الحفر. السنسورز اللي بتبص قدام مبتشوفش حفرة في الأرض.</p><p><b>مكانه:</b> زوج قدام، زوج على الجنبين، زوج ورا، وكلهم باصّين لتحت.</p><p><b>ليه 6 مش 2؟</b> الروبوت لما بيهرب بيرجع لورا، وجسمه بيحك في الحفرة وهو بيلف. من غير اللي ورا وعلى الجنب روبوت وقع في التجارب.</p></div>
 <div class="it"><b>Bumpers × 2</b><i>passive · external · binary</i><p><b>شغلته:</b> خط الدفاع الأخير: لو خبط فعلًا. فيه يمين وشمال علشان يعرف يلف ناحية إيه.</p></div>
 <div class="it"><b>الكاميرا</b><i>passive · external · digital</i><p><b>شغلته:</b> بتصوّر حتة أرض صغيرة قدام الروبوت (16×16 بكسل)، والذكاء الاصطناعي بيعرف منها نوع الأرض. في الضلمة محتاجة الكشافات.</p></div>
-<h3>أنا فين؟</h3>
+<h3>بيحسبوا هو فين</h3>
 <div class="it"><b>Encoders × 2</b><i>passive · internal · digital</i><p>بيعدّوا لفات العجل: للسرعة (الـ PID) وللمسافة.</p></div>
 <div class="it"><b>Gyro</b><i>passive · internal · digital</i><p>بيقيس سرعة اللف. سريع ودقيق، بس فيه غلطة ثابتة صغيرة (bias) بتكبر مع الوقت: 20 درجة في الدقيقة لو سبناه لوحده.</p></div>
 <div class="it"><b>Compass أو Sun sensor</b><i>passive · digital</i><p>اتجاه مطلق (الشمال فين) بيصحّح الـ gyro. المريخ مفيهوش مجال مغناطيسي، فبنستخدم sun sensor بداله.</p></div>
 <div class="it"><b>Optical flow أو DVL</b><i>active · external · digital</i><p>بيبص على الأرض تحت الروبوت ويقيس حركته الحقيقية، فمبيتأثرش بزحلقة العجل. تحت المية اسمه DVL وهو المصدر الوحيد للمسافة (مفيش عجل).</p></div>
 <div class="it"><b>Accelerometer</b><i>passive · internal · digital</i><p>بيقيس ميل الأرض. لو الميل أكتر من 11 درجة الروبوت بيرجع.</p></div>
-<h3>وحاجات تانية بيقيسها</h3>
+<h3>سنسورز تانية</h3>
 <dl class="kv">
 <dt>البطارية <kbd>analog</kbd></dt><dd>بيقرر منها إمتى يرجع.</dd>
 <dt>الغاز <kbd>analog</kbd></dt><dd>في الكهف: مناطق الغاز بتبقى «غالية» فالروبوت بيتجنبها.</dd>
@@ -82,9 +72,7 @@
 
 <article id="where" data-t="هو فين؟">
 <h2>هو فين؟ (Localisation)</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="on">هو فين</span><span class="">الخريطة</span><span class="">الأمان والسلوك</span><span class="">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>مفيش GPS، فالروبوت لازم يحسب مكانه بنفسه. بالعجل بس بيتوه أمتار. لما بنجمع كذا سنسور مع بعض (fusion) الغلط بيبقى سنتيمترات.</p></div>
-<p class="lead">دلوقتي عنده سنسورز. وأول سؤال لازم يجاوبه قبل أي حاجة: هو فين؟ لأن لو مكانه غلط، كل حاجة هيشوفها هتترسم في المكان الغلط.</p>
 <div class="it red"><b>بالعجل بس (Encoders only) — الخط الأحمر</b><p>يجمع حركة العجل من أول المهمة. اسمها dead reckoning. المشكلة إن الغلط بيتراكم: العجل بيزحلق، والاتجاه بينحرف. بعد 5 دقايق بيبقى تايه من 2.4 لـ 5.5 متر.</p></div>
 <div class="it teal"><b>كل السنسورز (Fused) — الخط الأخضر</b><p>المسافة من الـ optical flow (مبيتأثرش بالزحلقة). الاتجاه من الـ gyro (سريع) متصحّح بالـ compass (ثابت). الغلط: 4 لـ 17 سم بس.</p></div>
 <div class="it"><b>بالظبط (Perfect)</b><p>المكان الحقيقي، للمقارنة بس. مش موجود في روبوت حقيقي.</p></div>
@@ -100,9 +88,7 @@
 
 <article id="map" data-t="الخريطة">
 <h2>الخريطة</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="done">هو فين</span><span class="on">الخريطة</span><span class="">الأمان والسلوك</span><span class="">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>الخريطة شبكة مربعات، كل مربع 20 سم. كل مربع فيه احتمال إنه مسدود. اسمها occupancy grid.</p></div>
-<p class="lead">عرف هو فين، فيقدر ياخد اللي الـ sonar شافه ويحطه في مكانه الصح. ومن هنا بتتبني الخريطة.</p>
 <div class="it"><b>الـ sonar بيرسم إزاي؟</b><p>لما الـ sonar يرجّع صدى: كل المربعات اللي الصوت عدّى عليها «فاضية»، والمربع اللي عند الصدى «مسدود».</p></div>
 <div class="it"><b>صدى واحد مش كفاية</b><p>المربع محتاج صدايين علشان يتحسب حيطة. كده قراءة غلط واحدة مبتعملش حيطة من مفيش.</p></div>
 <div class="it"><b>«مفيش صدى» مش معناها فاضي</b><p>ممكن الصدى ضاع بس. فمبنمسحش بيه حيطان.</p></div>
@@ -113,9 +99,7 @@
 
 <article id="behaviour" data-t="السلوك (Subsumption)">
 <h2>السلوك (Subsumption)</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="done">هو فين</span><span class="done">الخريطة</span><span class="on">الأمان والسلوك</span><span class="">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>10 طبقات مترتبة بالأهمية. كل 50 ms كل طبقة بتقول «أنا عايزة أتحكم» أو لأ، وأعلى واحدة عايزة هي اللي بتسوق. الأمان فوق، والاستكشاف تحت.</p></div>
-<p class="lead">عنده خريطة. بس قبل ما نخليه يختار يروح فين، لازم نضمن إنه مش هيأذي نفسه في السكة. علشان كده السلوك متقسّم طبقات، والأمان فوق الكل.</p>
 <p>نفس مثال المحاضرة: روبوت رايح للنور، قابل حاجة في السكة، فالتفادي بياخد التحكم. ولما الطريق يفضى يرجع يكمّل.</p>
 <h3>الأمان (فوق)</h3>
 <div class="it red"><b>9 · STOP</b><p>وقع، البطارية خلصت، أو إنت وقّفته. مفيش حركة.</p></div>
@@ -134,9 +118,7 @@
 
 <article id="explore" data-t="يروح فين ويوصل إزاي">
 <h2>يروح فين ويوصل إزاي</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="done">هو فين</span><span class="done">الخريطة</span><span class="done">الأمان والسلوك</span><span class="on">يروح فين</span><span class="">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>سؤالين: «أروح فين؟» وليه 3 طرق نقارن بينهم. و«أوصل إزاي؟» وده الـ A*.</p></div>
-<p class="lead">بقى آمن، ومعاه خريطة. فاضل السؤال الكبير: يروح فين؟ ولما يختار، يوصل إزاي؟</p>
 <h3>أروح فين؟ (3 استراتيجيات)</h3>
 <p>الـ frontier هو الحد بين اللي اتكشف واللي لسه مجهول.</p>
 <div class="it"><b>Nearest frontier · أقرب حتة مجهولة</b><p>يروح لأقرب frontier. بسيط، بس «طمّاع»: بيجري ورا حتت صغيرة قريبة ويسيب المناطق الكبيرة.</p></div>
@@ -150,9 +132,7 @@
 
 <article id="ai" data-t="الذكاء الاصطناعي">
 <h2>الذكاء الاصطناعي</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="done">هو فين</span><span class="done">الخريطة</span><span class="done">الأمان والسلوك</span><span class="done">يروح فين</span><span class="on">الذكاء</span><span class="">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>3 حاجات، وكلها بتشتغل على الجهاز من غير نت ومن غير أي موديل كبير: مصنّف بيعرف نوع الأرض، كاشف بيعرف السنسور البايظ، واستراتيجية الاستكشاف.</p></div>
-<p class="lead">في كذا مكان فوق كنا محتاجين قرار أذكى من قاعدة ثابتة: الأرض دي رمل ولا طين؟ السنسور ده باظ؟ أنهي هدف أحسن؟ هنا جه الذكاء الاصطناعي.</p>
 <div class="it teal"><b>1. مصنّف الأرض (Random Forest)</b><p>ده الـ machine learning الحقيقي. من صورة الكاميرا بنطلّع 26 رقم (اللون، الخشونة، الحواف...)، و120 شجرة قرار بتقول: أرض عادية، رمل، صخر، طين، مية، أو حفرة.</p><p>اتدرّب على 3500 صورة، ودقته حوالي 86%. والنتيجة بتدخل في خريطة التكلفة، فالروبوت بيتجنب الرمل والطين فعلًا.</p></div>
 <div class="it teal"><b>2. كاشف الأعطال</b><p>ده إحصاء مش تعلّم. بيبص على آخر 60 قراءة لكل سنسور: ثابتة والروبوت بيتحرك (معلّق)، على أقصى المدى واللي جنبه شايف حاجة (ميت)، أو بتتنطط كتير (مشوّش). السنسور البايظ بيتشال من الحسابات والروبوت يكمّل.</p></div>
 <div class="it teal"><b>3. Utility</b><p>دالة بتختار الهدف الجاي (الدرس اللي فات).</p></div>
@@ -162,9 +142,7 @@
 
 <article id="worlds" data-t="التلات بيئات">
 <h2>التلات بيئات</h2>
-<div class="build" aria-label="بنبني الروبوت حتة حتة"><span class="done">العجل</span><span class="done">السنسورز</span><span class="done">هو فين</span><span class="done">الخريطة</span><span class="done">الأمان والسلوك</span><span class="done">يروح فين</span><span class="done">الذكاء</span><span class="on">3 بيئات</span></div>
 <div class="box sum"><b>الخلاصة</b><p>الكود واحد. اللي بيتغير من بيئة للتانية: شكل المكان، نوع الأرض، السنسورز المتركبة، والراديو.</p></div>
-<p class="lead">الروبوت كمل. ودلوقتي نحطه في 3 أماكن مختلفين خالص، ونشوف إيه اللي بيتغير وإيه اللي فضل زي ما هو.</p>
 <div class="it amber"><b>الكهف</b><p><b>المكان:</b> ممرات ضيقة (1.2 متر)، طين، حفر جنب الحيطان، غاز، وضلمة.</p><p><b>السنسورز:</b> sonar مداه 2.5 متر بس، الكشافات شغالة، والـ compass مشوّش من الصخر.</p><p><b>الراديو:</b> بيقطع ورا الصخر.</p></div>
 <div class="it amber"><b>المريخ</b><p><b>المكان:</b> أرض مفتوحة، صخور، حفر كبيرة بحواف مايلة، ورمل بيزحلق العجل 25%.</p><p><b>السنسورز:</b> مفيش compass، فيه sun sensor.</p><p><b>الراديو:</b> قوي، بس كل أمر بيوصل بعد ثانيتين.</p></div>
 <div class="it amber"><b>تحت المية</b><p><b>المكان:</b> شعاب، وتيار بيزق الروبوت على جنب.</p><p><b>السنسورز:</b> مفيش عجل (thrusters)، 12 sonar مداهم 6 متر، مفيش IR، DVL للسرعة، وسنسور ضغط للعمق.</p><p><b>الراديو:</b> مودم صوتي مداه قصير.</p></div>
