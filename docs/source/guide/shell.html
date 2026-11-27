@@ -163,6 +163,14 @@
   .warn p{color:var(--red);font-weight:500}
   figcaption{font-family:var(--f-hand);font-size:.85rem}
   .hero p{font-family:var(--f-hand)}
+  /* story: the narrative line, and the "we are building it piece by piece" strip */
+  p.lead{font-size:1.07rem;line-height:2;color:var(--ink);border-right:3px solid var(--teal);padding-right:12px;margin:14px 0}
+  .build{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 12px}
+  .build span{font-size:.76rem;line-height:1.7;padding:1px 10px;border-radius:999px;background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+  .build span.done{background:var(--tealbg);color:var(--teal);border-color:transparent}
+  .build span.done::before{content:"✓ "}
+  .build span.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  :root[data-theme="dark"] .build span.on{color:#06211e}
 </style>
 </head>
 <body>
@@ -189,7 +197,7 @@
     <p>روبوت واحد بيستكشف كهف والمريخ وتحت المية لوحده. الدليل ده بيمشّيك على المشروع درس درس: كل درس شاشة قصيرة، تبدأ بالخلاصة وبعدها التفاصيل.</p>
   </div>
   <a class="start" id="startBtn" href="#idea">ابدأ من أول درس ←</a>
-  <div class="box sum"><b>مستعجل؟</b><p>اقرا «المشروع في دقيقة» و«الروبوت بيفكر إزاي»، وبعدهم فصل «المناقشة». دول يكفّوك تفهم وتجاوب.</p></div>
+  <div class="box sum"><b>مستعجل؟</b><p>اقرا «الحكاية من الأول» و«الروبوت بيفكر إزاي»، وبعدهم فصل «المناقشة». دول يكفّوك تفهم وتجاوب.</p></div>
   <div id="homeList"></div>
 </article>
 <!--CHAPTERS-->
