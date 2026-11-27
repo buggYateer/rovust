@@ -6,6 +6,10 @@ the 'driving straight' structure of the Control lecture (Fig. 5.16):
                       ->  I-controller on the *position* difference of the
                           two encoders, fed back to both wheels.
 
+The rover has four wheels: each motor drives both wheels of its side
+(skid-steer), so "left wheel" / "right wheel" below mean the left and right
+side, and the kinematics are those of a differential drive.
+
 The same class drives the underwater vehicle: there the "wheels" are two
 thrusters and the "slip" is water.
 """

@@ -62,13 +62,13 @@ This is the rover from above. Teal dots are the eight sonars, red lines the thre
 
 </div>
 
-## 7. Two DC motors, an H-bridge and a PWM signal
+## 7. Four wheels, two DC motors, an H-bridge and PWM
 
-The actuator model follows Actuators 1 and 2 closely: an H-bridge for direction, PWM for the average voltage, and a motor whose speed is not proportional to the duty cycle. The dead band and the load dependence are what make open-loop control useless — the same duty gives a different speed on sand — and that motivates the next slide.
+The actuator model follows Actuators 1 and 2 closely: an H-bridge for direction, PWM for the average voltage, and a motor whose speed is not proportional to the duty cycle. The rover has four wheels but only two motors, one per side driving both wheels of that side, so it steers like a differential drive: equal speeds go straight, different speeds turn, opposite speeds spin it in place. The dead band and the load dependence are what make open-loop control useless — the same duty gives a different speed on sand — and that motivates the next slide.
 
 <div dir="rtl" align="right">
 
-موديل المشغّلات ماشي بالظبط مع محاضرتي Actuators 1 و2: H-bridge للاتجاه، PWM للجهد المتوسط، وموتور سرعته مش متناسبة مع الـ duty cycle. المنطقة الميّتة والاعتماد على الحمل هما اللي بيخلّوا التحكم المفتوح ملوش لازمة، نفس الـ duty بيدّي سرعة مختلفة على الرمل، وده اللي بيمهّد للشريحة الجاية.
+موديل المشغّلات ماشي بالظبط مع محاضرتي Actuators 1 و2: H-bridge للاتجاه، PWM للجهد المتوسط، وموتور سرعته مش متناسبة مع الـ duty cycle. الروبوت 4 عجلات بس بموتورين، موتور لكل جنب بيلف العجلتين بتوع جنبه، فبيتوجّه زي الـ differential drive: الجنبين نفس السرعة يمشي مستقيم، سرعتين مختلفين يلف، وعكس بعض يلف في مكانه. المنطقة الميّتة والاعتماد على الحمل هما اللي بيخلّوا التحكم المفتوح ملوش لازمة، نفس الـ duty بيدّي سرعة مختلفة على الرمل، وده اللي بيمهّد للشريحة الجاية.
 
 </div>
 

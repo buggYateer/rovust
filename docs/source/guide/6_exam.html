@@ -24,7 +24,7 @@
 <article id="lectures" data-t="المشروع والمحاضرات">
 <h2>المشروع والمحاضرات</h2>
 <div class="box sum"><b>الخلاصة</b><p>كل محاضرة ليها حتة شغالة في الروبوت. لكل محاضرة هنا: عندنا فين، والسؤال اللي ممكن ييجي منها.</p></div>
-<div class="it"><b>1. Embedded Robotics</b><p><b>عندنا:</b> متحكم واحد بيلف لوب كل 50 ms. والروبوت differential drive: موتورين، كل عجلة بسرعتها.</p><p><b>سؤال:</b> ليه differential؟ علشان بيلف في مكانه (مهم في الممرات الضيقة) وبموتورين بس.</p></div>
+<div class="it"><b>1. Embedded Robotics</b><p><b>عندنا:</b> متحكم واحد بيلف لوب كل 50 ms. والروبوت 4 عجلات بموتورين، موتور لكل جنب (skid-steer)، وبيتحسب زي الـ differential drive: كل جنب بسرعته.</p><p><b>سؤال:</b> ليه differential؟ علشان بيلف في مكانه (مهم في الممرات الضيقة) وبموتورين بس.</p></div>
 <div class="it"><b>2. Robot Behavior</b><p><b>عندنا:</b> Subsumption بـ 10 طبقات. الـ random walk هو طبقة WANDER. والـ bumper بيرجّعه ويلفّه.</p><p><b>سؤال:</b> اشرح الـ subsumption. الطبقة الأعلى بتاخد التحكم من اللي تحتها. وفين الـ negative feedback؟ في الـ PID وفي تفادي الحيطان.</p></div>
 <div class="it"><b>3. Sensors 1</b><p><b>عندنا:</b> كل السنسورز متصنّفة بتصنيف المحاضرة. الـ encoder قبل الـ gearbox. وكل analog على ADC 10-bit.</p><p><b>احسب:</b> 16 نبضة × 30 = 480 للفة. محيط العجلة 31.4 سم، يعني كل نبضة ≈ 0.65 مم. والـ ADC: <span class="ltr">D = Vin/Vref × 1023</span>.</p></div>
 <div class="it"><b>4. Sensors 2</b><p><b>عندنا:</b> الـ sonar بعيوبه، الـ IR بالـ lookup table، والـ gyro متصحّح بالـ compass.</p><p><b>سؤال:</b> ليه dead reckoning مش كفاية؟ الغلط بيتراكم والعجل بيزحلق. وعندنا الرقم: 2.4 لـ 5.5 متر في 5 دقايق.</p></div>
