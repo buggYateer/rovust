@@ -2,7 +2,7 @@
 
 Outputs (in docs/presentation/):
     Rovust_presentation.html            standalone viewer: arrow keys, N = notes, L = notes language (EN / مصري), F = fullscreen
-    Rovust_presentation.pdf             the 30 slides as pages
+    Rovust_presentation.pdf             the slides as pages
     Rovust_presentation.pptx            PowerPoint with the slides as pictures and a push between them (no notes in it: they show
                                         when the file is opened; the notes are in speaker_notes.md)
     SPEAKER_NOTES.md                   both languages, slide by slide
