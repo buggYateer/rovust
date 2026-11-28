@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<title>أبعاد Rovust</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a CAD-style viewport (always dark, like a modelling tool) beside an info + drive panel, a row of part toggles above, the parts table below. */
+:root{
+  --paper:#eef2f4; --sheet:#f8fafb; --ink:#17232b; --muted:#5b6b75; --grid:#dbe3e8; --chip:#e2e9ed;
+  --accent:#0f8a7c; --dim:#b4472f; --warn:#a76a00; --stage:#0e161b; --stageInk:#e3ecf0;
+  --ar:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f171c; --sheet:#141f26; --ink:#e3ecf0; --muted:#93a5af; --grid:#1f2d35; --chip:#1d2a32;
+  --accent:#3cc9b5; --dim:#f08a6e; --warn:#e5a84a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f171c; --sheet:#141f26; --ink:#e3ecf0; --muted:#93a5af; --grid:#1f2d35; --chip:#1d2a32;
+  --accent:#3cc9b5; --dim:#f08a6e; --warn:#e5a84a; color-scheme:dark}
+*{box-sizing:border-box}
+body{direction:rtl;background:var(--paper);color:var(--ink);font-family:var(--ar);font-size:15px;line-height:1.7;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:16px}
+header h1{margin:0;font-size:1.7rem;font-weight:700;text-wrap:balance}
+header p{margin:.2rem 0 0;color:var(--muted);max-width:68ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.85rem;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:1px 10px;border-radius:99px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.tag.code{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.tag.est{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:.86em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .lbl{color:var(--muted);font-size:.85rem;margin-inline-end:4px}
+.chip{font:inherit;font-size:.88rem;display:inline-flex;align-items:center;gap:7px;background:var(--sheet);color:var(--ink);border:1px solid var(--grid);border-radius:99px;padding:3px 12px;cursor:pointer}
+.chip i{width:10px;height:10px;border-radius:3px;background:var(--c,#888);flex:none}
+.chip[aria-pressed="false"]{opacity:.5}
+.chip[aria-pressed="false"] i{background:transparent;outline:1.5px solid var(--c,#888);outline-offset:-1.5px}
+.chip:focus-visible,.vbtn:focus-visible,.drive button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:var(--stage);border-radius:12px;overflow:hidden;height:min(72vh,640px);min-height:340px;touch-action:none;user-select:none}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas.drag{cursor:grabbing}
+.views{position:absolute;top:10px;inset-inline-start:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.vbtn{font:inherit;font-size:.8rem;background:rgba(20,31,38,.85);color:var(--stageInk);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:2px 10px;cursor:pointer}
+.vbtn:hover{border-color:#3cc9b5}
+.hint{position:absolute;bottom:8px;inset-inline-start:12px;font-size:.78rem;color:#93a5af;pointer-events:none}
+.labels{position:absolute;inset:0;pointer-events:none}
+.dl{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);font-size:12px;font-weight:600;direction:ltr;padding:0 6px;border-radius:5px;
+  background:rgba(14,22,27,.85);border:1px solid #3cc9b5;color:#3cc9b5;white-space:nowrap}
+.dl.est{border-color:#e5a84a;color:#e5a84a}
+.side{display:grid;gap:12px;min-width:0}
+.card{background:var(--sheet);border:1px solid var(--grid);border-radius:12px;padding:12px 14px;min-width:0}
+.card h2{margin:0 0 6px;font-size:1rem}
+.info h3{margin:0;font-size:1.15rem}
+.info .en{display:block;color:var(--muted)}
+.info dl{margin:.4rem 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.info dt{color:var(--muted)} .info dd{margin:0}
+.info p{margin:.4rem 0 0}
+.info .clear{font:inherit;font-size:.82rem;margin-top:8px;background:var(--chip);color:var(--ink);border:1px solid var(--grid);border-radius:8px;padding:2px 10px;cursor:pointer}
+.drive .presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.drive button{font:inherit;font-size:.85rem;background:var(--chip);color:var(--ink);border:1px solid var(--grid);border-radius:8px;padding:3px 10px;cursor:pointer}
+.drive button.on{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+.slider{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.slider input{width:100%;accent-color:var(--accent)}
+.out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}
+.out div{background:var(--paper);border-radius:8px;padding:4px 8px}
+.out b{display:block;font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.out span{font-size:.75rem;color:var(--muted)}
+.note{font-size:.84rem;color:var(--muted);margin:.4rem 0 0}
+.warnline{color:var(--dim);font-size:.84rem;margin:.3rem 0 0}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:640px}
+th,td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.82rem}
+tbody tr{cursor:pointer}
+tbody tr:hover,tbody tr.sel{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" dir="rtl" lang="ar">
+<header>
+  <h1>أبعاد الروبوت</h1>
+  <p>الروبوت 3D بالمقاس الحقيقي بالسنتيمتر. اسحب بالماوس علشان تلف حواليه من كل ناحية، فوق وتحت، والعجلة للتقريب. دوس على أي حتة علشان تشوف مقاسها، والباقي يبهت.</p>
+</header>
+<div class="legend">
+  <span><span class="tag code">من الكود</span> رقم مكتوب في كود المحاكاة</span>
+  <span><span class="tag est">تقدير للرسم</span> المحاكاة من فوق بس، فالارتفاعات وأماكن اللي جوه مقترحة</span>
+</div>
+<div class="chips" id="parts" role="group" aria-label="القطع"><span class="lbl">القطع:</span></div>
+<div class="chips" id="extras" role="group" aria-label="الإضافات"><span class="lbl">اعرض:</span></div>
+
+<div class="main">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="الروبوت 3D: اسحب علشان تلف حواليه"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="views" role="group" aria-label="زوايا جاهزة">
+      <button class="vbtn" data-v="iso">مايل</button>
+      <button class="vbtn" data-v="top">من فوق</button>
+      <button class="vbtn" data-v="side">من الجنب</button>
+      <button class="vbtn" data-v="front">من قدّام</button>
+      <button class="vbtn" data-v="bottom">من تحت</button>
+    </div>
+    <div class="hint">اسحب: لف · العجلة أو صباعين: تقريب · دبل كليك: رجوع</div>
+  </div>
+  <div class="side">
+    <div class="card info" id="info" aria-live="polite"></div>
+    <div class="card drive">
+      <h2>الحركة</h2>
+      <div class="presets" role="group" aria-label="حركات جاهزة">
+        <button data-p="0,0">واقف</button>
+        <button data-p="0.3,0" class="on">مستقيم</button>
+        <button data-p="0.2,0.6">يلف شمال</button>
+        <button data-p="0.2,-0.6">يلف يمين</button>
+        <button data-p="0,0.9">في مكانه</button>
+      </div>
+      <div class="slider"><label for="v">لقدّام</label><input type="range" id="v" min="-0.4" max="0.4" step="0.05" value="0.3"><span class="ltr" id="vOut"></span></div>
+      <div class="slider"><label for="w">اللف</label><input type="range" id="w" min="-1.2" max="1.2" step="0.1" value="0"><span class="ltr" id="wOut"></span></div>
+      <div class="out">
+        <div><span>الجنب الشمال</span><b id="lOut"></b></div>
+        <div><span>الجنب اليمين</span><b id="rOut"></b></div>
+        <div><span>بيلف حوالين</span><b id="icrOut"></b></div>
+      </div>
+      <p class="note">نفس معادلة البرنامج: سرعة الجنب = (لقدّام ∓ اللف × 15 سم) ÷ 5 سم. العجل بيلف على قد السرعة، والدايرة الحمرا على الأرض هي اللي بيلف حواليها.</p>
+      <p class="warnline" id="sat" hidden>جنب عدّى أقصى سرعة، فالبرنامج بيقلّل الاتنين بنفس النسبة.</p>
+    </div>
+  </div>
+</div>
+
+<section class="card">
+  <h2>كل المقاسات</h2>
+  <div class="tablebox"><table>
+    <thead><tr><th>الجزء</th><th>بالإنجليزي</th><th>المقاس (سم)</th><th>المكان (سم)</th><th>المصدر</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <p class="note">المكان من نص الروبوت (بين العجل الأربعة): «قدّام» موجب، و«شمال» موجب، والارتفاع من الأرض. السونار والكاميرا: أرقام بيئة الكهف.</p>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+if (!window.THREE) { $("stage").innerHTML = '<p style="color:#e3ecf0;padding:20px">الرسمة 3D محتاجة نت علشان تحمّل. جرّب تاني.</p>'; return; }
+const R = {wheelR:5, wheelW:4, track:30, wheelbase:20, bodyR:20, deckZ:11, deckT:1.4,
+  sonarZ:16.5, irX:14, irZ:13.4, irY:[0,15,-15], camX:14, camZ:26, camLook:80, antX:-13, antTop:36, cliffZ:9,
+  cliff:[[32,12],[32,-12],[0,26],[0,-26],[-32,12],[-32,-12]]};
+const V = (x, y, z) => new THREE.Vector3(x, z, -y);   // robot (x forward, y left, z up) -> three
+
+const PARTS = [
+  {id:"wheels", ar:"العجل (4)", en:"Wheels ×4", size:"قطر 10 · عرض 4", pos:"قدّام وورا ±10 · الجنب ±15", src:"code",
+   file:"sim/config.py → wheel_radius", text:"نص القطر 5 سم من الكود. العرض والمسافة القدامية/الورانية تقدير. كل موتور بيلف العجلتين اللي في جنبه."},
+  {id:"track", ar:"المسافة بين الجنبين", en:"Track (wheel_base)", size:"30", pos:"بين نص العجلتين", src:"code",
+   file:"sim/config.py → wheel_base = 0.30", text:"الرقم اللي بيدخل في معادلة اللف: كل ما يكبر، الروبوت يحتاج فرق سرعة أكبر علشان يلف بنفس السرعة."},
+  {id:"wheelbase", ar:"بين العجلة القدامية والورانية", en:"Wheelbase (front–rear)", size:"20", pos:"±10", src:"est",
+   file:"", text:"المحاكاة بتعامل كل جنب كأنه عجلة واحدة، فالرقم ده مش في الكود. 20 سم بتخلي العجل جوه حدود الروبوت تقريبًا."},
+  {id:"body", ar:"حدود التصادم والسطح", en:"Body / collision circle", size:"قطر 40", pos:"في النص", src:"code",
+   file:"sim/config.py → robot_radius = 0.20", text:"المحاكاة بتعتبر الروبوت دائرة نص قطرها 20 سم: لو الدائرة لمست حيطة يبقى خبط. علشان كده السطح اللي فوق دائرة بنفس المقاس، والسونار متركّب على حرفها."},
+  {id:"chassis", ar:"الشاسيه", en:"Chassis box", size:"28 × 22 × 7", pos:"تحت السطح، بين العجل", src:"est",
+   file:"", text:"الصندوق اللي فيه الموتورين والـ gearbox والـ H-bridge والبطارية. مقاسه تقدير علشان يدخل بين العجل."},
+  {id:"motors", ar:"موتورين DC", en:"2 × DC motor 12 V, gearbox 30:1", size:"موتور لكل جنب", pos:"جوه الشاسيه، ±7", src:"code",
+   file:"sim/config.py → MotorConfig", text:"12 فولت، والـ gearbox بيقلل السرعة 30 مرة. مكانهم جوه الشاسيه تقدير."},
+  {id:"encoders", ar:"الـ encoders", en:"Encoders ×2", size:"480 نبضة لكل لفة عجلة", pos:"على عمود كل موتور", src:"code",
+   file:"sim/config.py → encoder_ticks = 16 × gear 30", text:"16 نبضة في لفة الموتور × 30 = 480 في لفة العجلة. بيقيس لفّ العجلة، مش حركة الروبوت على الأرض."},
+  {id:"sonar", ar:"السونار (8)", en:"Sonar ring ×8", size:"مدى 250 · مخروط 15°", pos:"على دائرة نص قطرها 20، كل 45°", src:"code",
+   file:"sim/sensors/suite.py + config.py (cave)", text:"S0 لقدّام، S2 شمال، S4 لورا، S6 يمين. المدى 2.5 متر في الكهف (5 على المريخ)، فالرسمة بتقطعه عند 40 سم. ارتفاعه 16.5 سم تقدير."},
+  {id:"ir", ar:"الـ IR (3)", en:"IR distance ×3", size:"من 6 لـ 80", pos:"قدّام 14 · الجنب 0 و±15", src:"code",
+   file:"sim/sensors/suite.py → ir_offsets", text:"التلاتة باصين لقدّام وموزّعين على عرض الروبوت، علشان يغطّوا الحتة اللي بين مخاريط السونار. أقل من 6 سم القراية بتغلط، علشان كده هما راجعين لجوه 6 سم. ارتفاعهم 13.4 سم تقدير، فوق السطح، علشان يبقوا فوق العجل القدامي."},
+  {id:"cliff", ar:"حساسات الحفر (6)", en:"Cliff sensors ×6", size:"6 نقط على الأرض", pos:"قدّام 32 · الجنب 26 · ورا 32", src:"code",
+   file:"sim/sensors/suite.py → cliff_lookahead = 0.12", text:"الأرقام دي هي النقط اللي بيبصوا عليها على الأرض: 12 سم برا الروبوت قدّام وورا، و6 سم على الجنب. اتنين ورا لأن الروبوت بيرجع لورا وهو بيهرب."},
+  {id:"bumper", ar:"الـ bumpers (2)", en:"Bumpers L / R", size:"شريط قدّام", pos:"على حرف السطح القدّامي", src:"code",
+   file:"sim/sensors/range_sensors.py → Bumper", text:"نصّين، شمال ويمين، على الحتة القدامية من الدائرة. بيقفل لما الروبوت يخبط من قدّام."},
+  {id:"camera", ar:"الكاميرا", en:"Camera, tilted down", size:"بتشوف 80 قدّام", pos:"ارتفاع 26 · ميل محسوب", src:"code",
+   file:"sim/config.py → camera_range (cave 0.6 + 0.2)", text:"بتصوّر حتة أرض على بعد 80 سم من نص الروبوت في الكهف (140 على المريخ). الصورة 16×16 بتروح لمصنّف الأرض. الارتفاع والميل تقدير محسوب من المسافة دي."},
+  {id:"imu", ar:"الـ gyro والـ compass والـ accel", en:"IMU + compass", size:"—", pos:"في النص", src:"code",
+   file:"sim/sensors/suite.py", text:"في نص الروبوت بالظبط، علشان اللف في المكان ما يحسبش كأنه حركة."},
+  {id:"battery", ar:"البطارية", en:"Battery 18 Wh (cave)", size:"18 Wh", pos:"جوه الشاسيه، ورا", src:"code",
+   file:"sim/config.py → battery_wh", text:"السعة من الكود (18 في الكهف). مكانها جوه الشاسيه تقدير."},
+  {id:"antenna", ar:"الهوائي (الراديو)", en:"Radio antenna", size:"طوله 36 من الأرض", pos:"ورا · −13", src:"est",
+   file:"", text:"مدى الراديو 18 متر في الكهف من الكود. مكان الهوائي وطوله تقدير."},
+  {id:"flow", ar:"الـ optical flow", en:"Optical-flow sensor", size:"تحت الروبوت", pos:"في النص، باصص للأرض", src:"est",
+   file:"", text:"موجود في الكهف والمريخ (من الكود). بيقيس حركة الأرض تحته، فبيعرف لو العجل بيزحلق. مكانه تقدير."}
+];
+
+PARTS.push({id:"ctrl", ar:"المتحكم", en:"Controller board", size:"8 × 9", pos:"جوه الشاسيه، فوق الموتورين", src:"est", file:"",
+  text:"لوحة واحدة بتلف لوب كل 50 ملّي ثانية. المحاكاة فيها متحكم واحد؛ مكانه ومقاسه هنا تقدير."});
+
+// ------------------------------------------------------------------ scene
+const canvas = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, preserveDrawingBuffer:false});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e161b);
+scene.fog = new THREE.Fog(0x0e161b, 260, 520);
+const cam = new THREE.PerspectiveCamera(38, 16 / 9, 1, 2000);
+scene.add(new THREE.HemisphereLight(0xdfeff5, 0x1a2328, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(80, 160, 60); scene.add(sun);
+const fill = new THREE.DirectionalLight(0x9fd8ff, 0.3); fill.position.set(-100, 60, -80); scene.add(fill);
+
+// ground with a 10 cm grid
+{ const g = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.MeshStandardMaterial({color:0x2a3a44, roughness:1}));
+  g.rotation.x = -Math.PI / 2; scene.add(g);
+  const grid = new THREE.GridHelper(600, 60, 0x3d5260, 0x34474f); grid.position.y = 0.05; scene.add(grid); }
+
+const C = {body:0x8b99a2, body2:0x56656e, tire:0x1b2227, hub:0x9aaab3, sonar:0x3cc9b5, ir:0xf08a6e, cliff:0xe5a84a, dark:0x2a3238, accent:0x3cc9b5};
+const mat = (color, o = {}) => new THREE.MeshStandardMaterial({color, roughness:.55, metalness:.08, transparent:true, opacity:1, ...o});
+const robot = new THREE.Group(); scene.add(robot);
+const parts = {};                                       // key -> list of meshes (for highlight)
+const add = (key, mesh, parent = robot) => { (parts[key] = parts[key] || []).push(mesh); mesh.userData.key = key; parent.add(mesh); return mesh; };
+
+// contact shadow
+{ const cv = document.createElement("canvas"); cv.width = cv.height = 128; const x = cv.getContext("2d");
+  const gr = x.createRadialGradient(64, 64, 10, 64, 64, 64); gr.addColorStop(0, "rgba(0,0,0,.55)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+  const s = new THREE.Mesh(new THREE.PlaneGeometry(56, 56), new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv), transparent:true, depthWrite:false}));
+  s.rotation.x = -Math.PI / 2; s.position.y = .1; robot.add(s); }
+
+// wheels: each side's two wheels share one angle
+const wheels = {L:[], R:[]};
+for (const sx of [1, -1]) for (const [side, sy] of [["L", 1], ["R", -1]]) {
+  const g = new THREE.Group(); g.position.copy(V(sx * R.wheelbase / 2, sy * R.track / 2, R.wheelR));
+  const tire = new THREE.Mesh(new THREE.CylinderGeometry(R.wheelR, R.wheelR, R.wheelW, 40), mat(C.tire, {roughness:.9}));
+  tire.rotation.x = Math.PI / 2; g.add(tire); (parts.wheels = parts.wheels || []).push(tire);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, R.wheelW + .3, 24), mat(C.hub)); hub.rotation.x = Math.PI / 2; g.add(hub);
+  for (let k = 0; k < 10; k++) {                            // tread blocks so the turning shows
+    const a = k / 10 * Math.PI * 2, b = new THREE.Mesh(new THREE.BoxGeometry(1.6, .8, R.wheelW + .2), mat(0x323c43));
+    b.position.set(Math.cos(a) * (R.wheelR + .1), Math.sin(a) * (R.wheelR + .1), 0); b.rotation.z = a + Math.PI / 2; g.add(b);
+  }
+  const spoke = new THREE.Mesh(new THREE.BoxGeometry(4.2, .9, R.wheelW + .5), mat(C.cliff)); g.add(spoke);
+  g.traverse(n => n.userData.key = "wheels"); robot.add(g); wheels[side].push(g);
+}
+// chassis, deck, top box
+const shell = [];
+shell.push(add("chassis", new THREE.Mesh(new THREE.BoxGeometry(28, 7, 22), mat(C.body2))));
+parts.chassis[0].position.copy(V(0, 0, 7.5));
+shell.push(add("deck", new THREE.Mesh(new THREE.CylinderGeometry(R.bodyR, R.bodyR, R.deckT, 64), mat(C.body))));
+parts.deck[0].position.copy(V(0, 0, R.deckZ + R.deckT / 2));
+shell.push(add("deck", new THREE.Mesh(new THREE.BoxGeometry(20, 5.5, 16), mat(0x6c7a83, {roughness:.8}))));
+parts.deck[1].position.copy(V(0, 0, R.deckZ + R.deckT + 2.75));
+// sonar ring + 8 transducers
+const sonarRing = add("sonar", new THREE.Mesh(new THREE.CylinderGeometry(R.bodyR + .2, R.bodyR + .2, 2.2, 64, 1, true), mat(0x56707d, {side:THREE.DoubleSide})));
+sonarRing.position.copy(V(0, 0, R.sonarZ)); shell.push(sonarRing);
+const posts = [];
+for (let i = 0; i < 8; i++) {
+  const a = i * Math.PI / 4;
+  const s = add("sonar", new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 1.6, 24), mat(C.sonar, {emissive:0x0b3b35})));
+  s.position.copy(V((R.bodyR + .9) * Math.cos(a), (R.bodyR + .9) * Math.sin(a), R.sonarZ));
+  s.rotation.order = "YXZ"; s.rotation.y = a; s.rotation.z = Math.PI / 2;
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, R.sonarZ - R.deckZ - R.deckT - 1, 8), mat(0x56707d));
+  p.position.copy(V(R.bodyR * .97 * Math.cos(a + .39), R.bodyR * .97 * Math.sin(a + .39), (R.sonarZ + R.deckZ + R.deckT) / 2 - .5)); p.userData.key = "sonar"; robot.add(p); posts.push(p);
+}
+// IR x3 on the front of the deck
+for (const y of R.irY) {
+  const b = add("ir", new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.6, 3.6), mat(C.ir, {emissive:0x3a1408})));
+  b.position.copy(V(R.irX, y, R.irZ));
+}
+// cliff sensors under the deck rim
+const cliffMount = [[17, 10], [17, -10], [0, 19.5], [0, -19.5], [-17, 10], [-17, -10]];
+for (const [x, y] of cliffMount) { const b = add("cliff", new THREE.Mesh(new THREE.BoxGeometry(2, 1.6, 2), mat(C.cliff, {emissive:0x3a2504}))); b.position.copy(V(x, y, R.cliffZ)); }
+// bumpers: two arcs on the front of the deck
+for (const s of [1, -1]) {
+  const th0 = s > 0 ? 4 : -52, len = 48;
+  const geo = new THREE.CylinderGeometry(R.bodyR + 1.2, R.bodyR + 1.2, 2.2, 32, 1, true, 0, len * Math.PI / 180);
+  const m = add("bumper", new THREE.Mesh(geo, mat(0x39444b, {side:THREE.DoubleSide})));
+  // CylinderGeometry theta starts on +Z and goes toward +X; robot angle a maps to three angle (a + 90°)
+  m.rotation.y = (th0 + 90) * Math.PI / 180 - Math.PI / 2 + Math.PI / 2;
+  m.position.y = 8.6;
+}
+// camera on a mast
+const tilt = Math.atan2(R.camZ, R.camLook - R.camX);
+{ const mast = add("camera", new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, R.camZ - R.deckZ - R.deckT, 12), mat(C.dark)));
+  mast.position.copy(V(R.camX - 2, 0, (R.camZ + R.deckZ + R.deckT) / 2));
+  const cg = new THREE.Group(); cg.position.copy(V(R.camX, 0, R.camZ)); cg.rotation.z = -tilt; robot.add(cg);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(5, 3.2, 4), mat(C.dark)); cg.add(body); parts.camera.push(body);
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1.2, 20), mat(C.sonar, {emissive:0x0e4a42})); lens.rotation.z = Math.PI / 2; lens.position.x = 3; cg.add(lens); parts.camera.push(lens); cg.traverse(n => n.userData.key = "camera"); }
+// IMU + antenna
+const imu = add("imu", new THREE.Mesh(new THREE.BoxGeometry(3, 1.4, 3), mat(0xe9eef0)));
+imu.position.copy(V(0, 0, R.deckZ + R.deckT + 5.5 + .7));
+{ const a = add("antenna", new THREE.Mesh(new THREE.CylinderGeometry(.45, .45, R.antTop - R.deckZ - R.deckT, 10), mat(C.dark)));
+  a.position.copy(V(R.antX, 0, (R.antTop + R.deckZ + R.deckT) / 2));
+  const k = add("antenna", new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), mat(C.dark))); k.position.copy(V(R.antX, 0, R.antTop)); }
+
+// inside: motors, gearboxes, encoders, battery, shafts to both wheels of a side
+const inside = new THREE.Group(); robot.add(inside);
+for (const [side, sy] of [["L", 1], ["R", -1]]) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.1, 9, 24), mat(0xb0b8bd, {metalness:.5})); m.rotation.z = Math.PI / 2; m.position.copy(V(-1, sy * 6.5, 7.5)); inside.add(m); (parts.motors = parts.motors || []).push(m);
+  const gb = new THREE.Mesh(new THREE.BoxGeometry(4, 5, 5), mat(0x6c7a83)); gb.position.copy(V(5.5, sy * 6.5, 7.5)); inside.add(gb); parts.motors.push(gb);
+  const en = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, .8, 24), mat(C.sonar, {emissive:0x0e4a42})); en.rotation.z = Math.PI / 2; en.position.copy(V(-6, sy * 6.5, 7.5)); inside.add(en); (parts.encoders = parts.encoders || []).push(en);
+  for (const sx of [1, -1]) {                               // a drive belt to each wheel of this side
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(sx * 10 - (sx > 0 ? 5.5 : -1)) + 2, .9, .9), mat(C.cliff));
+    belt.position.copy(V((sx * 10 + (sx > 0 ? 5.5 : -1)) / 2, sy * 12.5, 6)); inside.add(belt); parts.motors.push(belt);
+  }
+  const ax = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, 7, 10), mat(0x8a959b)); ax.rotation.x = Math.PI / 2; ax.position.copy(V(5.5, sy * 10, 6)); inside.add(ax);
+}
+const bat = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 12), mat(C.cliff, {emissive:0x2a1a02})); bat.position.copy(V(-9.5, 0, 7.5)); inside.add(bat); parts.battery = [bat];
+const ctrl = new THREE.Mesh(new THREE.BoxGeometry(8, 1, 9), mat(0x2f6b4f)); ctrl.position.copy(V(-1, 0, 10.2)); inside.add(ctrl);
+const flow = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 3), mat(C.sonar)); flow.position.copy(V(0, 0, 3.5)); inside.add(flow);
+bat.userData.key = "battery"; ctrl.userData.key = "ctrl"; flow.userData.key = "flow";
+for (const m of parts.encoders) m.userData.key = "encoders";
+inside.traverse(n => { n.userData.inside = true; if (n.isMesh && !n.userData.key) n.userData.key = "motors"; });
+
+// ------------------------------------------------------------------ effects
+
+const fx = {};
+const efx = k => { const g = new THREE.Group(); robot.add(g); fx[k] = g; return g; };
+const glow = (color, o) => new THREE.MeshBasicMaterial({color, transparent:true, opacity:o, depthWrite:false, side:THREE.DoubleSide});
+{ // sonar cones + echoes
+  const g = efx("sonar"); g.userData.echo = [];
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4, L = 60, rr = Math.tan(7.5 * Math.PI / 180) * L;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(rr, L, 32, 1, true), glow(C.sonar, .16));
+    const holder = new THREE.Group(); holder.position.copy(V(R.bodyR + 1.5, 0, R.sonarZ).applyAxisAngle(new THREE.Vector3(0, 1, 0), a));
+    holder.rotation.y = a; g.add(holder);
+    cone.rotation.z = Math.PI / 2; cone.position.x = L / 2; holder.add(cone);
+    const echo = new THREE.Mesh(new THREE.TorusGeometry(1, .18, 6, 32), glow(C.sonar, .8)); echo.rotation.y = Math.PI / 2; holder.add(echo); g.userData.echo.push(echo);
+  }
+}
+{ const g = efx("ir");
+  for (const y of R.irY) { const L = 80, b = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, L, 8), glow(C.ir, .85)); b.rotation.z = Math.PI / 2; b.position.copy(V(R.irX + 1 + L / 2, y, R.irZ)); g.add(b); }
+}
+{ const g = efx("cliff");
+  cliffMount.forEach(([x, y], i) => {
+    const a = V(x, y, R.cliffZ), b = V(R.cliff[i][0], R.cliff[i][1], 0.2), d = b.clone().sub(a);
+    const ray = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, d.length(), 8), glow(C.cliff, .85));
+    ray.position.copy(a.clone().add(b).multiplyScalar(.5)); ray.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize()); g.add(ray);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(2, 2.8, 32), glow(C.cliff, .9)); ring.rotation.x = -Math.PI / 2; ring.position.copy(b); g.add(ring);
+  });
+}
+{ const g = efx("camera");
+  const cv = document.createElement("canvas"); cv.width = cv.height = 16; const x = cv.getContext("2d");
+  for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++) { const v = 90 + ((i * 7 + j * 13) % 9) * 12 + (Math.sin(i * .9 + j * .4) > .3 ? 40 : 0); x.fillStyle = `rgb(${v},${v - 6},${v - 18})`; x.fillRect(i, j, 1, 1); }
+  const tex = new THREE.CanvasTexture(cv); tex.magFilter = THREE.NearestFilter;
+  const patch = new THREE.Mesh(new THREE.PlaneGeometry(14, 10), new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:1}));
+  patch.rotation.x = -Math.PI / 2; patch.position.copy(V(R.camLook, 0, .3)); g.add(patch);
+  const o = V(R.camX + 3, 0, R.camZ), corners = [[-7, -5], [7, -5], [7, 5], [-7, 5]].map(([a, b]) => V(R.camLook + a, b, .3));
+  const pts = []; for (const c of corners) pts.push(o, c);
+  for (let i = 0; i < 4; i++) pts.push(corners[i], corners[(i + 1) % 4]);
+  g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color:C.ir, transparent:true, opacity:.9})));
+  const fr = new THREE.Mesh(new THREE.BufferGeometry().setFromPoints([o, corners[0], corners[1], o, corners[1], corners[2], o, corners[2], corners[3], o, corners[3], corners[0]]), glow(C.ir, .1)); g.add(fr);
+}
+{ const g = efx("imu");
+  const c = V(0, 0, R.deckZ + R.deckT + 7);
+  for (const [d, col] of [[V(1, 0, 0), 0xf08a6e], [V(0, 1, 0), 0x3cc9b5], [V(0, 0, 1), 0xe9eef0]]) g.add(new THREE.ArrowHelper(d, c, 12, col, 3, 1.6));
+  g.userData.rings = [];
+  for (let i = 0; i < 3; i++) { const r = new THREE.Mesh(new THREE.TorusGeometry(1, .12, 6, 40), glow(C.sonar, .7)); r.rotation.x = Math.PI / 2; r.position.copy(V(R.antX, 0, R.antTop)); g.add(r); g.userData.rings.push(r); }
+}
+{ const g = efx("drive"); g.userData.arrows = {};
+  for (const [side, sy] of [["L", 1], ["R", -1]]) { const a = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), V(0, sy * (R.track / 2 + 6), 1), 10, C.sonar, 3, 2); g.add(a); g.userData.arrows[side] = a; } }
+
+const solid = []; robot.traverse(n => { if (n.isMesh && n.userData.key && !(n.material instanceof THREE.MeshBasicMaterial)) solid.push(n); });
+
+// ------------------------------------------------------------------ layers
+const KEY2PART = {deck:"body", chassis:"chassis", wheels:"wheels", sonar:"sonar", ir:"ir", cliff:"cliff", bumper:"bumper", camera:"camera",
+  imu:"imu", antenna:"antenna", motors:"motors", encoders:"encoders", battery:"battery", flow:"flow", ctrl:"ctrl"};
+const LAYERS = [
+  {id:"body", ar:"الجسم", keys:["deck", "chassis"], c:"#8b99a2", on:true},
+  {id:"wheels", ar:"العجل", keys:["wheels"], c:"#56656e", on:true},
+  {id:"sonar", ar:"السونار", keys:["sonar"], c:"#3cc9b5", on:true},
+  {id:"ir", ar:"حساسات المسافة", keys:["ir"], c:"#f08a6e", on:true},
+  {id:"cliff", ar:"حساسات الحفر", keys:["cliff"], c:"#e5a84a", on:true},
+  {id:"bumper", ar:"شرايط الخبط", keys:["bumper"], c:"#7b8790", on:true},
+  {id:"camera", ar:"الكاميرا", keys:["camera"], c:"#2a3238", on:true},
+  {id:"imu", ar:"حساسات الاتجاه", keys:["imu"], c:"#e9eef0", on:true},
+  {id:"antenna", ar:"الهوائي", keys:["antenna"], c:"#2a3238", on:true},
+  {id:"inside", ar:"اللي جوه", keys:["motors", "encoders", "battery", "ctrl", "flow"], c:"#b0b8bd", on:false}
+];
+const EXTRAS = [
+  {id:"beams", ar:"مدى السنسورز", c:"#3cc9b5", on:false},
+  {id:"dims", ar:"المقاسات", c:"#f08a6e", on:true},
+  {id:"move", ar:"أسهم الحركة", c:"#3cc9b5", on:true}
+];
+const state = Object.fromEntries([...LAYERS, ...EXTRAS].map(l => [l.id, l.on]));
+const layerOfKey = {}; for (const l of LAYERS) for (const k of l.keys) layerOfKey[k] = l.id;
+function chip(box, l) {
+  const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.style.setProperty("--c", l.c);
+  b.setAttribute("aria-pressed", String(state[l.id])); b.innerHTML = "<i></i>"; b.append(l.ar);
+  b.onclick = () => { state[l.id] = !state[l.id]; b.setAttribute("aria-pressed", String(state[l.id])); if (!state[l.id] && sel && (PART2LAYER[sel] === l.id)) select(null); };
+  box.appendChild(b);
+}
+LAYERS.forEach(l => chip($("parts"), l)); EXTRAS.forEach(l => chip($("extras"), l));
+const PART2LAYER = {}; for (const [k, p] of Object.entries(KEY2PART)) PART2LAYER[p] = layerOfKey[k];
+
+// ------------------------------------------------------------------ dimensions (lines in 3D, labels in HTML)
+const DIMS = [
+  {a:[-10, 15, .3], b:[-10, -15, .3], t:"30", src:"code"},
+  {a:[10, -21, .3], b:[-10, -21, .3], t:"20", src:"est"},
+  {a:[0, 20, 12.6], b:[0, -20, 12.6], t:"Ø 40", src:"code"},
+  {a:[10, 18.5, 0], b:[10, 18.5, 10], t:"Ø 10", src:"code"},
+  {a:[-21, 0, 0], b:[-21, 0, 12.4], t:"12.4", src:"est"},
+  {a:[14, -4, 0], b:[14, -4, 26], t:"26", src:"est"},
+  {a:[-13, -4, 0], b:[-13, -4, 36], t:"36", src:"est"},
+  {a:[0, 0, .4], b:[80, 0, .4], t:"80", src:"code"}
+];
+const dimG = new THREE.Group(); robot.add(dimG);
+const dimMat = {code:new THREE.LineBasicMaterial({color:0x3cc9b5, depthTest:false, transparent:true}), est:new THREE.LineBasicMaterial({color:0xe5a84a, depthTest:false, transparent:true})};
+for (const d of DIMS) {
+  const a = V(...d.a), b = V(...d.b), dir = b.clone().sub(a).normalize();
+  const n = Math.abs(dir.y) > .9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+  const tick = n.clone().multiplyScalar(1.6), pts = [a, b, a.clone().add(tick), a.clone().sub(tick), b.clone().add(tick), b.clone().sub(tick)];
+  const l = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), dimMat[d.src]); l.renderOrder = 10; dimG.add(l);
+  d.mid = a.clone().add(b).multiplyScalar(.5);
+  d.el = document.createElement("span"); d.el.className = "dl" + (d.src === "est" ? " est" : ""); d.el.textContent = d.t; $("labels").appendChild(d.el);
+}
+// the point it turns around
+const icr = new THREE.Group(); robot.add(icr);
+const icrRing = new THREE.Mesh(new THREE.RingGeometry(.97, 1, 96), new THREE.MeshBasicMaterial({color:0xf08a6e, transparent:true, opacity:.75, side:THREE.DoubleSide, depthWrite:false}));
+icrRing.rotation.x = -Math.PI / 2; icrRing.position.y = .25; icr.add(icrRing);
+const icrDot = new THREE.Mesh(new THREE.CircleGeometry(1.4, 24), new THREE.MeshBasicMaterial({color:0xf08a6e, side:THREE.DoubleSide})); icrDot.rotation.x = -Math.PI / 2; icrDot.position.y = .3; icr.add(icrDot);
+
+// ------------------------------------------------------------------ orbit camera
+const stage = $("stage");
+const O = {th:-0.85, ph:1.02, r:125, tx:0, ty:9, tz:0};
+const VIEWS = {iso:{th:-0.85, ph:1.02, r:125}, top:{th:Math.PI, ph:0.03, r:150}, side:{th:-Math.PI / 2, ph:Math.PI / 2 - .04, r:115},
+  front:{th:0, ph:Math.PI / 2 - .04, r:110}, bottom:{th:Math.PI, ph:Math.PI - .05, r:120}};
+let goal = null;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function placeCam() {
+  const s = Math.sin(O.ph);
+  cam.position.set(O.tx + O.r * s * Math.cos(O.th), O.ty + O.r * Math.cos(O.ph), O.tz + O.r * s * Math.sin(O.th));
+  cam.up.set(0, 1, 0);
+  if (O.ph < .08 || O.ph > Math.PI - .08) cam.up.set(-Math.cos(O.th), 0, -Math.sin(O.th));   // straight above / below: keep the front up
+  cam.lookAt(O.tx, O.ty, O.tz);
+}
+const ptrs = new Map(); let moved = 0, pinch0 = 0, r0 = 0;
+canvas.addEventListener("pointerdown", e => { canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY}); moved = 0; goal = null; canvas.classList.add("drag");
+  if (ptrs.size === 2) { const [p, q] = [...ptrs.values()]; pinch0 = Math.hypot(p.x - q.x, p.y - q.y); r0 = O.r; } });
+canvas.addEventListener("pointermove", e => {
+  const p = ptrs.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+  if (ptrs.size === 1) { O.th += dx * .0085; O.ph = clamp(O.ph - dy * .0085, .03, Math.PI - .03); }
+  else if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0) O.r = clamp(r0 * pinch0 / d, 40, 420); }
+});
+const up = e => { const wasClick = ptrs.size === 1 && moved < 6; ptrs.delete(e.pointerId); if (!ptrs.size) canvas.classList.remove("drag"); if (wasClick && e.type === "pointerup") pick(e); };
+canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", up);
+canvas.addEventListener("wheel", e => { e.preventDefault(); goal = null;
+  // a touchpad pinch arrives as small wheel steps with ctrlKey set: give it more weight than a mouse wheel notch
+  const px = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+  O.r = clamp(O.r * Math.exp(px * (e.ctrlKey ? .012 : .0025)), 40, 420); }, {passive:false});
+const rf = () => cam.aspect < 1 ? 1.75 : 1;   // a tall phone screen needs the camera further back
+canvas.addEventListener("dblclick", () => { goal = {...VIEWS.iso, r:VIEWS.iso.r * rf()}; });
+document.querySelectorAll(".vbtn").forEach(b => b.onclick = () => { goal = {...VIEWS[b.dataset.v]}; goal.r *= rf();
+  // turn the short way round
+  while (goal.th - O.th > Math.PI) goal.th -= 2 * Math.PI; while (O.th - goal.th > Math.PI) goal.th += 2 * Math.PI; });
+
+// ------------------------------------------------------------------ picking + selection
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+let sel = null;
+function pick(e) {
+  const r = canvas.getBoundingClientRect();
+  mouse.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(mouse, cam);
+  const hit = ray.intersectObjects(solid.filter(m => m.visible && m.material.opacity > .3), false)[0];
+  select(hit ? KEY2PART[hit.object.userData.key] : null);
+}
+const byId = Object.fromEntries(PARTS.map(p => [p.id, p]));
+function select(id) {
+  sel = id && byId[id] ? id : null;
+  if (sel && PART2LAYER[sel] && !state[PART2LAYER[sel]]) { state[PART2LAYER[sel]] = true; syncChips(); }
+  document.querySelectorAll("#rows tr").forEach(r => r.classList.toggle("sel", r.dataset.id === sel));
+  const info = $("info"); info.innerHTML = "";
+  if (!sel) {
+    const h = document.createElement("h3"); h.textContent = "دوس على أي حتة"; info.appendChild(h);
+    const p = document.createElement("p"); p.textContent = "اختار حتة من الروبوت أو من الجدول تحت، وهتلاقي هنا مقاسها ومكانها وجاية منين، والباقي يبهت علشان تبان."; info.appendChild(p);
+    return;
+  }
+  const p = byId[sel];
+  const h = document.createElement("h3"); h.textContent = p.ar; info.appendChild(h);
+  const en = document.createElement("span"); en.className = "en ltr"; en.textContent = p.en; info.appendChild(en);
+  const dl = document.createElement("dl");
+  const row = (k, v, ltr) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); if (v instanceof Node) dd.appendChild(v); else dd.textContent = v; if (ltr) dd.className = "ltr"; dl.append(dt, dd); };
+  row("المقاس (سم)", p.size); row("المكان (سم)", p.pos);
+  const tg = document.createElement("span"); tg.className = "tag " + p.src; tg.textContent = p.src === "code" ? "من الكود" : "تقدير للرسم"; row("المصدر", tg);
+  if (p.file) row("الملف", p.file, true);
+  info.appendChild(dl);
+  const t = document.createElement("p"); t.textContent = p.text; info.appendChild(t);
+  const c = document.createElement("button"); c.className = "clear"; c.type = "button"; c.textContent = "رجّع الكل"; c.onclick = () => select(null); info.appendChild(c);
+}
+function syncChips() {
+  document.querySelectorAll("#parts .chip").forEach((b, i) => b.setAttribute("aria-pressed", String(state[LAYERS[i].id])));
+}
+const rows = $("rows");
+for (const p of PARTS) {
+  const tr = document.createElement("tr"); tr.dataset.id = p.id; tr.tabIndex = 0;
+  const td = (v, cls) => { const c = document.createElement("td"); c.textContent = v; if (cls) c.className = cls; tr.appendChild(c); };
+  td(p.ar); td(p.en, "ltr"); td(p.size); td(p.pos);
+  const c = document.createElement("td"); const tg = document.createElement("span"); tg.className = "tag " + p.src; tg.textContent = p.src === "code" ? "من الكود" : "تقدير للرسم"; c.appendChild(tg); tr.appendChild(c);
+  const go = () => { select(KEY2PART[p.id] ? p.id : (Object.values(KEY2PART).includes(p.id) ? p.id : null) || p.id); stage.scrollIntoView({behavior:"smooth", block:"nearest"}); };
+  tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+  rows.appendChild(tr);
+}
+
+// ------------------------------------------------------------------ drive
+let wl = 0, wr = 0, angL = 0, angR = 0, vNow = 0, wNow = 0;
+function updateDrive() {
+  const v = +$("v").value, w = +$("w").value, L = R.track / 100, r = R.wheelR / 100;
+  let l = (v - w * L / 2) / r, rr = (v + w * L / 2) / r;
+  const m = Math.max(Math.abs(l), Math.abs(rr)); $("sat").hidden = m <= 12;
+  if (m > 12) { l *= 12 / m; rr *= 12 / m; }
+  wl = l; wr = rr; vNow = v; wNow = w;
+  $("vOut").textContent = `${v.toFixed(2)} m/s`; $("wOut").textContent = `${w.toFixed(1)} rad/s`;
+  $("lOut").textContent = `${l.toFixed(1)} rad/s`; $("rOut").textContent = `${rr.toFixed(1)} rad/s`;
+  $("icrOut").textContent = Math.abs(w) < 1e-6 ? (Math.abs(v) < 1e-6 ? "واقف" : "مستقيم") : (Math.abs(v) < 1e-6 ? "نصّه" : `${Math.abs(v / w * 100).toFixed(0)} سم ${w * v > 0 ? "شمال" : "يمين"}`);
+  document.querySelectorAll(".drive .presets button").forEach(b => { const [pv, pw] = b.dataset.p.split(",").map(Number); b.classList.toggle("on", Math.abs(pv - v) < 1e-6 && Math.abs(pw - w) < 1e-6); });
+}
+$("v").oninput = updateDrive; $("w").oninput = updateDrive;
+document.querySelectorAll(".drive .presets button").forEach(b => b.onclick = () => { const [pv, pw] = b.dataset.p.split(",").map(Number); $("v").value = pv; $("w").value = pw; updateDrive(); });
+
+// ------------------------------------------------------------------ frame
+const proj = new THREE.Vector3();
+function frame(now) {
+  const t = now / 1000, dt = Math.min(.05, t - (frame.t || t)); frame.t = t;
+  if (goal) { for (const k of ["th", "ph", "r"]) O[k] += (goal[k] - O[k]) * .14; if (Math.abs(goal.th - O.th) + Math.abs(goal.ph - O.ph) + Math.abs(goal.r - O.r) * .01 < .002) goal = null; }
+  placeCam();
+  // parts: shown / x-ray / selected
+  const selKeys = sel ? Object.keys(KEY2PART).filter(k => KEY2PART[k] === sel) : null;
+  for (const m of solid) {
+    const k = m.userData.key, lay = layerOfKey[k];
+    if (!state[lay]) { m.visible = false; continue; }
+    let o = 1;
+    if (state.inside && (k === "deck" || k === "chassis")) o = .2;
+    if (selKeys && !selKeys.includes(k)) o = Math.min(o, .14);
+    m.visible = true; m.material.opacity = o; m.material.depthWrite = o > .95;
+    if (m.userData.e0 === undefined) m.userData.e0 = m.material.emissive.getHex();
+    if (selKeys && selKeys.includes(k)) { m.material.emissive.setHex(0x1d6b60); m.material.emissiveIntensity = .25 + .2 * Math.sin(t * 4); }
+    else { m.material.emissive.setHex(m.userData.e0); m.material.emissiveIntensity = 1; }
+  }
+  for (const k of ["sonar", "ir", "cliff", "camera", "imu"]) fx[k].visible = state.beams && state[k] && (!sel || sel === k);
+  fx.sonar.userData.echo.forEach((e, k) => { const ph = (t * .8 + k * .07) % 1; e.position.x = 2 + ph * 58; const s = 1 + ph * 7; e.scale.set(s, s, s); e.material.opacity = (1 - ph) * .8; });
+  fx.imu.userData.rings.forEach((r, k) => { const ph = (t * .7 + k / 3) % 1; const s = 1 + ph * 8; r.scale.set(s, s, s); r.material.opacity = (1 - ph) * .7; });
+  // drive: wheels turn at their side's speed (slowed down to follow), arrows, turning point
+  angL += wl * dt * .5; angR += wr * dt * .5;
+  for (const w of wheels.L) w.rotation.z = -angL; for (const w of wheels.R) w.rotation.z = -angR;
+  fx.drive.visible = state.move;
+  for (const [side, sp] of [["L", wl], ["R", wr]]) { const a = fx.drive.userData.arrows[side]; const Ln = Math.max(.01, Math.abs(sp) * 2.2); a.visible = Math.abs(sp) > .05; a.setDirection(new THREE.Vector3(Math.sign(sp) || 1, 0, 0)); a.setLength(Ln, Math.min(3, Ln * .5), 2); }
+  icr.visible = state.move && Math.abs(wNow) > 1e-6;
+  if (icr.visible) { const rc = vNow / wNow * 100; icr.position.copy(V(0, rc, 0)); icrRing.scale.setScalar(Math.max(Math.abs(rc), 2)); icrRing.visible = Math.abs(rc) > 1; }
+  // dimensions
+  dimG.visible = state.dims;
+  const W = stage.clientWidth, H = stage.clientHeight;
+  for (const d of DIMS) {
+    if (!state.dims) { d.el.style.display = "none"; continue; }
+    proj.copy(d.mid).applyMatrix4(robot.matrixWorld).project(cam);
+    const vis = proj.z < 1 && Math.abs(proj.x) < 1.05 && Math.abs(proj.y) < 1.05;
+    d.el.style.display = vis ? "" : "none";
+    if (vis) { d.el.style.left = `${(proj.x + 1) / 2 * W}px`; d.el.style.top = `${(1 - proj.y) / 2 * H}px`; }
+  }
+  renderer.render(scene, cam);
+  requestAnimationFrame(frame);
+}
+function size() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(stage);
+scene.fog = null; scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--stage").trim() || "#0e161b");
+size(); O.r *= rf(); updateDrive(); select(null);
+requestAnimationFrame(frame);
+})();
+</script>
+</html>

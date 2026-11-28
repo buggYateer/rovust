@@ -295,6 +295,10 @@ def write_pptx(pngs: list[str], order: list[str], name: str):
             k = prs.slide_width / 1920
             slide.shapes.add_movie(video, int(x * k), int(y * k), int(w * k), int(h * k),
                                    poster_frame_image=poster, mime_type="video/mp4")
+            # PowerPoint's "Play Full Screen": a click on the frame plays it over the whole
+            # screen, then the slide comes back
+            for v in slide._element.iter("{http://schemas.openxmlformats.org/presentationml/2006/main}video"):
+                v.set("fullScrn", "1")
         else:
             slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
         # the next slide pushes the old one out; a part-opening slide comes up from below
