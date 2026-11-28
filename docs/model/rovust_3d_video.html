@@ -21,8 +21,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hi
 .brand{position:fixed;top:4vh;right:3vw;font-family:var(--mono);font-size:clamp(12px,1.4vw,28px);letter-spacing:.3em;color:var(--muted)}
 .chap{position:fixed;top:4vh;left:3vw;font-family:var(--ar);direction:rtl;font-size:clamp(12px,1.4vw,28px);color:var(--muted)}
 .title{position:fixed;inset:0;display:grid;place-content:start center;padding-top:14vh;justify-items:center;gap:1.5vh;pointer-events:none}
-.title b{font-family:var(--mono);font-size:clamp(36px,7vw,140px);letter-spacing:.12em}
-.title span{font-family:var(--ar);direction:rtl;font-size:clamp(14px,2vw,40px);color:var(--muted)}
+.title b{font-family:var(--mono);font-size:clamp(36px,7vw,140px);letter-spacing:.12em;color:var(--accent)}
+.title span{font-family:var(--mono);direction:ltr;font-size:clamp(14px,1.9vw,38px);letter-spacing:.08em;color:var(--ink)}
 .bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;padding:8px 14px;background:rgba(0,0,0,.45)}
 .bar button{font:600 14px var(--ar);background:var(--accent);color:#06201c;border:0;border-radius:6px;padding:4px 14px;cursor:pointer}
 .bar input{flex:1;accent-color:var(--accent)}
@@ -34,7 +34,7 @@ body.rec .bar{display:none}
 <canvas id="c"></canvas>
 <div class="brand">ROVUST</div>
 <div class="chap" id="chap"></div>
-<div class="title" id="title"><b>ROVUST</b><span>الروبوت من بره ومن جوه</span></div>
+<div class="title" id="title"><b>ROVUST</b><span>The rover, inside and outside</span></div>
 <div class="cap" id="cap"><div class="ar" id="capAr"></div><div class="why" id="capWhy"></div><div class="en" id="capEn"></div><div class="note" id="capNote"></div></div>
 <div class="bar"><button id="play">إيقاف</button><input type="range" id="seek" min="0" max="76" step="0.01" value="0" aria-label="الوقت"><span id="time"></span></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
