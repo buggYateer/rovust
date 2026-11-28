@@ -92,7 +92,17 @@ This is the hardware as a wiring diagram. On the left every sensor and the inter
 
 </div>
 
-## 10. What the controller does every 50 ms
+## 10. Now picture it: every part we described, on one rover
+
+Before the software, here is everything we just described on one rover, in 3D: the four wheels and the two motors, one per side, and how it spins in place; the inside, with the gearboxes, encoders and battery; then each sensor in turn, the eight sonars, the three IR rangers, the six cliff sensors, the bumpers, the camera looking at the ground ahead, and the heading sensors and radio. Sizes come from the simulation's code; heights and the parts inside are our estimate, because the simulation is two-dimensional.
+
+<div dir="rtl" align="right">
+
+قبل ما نروح للسوفتوير، ده كل اللي اتكلمنا عنه متجمّع في روبوت واحد، 3D: العجل الأربعة والموتورين، موتور لكل جنب، وإزاي بيلف في مكانه. وبعدين من جوه: علبة التروس والـ encoders والبطارية. وبعدين كل سنسور لوحده: السونار الثمانية، والـ IR التلاتة، وحساسات الحفر الستة، والـ bumpers، والكاميرا وهي بتبص على الأرض قدّام، وحساسات الاتجاه والراديو. المقاسات من كود المحاكاة، والارتفاعات واللي جوه تقدير مننا، لأن المحاكاة 2D.
+
+</div>
+
+## 11. What the controller does every 50 ms
 
 This is the whole robot on one slide, as a flowchart on the left and pseudocode on the right. Every 50 milliseconds the controller first checks whether the mission is over. If not, it looks at the radio link for an operator command. Then the subsumption stack runs: the highest layer that wants control produces a forward speed v and a turn rate omega. Inverse kinematics splits that into two wheel speeds, a PID per wheel compares them with the encoder speed and outputs a PWM duty cycle, and the H-bridge drives the motor. Then the sensors are read, the pose is estimated by fusing odometry with the gyro, compass and optical flow, and the occupancy grid is updated. Every fourth frame the AI runs: the terrain classifier, the fault detector, and the explorer that chooses the next target and plans a path to it with A star.
 
@@ -102,7 +112,7 @@ This is the whole robot on one slide, as a flowchart on the left and pseudocode 
 
 </div>
 
-## 11. Design & Implementation
+## 12. Design & Implementation
 
 Part three: the software built on that hardware, and the application people use to watch and drive it.
 
@@ -112,7 +122,7 @@ Part three: the software built on that hardware, and the application people use 
 
 </div>
 
-## 12. Where am I? Fusion turns metres into centimetres
+## 13. Where am I? Fusion turns metres into centimetres
 
 Localisation is where the sensor analysis pays off. The red estimate is pure dead reckoning and it drifts by metres. The green one fuses three things: a ground-speed sensor that does not see wheel slip, a gyro for fast heading changes, and a compass or sun sensor to bound the gyro's drift. The map is a probabilistic grid; its rules were tuned against real failures — for instance, an echo places the obstacle just beyond the surface, otherwise half the hits fall inside the corridor and the walls grow thick.
 
@@ -122,7 +132,7 @@ Localisation is where the sensor analysis pays off. The red estimate is pure dea
 
 </div>
 
-## 13. Subsumption: the higher layer takes the wheels
+## 14. Subsumption: the higher layer takes the wheels
 
 Behaviour is organised as a subsumption architecture, straight from the Robot Behaviour lecture. Ten layers; the highest one that wants control wins. The reflexes are on top — stop, escape, cliff, slope — then avoidance, then the operator, then return-home, then exploration. The avoidance layer is itself an on-off controller with a hysteresis band, which is the Control lecture applied to behaviour. And the manual driving mode exists to demonstrate the layers by switching them off.
 
@@ -132,7 +142,7 @@ Behaviour is organised as a subsumption architecture, straight from the Robot Be
 
 </div>
 
-## 14. Deciding where to go next, and how to get there
+## 15. Deciding where to go next, and how to get there
 
 Three strategies decide where to go; one planner decides how to get there. The proposal's hypothesis was that nearest-frontier would win in open terrain and DFS in corridors. We implemented both faithfully, and added a third: a utility score that weighs expected information against terrain-weighted cost, hazards and battery. You will see in the results which one actually won.
 
@@ -142,7 +152,7 @@ Three strategies decide where to go; one planner decides how to get there. The p
 
 </div>
 
-## 15. AI where it changes what the rover does
+## 16. AI where it changes what the rover does
 
 Three uses of AI, each with a visible consequence. The terrain classifier is real machine learning — a random forest over texture features — and its predictions enter the planner's cost map, so the rover visibly avoids sand and mud. It is fast, too: the forest is evaluated straight from its trees, about one millisecond per prediction instead of ten, with identical answers. The fault detector is statistics, and it decides which sensors to trust. The utility explorer is a decision function. We are explicit about the scope: nothing here is a large model; everything trains or runs locally in seconds.
 
@@ -152,7 +162,7 @@ Three uses of AI, each with a visible consequence. The terrain classifier is rea
 
 </div>
 
-## 16. Same robot, same code — only the configuration changes
+## 17. Same robot, same code — only the configuration changes
 
 The three environments stress different things. The cave is about corridors, darkness and dead ends. Mars is about open terrain, slip and the lack of a magnetic field. Under water, the whole sensor suite changes — thrusters, sonar, a Doppler log — and still the same control, estimation and decision code runs. That is the claim of the proposal, and it is what makes the comparisons in the results fair.
 
@@ -162,7 +172,7 @@ The three environments stress different things. The cave is about corridors, dar
 
 </div>
 
-## 17. A desktop app to watch, test and drive the rover
+## 18. A desktop app to watch, test and drive the rover
 
 The application is a conventional desktop program built with Qt, shown here in English with the light theme and in Egyptian Arabic with the dark theme, where the whole layout mirrors right to left. The header carries the mission — number, world, clock and status — and the controls: new mission, pause, stop, restart, speed up to sixteen times, lights, the phone console and sending the report. The side panel sets up the mission and can fold away to a strip. Six live cards summarise it — mapped, distance, battery, link, behaviour and position error — and below them the two maps, ground truth and belief. The tabs at the bottom expose the inner loop: every sensor, the motor control loop, statistics, the radio link and an event log. Any sensor can be broken with one click while the mission runs. We also designed it to stay calm: the status bar shows one alert at a time with a count of the others, and buttons that cannot act right now are greyed out instead of failing silently.
 
@@ -172,7 +182,7 @@ The application is a conventional desktop program built with Qt, shown here in E
 
 </div>
 
-## 18. Drive it from a phone or a game controller
+## 19. Drive it from a phone or a game controller
 
 Remote control is where the communication activity from Robot Behaviour meets the argument for autonomy. The desktop opens a console for a phone or tablet and shows its address and a QR code: scan it and you drive, with the joystick inside a ring of live sonar readings. A game controller works too, on the desktop or on the phone, and it drives like a racing game: cross is gas, triangle is reverse, the stick steers, and the stick alone means "go that way". Whatever you drive with, every command travels through a simulated radio link that weakens with distance and with each wall between the rover and its base. When you drive deep into the cave the link drops, a short alert says so — the same alert rules on the desktop and the phone, held long enough to read, never a popup — and after three seconds the rover takes over and drives itself back into range. The lesson writes itself: a rover that cannot decide alone is lost the moment the radio is.
 
@@ -182,7 +192,7 @@ Remote control is where the communication activity from Robot Behaviour meets th
 
 </div>
 
-## 19. Results
+## 20. Results
 
 Part four: what we measured. Every number comes from a run, and every run is a different generated map.
 
@@ -192,7 +202,7 @@ Part four: what we measured. Every number comes from a run, and every run is a d
 
 </div>
 
-## 20. The AI explorer won in all three worlds
+## 21. The AI explorer won in all three worlds
 
 Here is the hypothesis test. The proposal predicted DFS in corridors and nearest-frontier in the open. DFS did win the cave among the two classical methods. But nearest-frontier was the weakest everywhere — greedy on distance, it chases crumbs. The utility explorer, which weighs how much it expects to learn against how much the path costs, came first in all three worlds. And no rover fell into a pit in ninety runs — the cliff layer works.
 
@@ -202,7 +212,7 @@ Here is the hypothesis test. The proposal predicted DFS in corridors and nearest
 
 </div>
 
-## 21. Remove one sensor at a time: which ones are essential?
+## 22. Remove one sensor at a time: which ones are essential?
 
 The ablation answers the question the supervisor cares about most: which sensors earn their place. Kill the sonar and coverage collapses; kill the ground-speed sensor and the estimate is five to sixteen metres off; kill the compass or sun sensor and the map rotates away. Kill the cliff switches and one rover in four ends in a crater. The infrared and bumpers cost almost nothing to lose — they are the last line of defence, which is exactly the role we gave them.
 
@@ -212,7 +222,7 @@ The ablation answers the question the supervisor cares about most: which sensors
 
 </div>
 
-## 22. Conclusion
+## 23. Conclusion
 
 Part five: the conclusion, then the demo video.
 
@@ -222,7 +232,7 @@ Part five: the conclusion, then the demo video.
 
 </div>
 
-## 23. One robot, three unknown worlds — only the configuration changed
+## 24. One robot, three unknown worlds — only the configuration changed
 
 Five things we take away. First, building from the motors up was not an academic exercise — the control problems are real and visible. Second, sensor placement is a safety decision. Third, fusion turns a drifting robot into one that can trust its map. Fourth, measuring beat assuming: our own hypothesis was half wrong. And fifth, autonomy is what is left when the radio fails — the rover that drives itself home is the whole point. Four natural next steps. Scan matching would close the loop between the map and the pose. A learned explorer could replace our hand-tuned utility weights, trained in the same harness that produced our results. The radio model is already there for a multi-robot version. And because the controller analysis is essentially a wiring list, the step to real hardware is a matter of interfaces, not of rewriting the robot.
 
@@ -232,7 +242,7 @@ Five things we take away. First, building from the motors up was not an academic
 
 </div>
 
-## 24. Where the methods come from
+## 25. Where the methods come from
 
 Our references. The course comes first: Bräunl's Embedded Robotics, which the lectures follow, and the lecture notes themselves; the PID, H-bridge, encoder and driving-straight material is from there. Then the classic papers behind each design choice: Brooks for subsumption, Elfes for occupancy grids, Thrun, Burgard and Fox for probabilistic localisation, Hart, Nilsson and Raphael for A star, Yamauchi for frontier exploration, Coulter for pure pursuit, and Breiman for the random forest.
 
@@ -242,7 +252,7 @@ Our references. The course comes first: Bräunl's Embedded Robotics, which the l
 
 </div>
 
-## 25. demo-video
+## 26. demo-video
 
 The demo video: three minutes of the application running — a cave mission and its two maps, the motor loop, a sensor breaking, the radio failing and the rover coming home, driving from a phone and a game controller, a report, Mars, underwater and the Arabic interface.
 
@@ -252,7 +262,7 @@ The demo video: three minutes of the application running — a cave mission and 
 
 </div>
 
-## 26. Thank you
+## 27. Thank you
 
 Thank you for listening. We are happy to answer your questions.
 

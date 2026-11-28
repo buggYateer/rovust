@@ -26,6 +26,10 @@ In the HTML viewer a click opens it in the default player; that one is a link,
 so keep the `docs/media` folder next to `docs/presentation`. Upload it to the group's Drive folder
 together with the presentation.
 
+**The 3D video** (`docs/media/rovust_3d.mp4`, 76 seconds, no sound) is slide 10,
+right after *Hardware*: the rover in 3D, one part at a time. It plays the same
+way, in a frame on the slide.
+
 ## Files
 
 | File | What it is |

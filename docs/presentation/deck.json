@@ -10,6 +10,7 @@
     "actuators",
     "control",
     "hardware",
+    "model-3d",
     "flowchart",
     "sec-design",
     "localisation",

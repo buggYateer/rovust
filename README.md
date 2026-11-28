@@ -186,7 +186,7 @@ python tools/build_guide.py                          # the team guide as one fil
 
 | | |
 |---|---|
-| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) · [demo video, 3 min](docs/media/rovust_demo.mp4) · [printed cover sheet](docs/cover_sheet.pdf) |
+| Presentation | [Claude Slides](https://claude.ai/artifact/VnwvfuttPtvHGe81Xfyhb9) (online) · [PowerPoint](docs/presentation/Rovust_presentation.pptx) · [PDF](docs/presentation/Rovust_presentation.pdf) · [web viewer](docs/presentation/Rovust_presentation.html) · [speaker notes](docs/presentation/SPEAKER_NOTES.md) · [how to present](docs/presentation/README.md) · [demo video, 3 min](docs/media/rovust_demo.mp4) · [3D video, 76 s](docs/media/rovust_3d.mp4) · [printed cover sheet](docs/cover_sheet.pdf) |
 | Proposal | [docs/Task1_v2.md](docs/Task1_v2.md) |
 | Design notes | [docs/DESIGN.md](docs/DESIGN.md): architecture, sensor placement and its justification, lessons learned |
 | Results | [docs/RESULTS.md](docs/RESULTS.md) |

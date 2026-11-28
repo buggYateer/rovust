@@ -27,6 +27,9 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRES = os.path.join(ROOT, "docs", "presentation")
 VIDEO_LINK = "../media/rovust_demo.mp4"   # the demo video, linked from the Demo slide (relative to this folder)
+# slides that carry a video: id -> (file, box in slide pixels or None for the full slide)
+VIDEOS = {"demo-video": (VIDEO_LINK, None),
+          "model-3d": ("../media/rovust_3d.mp4", (352, 290, 1216, 684))}
 SLIDES = os.path.join(PRES, "slides")
 PNG_DIR = os.path.join(PRES, "png")
 
@@ -183,7 +186,7 @@ def write_viewer(idx, slides, notes_en, notes_ar) -> str:
 <div id="bar"><button id="prev" title="Previous (←)">&#8592;</button><button id="next" title="Next (→)">&#8594;</button>
 <b id="counter"></b><span id="title"></span><span class="sp"></span>
 <button id="bnotes">Notes <kbd>N</kbd></button><button id="blang">EN / مصري <kbd>L</kbd></button><button id="bfull">Fullscreen <kbd>F</kbd></button></div>
-<script>const NOTES_EN={json.dumps(notes_en, ensure_ascii=False)};const NOTES_AR={json.dumps(notes_ar, ensure_ascii=False)};{VIEWER_JS}document.addEventListener('click',e=>{{if(e.target.closest('section#demo-video'))window.open('{VIDEO_LINK}','_blank');}});</script>
+<script>const NOTES_EN={json.dumps(notes_en, ensure_ascii=False)};const NOTES_AR={json.dumps(notes_ar, ensure_ascii=False)};{VIEWER_JS}document.addEventListener('click',e=>{{const v={json.dumps({k: v[0] for k, v in VIDEOS.items()})};for(const k in v)if(e.target.closest('section#'+k))window.open(v[k],'_blank');}});</script>
 </body></html>"""
     out = os.path.join(PRES, "Rovust_presentation.html")
     open(out, "w", encoding="utf-8", newline="\n").write(page)
@@ -274,12 +277,24 @@ def write_pptx(pngs: list[str], order: list[str], name: str):
     blank = prs.slide_layouts[6]
     for png, sid in zip(pngs, order):
         slide = prs.slides.add_slide(blank)
-        video = os.path.normpath(os.path.join(PRES, VIDEO_LINK))
-        if sid == "demo-video" and os.path.exists(video):
+        link, box = VIDEOS.get(sid, (None, None))
+        video = os.path.normpath(os.path.join(PRES, link)) if link else None
+        if video and os.path.exists(video) and box is None:
             # the video itself, inside the file: it plays in the slide on a click, wherever the
             # .pptx is copied to (the slide picture is its poster)
             slide.shapes.add_movie(video, 0, 0, prs.slide_width, prs.slide_height,
                                    poster_frame_image=png, mime_type="video/mp4")
+        elif video and os.path.exists(video):
+            # a video in a frame on the slide: the slide picture behind it, the movie on the frame,
+            # its poster cut from the same picture so nothing jumps when it starts
+            from PIL import Image
+            slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
+            x, y, w, h = box
+            poster = os.path.join(tempfile.gettempdir(), f"rovust-poster-{sid}.png")
+            Image.open(png).crop((x, y, x + w, y + h)).save(poster)
+            k = prs.slide_width / 1920
+            slide.shapes.add_movie(video, int(x * k), int(y * k), int(w * k), int(h * k),
+                                   poster_frame_image=poster, mime_type="video/mp4")
         else:
             slide.shapes.add_picture(png, 0, 0, prs.slide_width, prs.slide_height)
         # the next slide pushes the old one out; a part-opening slide comes up from below
