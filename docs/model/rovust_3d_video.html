@@ -273,7 +273,7 @@ function camFor(k, u, pz) {
     case "overview": { const a = -1.5 + u * .14; return at(Math.cos(a) * 92, 46, Math.sin(a) * 92, 0, 10, 0); }
     case "wheels": return at(rp.x + 4, 17, -68 + u * .6, rp.x, 6, 0);
     case "spin": return at(50, 78, 62, 0, 4, 0);
-    case "water": { const a = 0.12 + u * .04; return at(Math.cos(a) * 95, 70, Math.sin(a) * 95, 0, 6, 0); }
+    case "water": { const a = 0.22 + u * .05, r = 64 - u * 2.2; return at(Math.cos(a) * r, 26, Math.sin(a) * r, -3, 11, 0); }
     case "xray": { const a = -0.75 + u * .05, r = 50 - u * .9; return at(Math.cos(a) * r, 36 - u * .6, Math.sin(a) * r, 0, 7, 0); }
     case "sonar": return at(8 + u * 1.2, 150, 70, 0, 8, 0);
     case "ir": return at(105 + u * 1.5, 52, 82, 38, 8, 0);
@@ -308,7 +308,7 @@ function render(t) {
   for (const w of wheels.L) w.rotation.z = -pz.al;
   for (const w of wheels.R) w.rotation.z = -pz.ar;
   // focus: the part being explained stays solid, everything else fades back
-  const fk = FADE[b.k], d = fk ? fade(t, b.t, b.t + b.d, .7) : 0, low = b.k === "xray" ? .06 : b.k === "water" ? 1 : .14;
+  const fk = FADE[b.k], d = fk ? fade(t, b.t, b.t + b.d, .7) : 0, low = b.k === "xray" ? .06 : b.k === "water" ? .18 : .14;
   for (const m of solid) {
     const on = fk && fk.includes(m.userData.key);
     let o = on ? 1 : 1 - (1 - low) * d;
