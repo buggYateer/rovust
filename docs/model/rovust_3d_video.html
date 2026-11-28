@@ -20,6 +20,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hi
 .cap .note{font-family:var(--ar);direction:rtl;font-size:clamp(11px,1.15vw,22px);color:var(--warn);text-shadow:0 2px 8px rgba(0,0,0,.8)}
 .brand{position:fixed;top:4vh;right:3vw;font-family:var(--mono);font-size:clamp(12px,1.4vw,28px);letter-spacing:.3em;color:var(--muted)}
 .chap{position:fixed;top:4vh;left:3vw;font-family:var(--ar);direction:rtl;font-size:clamp(12px,1.4vw,28px);color:var(--muted)}
+.water{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 30%,rgba(40,140,200,.22),rgba(10,60,110,.42))}
 .title{position:fixed;inset:0;display:grid;place-content:start center;padding-top:14vh;justify-items:center;gap:1.5vh;pointer-events:none}
 .title b{font-family:var(--mono);font-size:clamp(36px,7vw,140px);letter-spacing:.12em;color:var(--accent)}
 .title span{font-family:var(--mono);direction:ltr;font-size:clamp(14px,1.9vw,38px);letter-spacing:.08em;color:var(--ink)}
@@ -35,6 +36,7 @@ body.rec .bar{display:none}
 <div class="brand">ROVUST</div>
 <div class="chap" id="chap"></div>
 <div class="title" id="title"><b>ROVUST</b><span>The rover, inside and outside</span></div>
+<div class="water" id="water"></div>
 <div class="cap" id="cap"><div class="ar" id="capAr"></div><div class="why" id="capWhy"></div><div class="en" id="capEn"></div><div class="note" id="capNote"></div></div>
 <div class="bar"><button id="play">إيقاف</button><input type="range" id="seek" min="0" max="76" step="0.01" value="0" aria-label="الوقت"><span id="time"></span></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -54,6 +56,7 @@ const BEATS = [
   {k:"overview", d:6, chap:"الشكل العام", ar:"روبوت مستكشف: جسم دائري قطره 40 سم على أربع عجل", en:"Ø 40 cm body · 4 wheels · 8 sonars · 20+ sensors", note:"المحاكاة من فوق بس، فالارتفاعات هنا تقديرية"},
   {k:"wheels", d:8, chap:"الحركة", ar:"أربع عجل وموتورين: كل موتور بيلف العجلتين اللي في جنبه", en:"2 DC motors · one per side · skid-steer", note:""},
   {k:"spin", d:6, chap:"الحركة", ar:"يلف في مكانه: جنب لقدّام وجنب لورا بنفس السرعة", en:"left = −right", note:""},
+  {k:"water", d:6, chap:"تحت المية", ar:"تحت المية: العجل بيتشال وبيبقى مروحتين، بنفس الكود", why:"المروحتين نفس السرعة يمشي مستقيم، وواحدة أسرع يلف. والإلكترونيات في صندوق مقفول", en:"Underwater: 2 thrusters · same drive code · sealed hull", note:""},
   {k:"xray", d:8, chap:"جوه الشاسيه", ar:"جوه: موتور لكل جنب، وعلبة تروس، وعدّاد لفّات، والبطارية", en:"DC motor 12 V · gearbox 30:1 · encoder 480 / turn · battery 18 Wh", note:"أماكن القطع جوه تقديرية"},
   {k:"sonar", d:9, chap:"أماكن السنسورز", ar:"تمانية سونار على حرف الجسم، واحد كل 45 درجة", why:"ليه كده؟ مفيش حتة من الجسم بتداري على أي مخروط، فبيشوف حواليه كله", en:"Sonar ×8 · 2.5 m · 15° cone", note:""},
   {k:"ir", d:9, chap:"أماكن السنسورز", ar:"تلات حساسات مسافة باصّين لقدّام، بتقيس من 6 لـ 80 سم", why:"ليه كده؟ متوزعين على عرض الجسم كله، وراجعين 6 سم لجوه لأن أقرب من كده القراية بتغلط", en:"IR distance ×3", note:""},
@@ -180,6 +183,17 @@ imu.position.copy(V(0, 0, R.deckZ + R.deckT + 5.5 + .7));
   a.position.copy(V(R.antX, 0, (R.antTop + R.deckZ + R.deckT) / 2));
   const k = add("antenna", new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), mat(C.dark))); k.position.copy(V(R.antX, 0, R.antTop)); }
 
+// underwater: two thrusters, one per side (they replace the wheels in that world)
+const props = [];
+for (const sy of [1, -1]) {
+  const g = new THREE.Group(); g.position.copy(V(-3, sy * 24, 7)); robot.add(g);
+  const duct = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.6, 6, 32, 1, true), mat(0x3a4a54, {side:THREE.DoubleSide})); duct.rotation.z = Math.PI / 2; g.add(duct);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, 4.4, 16), mat(0x9aaab3)); hub.rotation.z = Math.PI / 2; g.add(hub);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.4, 4.2), mat(0x3a4a54)); const arm2 = arm; arm.scale.z = 2.2; arm.position.set(0, 0, sy > 0 ? 6 : -6); g.add(arm);
+  const prop = new THREE.Group(); g.add(prop); props.push(prop);
+  for (let k = 0; k < 3; k++) { const bl = new THREE.Mesh(new THREE.BoxGeometry(.5, 3.1, 1.3), mat(C.sonar, {emissive:0x0b3b35})); bl.position.y = 1.6; const h = new THREE.Group(); h.rotation.x = k * 2 * Math.PI / 3; bl.rotation.x = .5; h.add(bl); prop.add(h); }
+  g.traverse(n => n.userData.key = "thruster");
+}
 // inside: motors, gearboxes, encoders, battery, shafts to both wheels of a side
 const inside = new THREE.Group(); robot.add(inside);
 for (const [side, sy] of [["L", 1], ["R", -1]]) {
@@ -259,6 +273,7 @@ function camFor(k, u, pz) {
     case "overview": { const a = -1.5 + u * .14; return at(Math.cos(a) * 92, 46, Math.sin(a) * 92, 0, 10, 0); }
     case "wheels": return at(rp.x + 4, 17, -68 + u * .6, rp.x, 6, 0);
     case "spin": return at(50, 78, 62, 0, 4, 0);
+    case "water": { const a = 0.12 + u * .04; return at(Math.cos(a) * 95, 70, Math.sin(a) * 95, 0, 6, 0); }
     case "xray": { const a = -0.75 + u * .05, r = 50 - u * .9; return at(Math.cos(a) * r, 36 - u * .6, Math.sin(a) * r, 0, 7, 0); }
     case "sonar": return at(8 + u * 1.2, 150, 70, 0, 8, 0);
     case "ir": return at(105 + u * 1.5, 52, 82, 38, 8, 0);
@@ -279,11 +294,11 @@ function cameraAt(t) {
 }
 
 // ------------------------------------------------------------------ render(t)
-const FADE = {wheels:["wheels"], spin:["wheels"], xray:["motors", "encoders", "battery"], sonar:["sonar"], ir:["ir"], cliff:["cliff"], bumper:["bumper"], camera:["camera"], imu:["imu", "antenna"]};
-const FOCUS = {wheels:["wheels"], spin:["wheels"], xray:["motors", "encoders", "battery"], sonar:["sonar"], ir:["ir"], cliff:["cliff"], bumper:["bumper"], camera:["camera"], imu:["imu", "antenna"], drive:["wheels"]};
+const FADE = {wheels:["wheels"], spin:["wheels"], water:["thruster"], xray:["motors", "encoders", "battery"], sonar:["sonar"], ir:["ir"], cliff:["cliff"], bumper:["bumper"], camera:["camera"], imu:["imu", "antenna"]};
+const FOCUS = {wheels:["wheels"], spin:["wheels"], water:["thruster"], xray:["motors", "encoders", "battery"], sonar:["sonar"], ir:["ir"], cliff:["cliff"], bumper:["bumper"], camera:["camera"], imu:["imu", "antenna"], drive:["wheels"]};
 const all = Object.values(parts).flat();
 const fade = (t, a, b, f = .5) => Math.min(ease((t - a) / f), ease((b - t) / f));
-const capWhy = document.getElementById("capWhy"), capAr = document.getElementById("capAr"), capEn = document.getElementById("capEn"), capNote = document.getElementById("capNote");
+const water = document.getElementById("water"), capWhy = document.getElementById("capWhy"), capAr = document.getElementById("capAr"), capEn = document.getElementById("capEn"), capNote = document.getElementById("capNote");
 const cap = document.getElementById("cap"), chap = document.getElementById("chap"), title = document.getElementById("title");
 let lastBeat = -1;
 function render(t) {
@@ -293,11 +308,15 @@ function render(t) {
   for (const w of wheels.L) w.rotation.z = -pz.al;
   for (const w of wheels.R) w.rotation.z = -pz.ar;
   // focus: the part being explained stays solid, everything else fades back
-  const fk = FADE[b.k], d = fk ? fade(t, b.t, b.t + b.d, .7) : 0, low = b.k === "xray" ? .06 : .14;
+  const fk = FADE[b.k], d = fk ? fade(t, b.t, b.t + b.d, .7) : 0, low = b.k === "xray" ? .06 : b.k === "water" ? 1 : .14;
   for (const m of solid) {
     const on = fk && fk.includes(m.userData.key);
     let o = on ? 1 : 1 - (1 - low) * d;
     if (m.userData.inside) o = b.k === "xray" ? (on ? d : low * d) : 0;
+    const wd = b.k === "water" ? d : 0;
+    if (m.userData.key === "thruster") o = wd;
+    // the underwater vehicle has no wheels, no IR and no cliff sensors
+    if (wd && ["wheels", "ir", "cliff"].includes(m.userData.key)) o = 1 - wd;
     m.material.opacity = o; m.material.depthWrite = o > .95; m.visible = o > .01;
   }
   // highlight
@@ -309,6 +328,9 @@ function render(t) {
   const show = (k, a, z) => { const g = fx[k], o = fade(t, a, z); g.visible = o > .01; g.traverse(n => { if (n.material) { n.userData.o0 = n.userData.o0 ?? n.material.opacity; n.material.opacity = n.userData.o0 * o; n.material.transparent = true; } }); };
   for (const k of ["sonar", "ir", "cliff", "camera", "imu"]) show(k, BK[k].t, BK[k].t + BK[k].d); show("drive", BK.drive.t + .5, BK.drive.t + BK.drive.d);
   fx.sonar.userData.echo.forEach((e, k) => { const ph = (Math.max(0, t - BK.sonar.t) * .8 + k * .07) % 1; e.position.x = 2 + ph * 58; const s = 1 + ph * 7; e.scale.set(s, s, s); e.material.opacity = (1 - ph) * .8 * fade(t, BK.sonar.t, BK.sonar.t + BK.sonar.d); });
+  for (const p of props) p.rotation.x = t * 9;
+  if (b.k === "water") robot.position.y = 6 * fade(t, b.t, b.t + b.d, 1.2);   // it floats
+  water.style.opacity = String(b.k === "water" ? fade(t, b.t, b.t + b.d, .8) : 0);
   fx.imu.userData.rings.forEach((r, k) => { const ph = (Math.max(0, t - BK.imu.t) * .7 + k / 3) % 1; const s = 1 + ph * 8; r.scale.set(s, s, s); r.material.opacity = (1 - ph) * .7 * fade(t, BK.imu.t, BK.imu.t + BK.imu.d); });
   { const s = segAt(t), v = s ? s[2] : 0, w = s ? s[3] : 0;
     const wl = (v - w * R.track / 2) / R.wheelR, wr = (v + w * R.track / 2) / R.wheelR;
